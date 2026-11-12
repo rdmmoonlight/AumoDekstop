@@ -29,8 +29,10 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Restore dependencies
-        run: dotnet restore $env:Project_Path -r win-x64
-
+        run: dotnet restore $env:Project_Path -r win-x64 -p:Configuration=$env:Configuration
+        env:
+          Configuration: ${{ matrix.configuration }}
+          
       - name: Build application
         run: dotnet build $env:Project_Path -c $env:Configuration -r win-x64 -p:Platform=x64 --no-restore
         env:
