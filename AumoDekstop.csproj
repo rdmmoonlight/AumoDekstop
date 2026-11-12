@@ -16,7 +16,7 @@
     <!-- Konfigurasi Unpackaged & Self-Contained Mandiri -->
     <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-    <EnableMsixTooling>false</EnableMsixTooling>
+    <EnableMsixTooling>true</EnableMsixTooling>
     <EnableWinAppRunSupport>false</EnableWinAppRunSupport>
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
 
