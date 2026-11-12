@@ -1,27 +1,36 @@
 using Microsoft.UI.Xaml;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using Microsoft.UI.Xaml.Controls;
 
 namespace AumoDekstop;
 
-/// <summary>
-/// The application window. This hosts a Frame that displays pages. Add your
-/// UI and logic to MainPage.xaml / MainPage.xaml.cs instead of here so you
-/// can use Page features such as navigation events and the Loaded lifecycle.
-/// </summary>
 public sealed partial class MainWindow : Window
 {
     public MainWindow()
     {
-        InitializeComponent();
+        this.InitializeComponent();
+    }
 
-        ExtendsContentIntoTitleBar = true;
-        SetTitleBar(AppTitleBar);
+    private void RibbonTabs_SelectionChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
+    {
+        if (sender.SelectedItem is SelectorBarItem selected)
+        {
+            StatusText.Text = $"● Tab aktif: {selected.Text} | Server: https://aumo.onrender.com";
+            // Nantinya di sini kita arahkan RootFrame.Navigate(typeof(...)) sesuai tab
+        }
+    }
 
-        AppWindow.SetIcon("Assets/AppIcon.ico");
+    private void OnBaruClick(object sender, RoutedEventArgs e)
+    {
+        StatusText.Text = "● Membuat entri baru...";
+    }
 
-        // Navigate the root frame to the main page on startup.
-        RootFrame.Navigate(typeof(MainPage));
+    private void OnSimpanClick(object sender, RoutedEventArgs e)
+    {
+        StatusText.Text = "● Mengirim data ke server...";
+    }
+
+    private void OnSyncClick(object sender, RoutedEventArgs e)
+    {
+        StatusText.Text = "● Menyinkronkan dengan https://aumo.onrender.com...";
     }
 }
