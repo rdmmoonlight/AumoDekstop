@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "AumoDekstop (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "AumoDekstop (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
