@@ -1,4 +1,4 @@
-name: Build AumoDekstop (.NET 10 WinUI 3)
+name: Build AumoDekstop (.NET 10 WinUI 3 Single-File)
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        configuration: [Release] # Cukup Release agar cepat dan hemat kuota runner
+        configuration: [Release]
 
     env:
       Project_Path: AumoDekstop.csproj
@@ -36,14 +36,14 @@ jobs:
         env:
           Configuration: ${{ matrix.configuration }}
 
-      - name: Publish unpackaged application
-        run: dotnet publish $env:Project_Path -c $env:Configuration -r win-x64 -p:Platform=x64 --self-contained false -p:PublishTrimmed=false --no-build -o ./publish
+      - name: Publish single-file executable
+        run: dotnet publish $env:Project_Path -c $env:Configuration -r win-x64 -p:Platform=x64 --no-build -o ./publish
         env:
           Configuration: ${{ matrix.configuration }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: AumoDekstop-win-x64-${{ matrix.configuration }}
-          path: ./publish
+          name: AumoDekstop-win-x64-SingleFile
+          path: ./publish/AumoDekstop.exe
           retention-days: 7
