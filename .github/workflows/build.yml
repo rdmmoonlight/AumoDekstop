@@ -29,7 +29,7 @@ jobs:
         run: dotnet build AumoDekstop.csproj -c Release -r win-x64 -p:Platform=x64 --no-restore
 
       - name: 5. Publish Release Output
-        run: dotnet publish AumoDekstop.csproj -c Release -r win-x64 -p:Platform=x64 --self-contained false -p:PublishTrimmed=false --no-build -o ./publish
+        run: dotnet publish AumoDekstop.csproj -c Release -r win-x64 -p:Platform=x64 --self-contained false -p:PublishTrimmed=false -p:PublishReadyToRun=false -o ./publish
 
       - name: 6. Upload Build Artifact (Opsional)
         uses: actions/upload-artifact@v4
