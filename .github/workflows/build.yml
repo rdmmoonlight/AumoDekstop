@@ -1,0 +1,39 @@
+name: Build AumoDekstop (WinUI 3)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch: # Memungkinkan kamu menjalankan tes build secara manual lewat tab Actions di GitHub
+
+jobs:
+  build:
+    name: Build & Publish Windows x64
+    # Wajib menggunakan runner Windows karena WinUI 3 membutuhkan Windows SDK & XAML Compiler
+    runs-on: windows-latest
+
+    steps:
+      - name: 1. Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 2. Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: 3. Restore Dependencies
+        run: dotnet restore AumoDekstop.csproj -r win-x64
+
+      - name: 4. Tes Build (Release | x64)
+        run: dotnet build AumoDekstop.csproj -c Release -r win-x64 -p:Platform=x64 --no-restore
+
+      - name: 5. Publish Release Output
+        run: dotnet publish AumoDekstop.csproj -c Release -r win-x64 -p:Platform=x64 --self-contained false -p:PublishTrimmed=false --no-build -o ./publish
+
+      - name: 6. Upload Build Artifact (Opsional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: AumoDekstop-win-x64
+          path: ./publish
+          retention-days: 7
