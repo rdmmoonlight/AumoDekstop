@@ -1,41 +1,50 @@
-﻿using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+﻿using AumoDekstop.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Shapes;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace AumoDekstop;
 
-/// <summary>
-/// Provides application-specific behavior to supplement the default Application class.
-/// </summary>
 public partial class App : Application
 {
     private Window? _window;
-    
+
     /// <summary>
-    /// Initializes the singleton application object.  This is the first line of authored code
-    /// executed, and as such is the logical equivalent of main() or WinMain().
+    /// Menyediakan akses global ke ServiceProvider (Dependency Injection) di seluruh halaman/ViewModel.
     /// </summary>
+    public IServiceProvider Services { get; }
+
+    /// <summary>
+    /// Mengambil instance App yang sedang berjalan dengan tipe yang sudah di-cast.
+    /// </summary>
+    public new static App Current => (App)Application.Current;
+
     public App()
     {
         InitializeComponent();
+        Services = ConfigureServices();
     }
 
-    /// <summary>
-    /// Invoked when the application is launched.
-    /// </summary>
-    /// <param name="args">Details about the launch request and process.</param>
+    private static IServiceProvider ConfigureServices()
+    {
+        var services = new ServiceCollection();
+
+        // 1. Konfigurasi HttpClient ke backend Render
+        services.AddHttpClient<ApiService>(client =>
+        {
+            client.BaseAddress = new Uri("https://aumo.onrender.com/");
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+
+            // Catatan: Render (terutama paket free tier) butuh waktu ~30-50 detik untuk cold start
+            client.Timeout = TimeSpan.FromSeconds(60);
+        });
+
+        // 2. Daftarkan ViewModels (Transient: instance baru setiap kali halaman dibuka)
+        // services.AddTransient<DashboardViewModel>();
+        // services.AddTransient<LoginViewModel>();
+
+        return services.BuildServiceProvider();
+    }
+
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
         _window = new MainWindow();
