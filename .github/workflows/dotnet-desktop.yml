@@ -163,3 +163,15 @@ jobs:
           name: AumoDekstop-win-x64-Unsigned-v${{ steps.version.outputs.app_version }}
           path: ./publish/AumoDekstop.exe
           retention-days: 1
+          
+      - name: Create GitHub Release
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APP_VERSION: ${{ steps.version.outputs.app_version }}
+        run: |
+          $installerFile = Get-ChildItem -Path "./OutputInstaller" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty FullName
+          gh release create "v$env:APP_VERSION" "$installerFile" `
+            --repo "${{ github.repository }}" `
+            --title "AumoDekstop v$env:APP_VERSION" `
+            --generate-notes
