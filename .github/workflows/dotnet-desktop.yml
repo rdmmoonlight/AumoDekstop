@@ -1,10 +1,6 @@
 name: Build AumoDekstop (.NET 10 WinUI 3 Single-File)
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
   workflow_dispatch:
 
 permissions:
