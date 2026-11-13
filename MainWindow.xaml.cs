@@ -14,31 +14,67 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         this.InitializeComponent();
-
         GitHubUpdateService.CleanupOldExecutable();
-    
-        this.Activated += MainWindow_Activated;
+
+        // Gunakan event Loaded pada Content agar XamlRoot dijamin sudah siap 100%
+        if (this.Content is FrameworkElement rootElement)
+        {
+            rootElement.Loaded += RootElement_Loaded;
+        }
     }
 
-    private async void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
+    private async void RootElement_Loaded(object sender, RoutedEventArgs e)
     {
-        // Pastikan pengecekan hanya berjalan sekali saat aplikasi pertama kali dibuka
-        if (_hasCheckedUpdate || args.WindowActivationState == WindowActivationState.Deactivated)
-            return;
-
+        if (_hasCheckedUpdate) return;
         _hasCheckedUpdate = true;
-        await CheckAndPromptUpdateAsync();
+
+        // Tampilkan versi aktif di StatusBar saat pertama kali terbuka
+        string currentVer = GitHubUpdateService.GetCurrentVersionString();
+        StatusText.Text = $"● Siap | Versi: v{currentVer} | Server: {ApiService.BaseServerUrl}";
+
+        await CheckAndPromptUpdateAsync(isManualCheck: false);
     }
 
-    private async Task CheckAndPromptUpdateAsync()
+    /// <summary>
+    /// Handler untuk tombol manual "Cek Update" di toolbar/menu Anda.
+    /// </summary>
+    private async void OnCheckUpdateClick(object sender, RoutedEventArgs e)
     {
-        // Pastikan Content dan XamlRoot sudah siap sebelum menampilkan dialog
+        await CheckAndPromptUpdateAsync(isManualCheck: true);
+    }
+
+    private async Task CheckAndPromptUpdateAsync(bool isManualCheck)
+    {
         if (this.Content?.XamlRoot == null)
             return;
 
+        string currentVer = GitHubUpdateService.GetCurrentVersionString();
+
+        if (isManualCheck)
+        {
+            StatusText.Text = $"● Mengecek pembaruan di GitHub (Versi saat ini: v{currentVer})...";
+        }
+
         var update = await _updateService.CheckForUpdateAsync();
+
         if (update == null)
+        {
+            if (isManualCheck)
+            {
+                StatusText.Text = $"● Aplikasi sudah versi terbaru (v{currentVer}).";
+                var infoDialog = new ContentDialog
+                {
+                    Title = "Tidak Ada Pembaruan",
+                    Content = $"Anda sudah menggunakan versi terbaru (v{currentVer}).",
+                    CloseButtonText = "OK",
+                    XamlRoot = this.Content.XamlRoot
+                };
+                await infoDialog.ShowAsync();
+            }
             return;
+        }
+
+        StatusText.Text = $"● Pembaruan ditemukan: {update.VersionTag}!";
 
         var confirmDialog = new ContentDialog
         {
@@ -48,7 +84,7 @@ public sealed partial class MainWindow : Window
                 MaxHeight = 250,
                 Content = new TextBlock
                 {
-                    Text = $"Versi baru AumoDekstop siap diunduh.\n\nCatatan Rilis:\n{update.ReleaseNotes}",
+                    Text = $"Versi saat ini: v{currentVer}\nVersi terbaru: {update.VersionTag}\n\nCatatan Rilis:\n{update.ReleaseNotes}",
                     TextWrapping = TextWrapping.Wrap
                 }
             },
