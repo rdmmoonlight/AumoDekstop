@@ -20,7 +20,6 @@ public sealed class UpdateInfo
 
 public class GitHubUpdateService
 {
-    // Ganti dengan username & nama repo GitHub Anda
     private const string RepoOwner = "rdmmoonlight";
     private const string RepoName = "AumoDekstop";
 
@@ -29,9 +28,33 @@ public class GitHubUpdateService
         DefaultRequestHeaders =
         {
             // GitHub API wajib menyertakan User-Agent
-            { "User-Agent", "AumoDekstop-Updater" }
+            { "User-Agent", "AumoDekstop-Portable-Updater" }
         }
     };
+
+    /// <summary>
+    /// Membersihkan sisa file executable lama (.old) dari proses update sebelumnya.
+    /// Panggil method ini di constructor MainWindow().
+    /// </summary>
+    public static void CleanupOldExecutable()
+    {
+        try
+        {
+            string? currentExe = Environment.ProcessPath;
+            if (!string.IsNullOrEmpty(currentExe))
+            {
+                string oldExe = currentExe + ".old";
+                if (File.Exists(oldExe))
+                {
+                    File.Delete(oldExe);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[AutoUpdate] Gagal menghapus file .old: {ex.Message}");
+        }
+    }
 
     /// <summary>
     /// Mengambil versi aplikasi saat ini dari InformationalVersion (contoh: 26.11.1.PC)
@@ -48,7 +71,7 @@ public class GitHubUpdateService
     }
 
     /// <summary>
-    /// Mengecek apakah ada versi .PC yang lebih baru di GitHub Releases.
+    /// Mengecek apakah ada versi .PC portabel yang lebih baru di GitHub Releases.
     /// </summary>
     public async Task<UpdateInfo?> CheckForUpdateAsync()
     {
@@ -78,18 +101,19 @@ public class GitHubUpdateService
 
             if (latestVersion > currentVersion)
             {
-                // Cari file installer .exe di dalam aset rilis
-                var installerAsset = latestPcRelease.Assets.FirstOrDefault(a =>
-                    a.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
+                // Cari file executable portabel (.exe) dan pastikan bukan file Setup installer
+                var portableAsset = latestPcRelease.Assets.FirstOrDefault(a =>
+                    a.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) &&
+                    !a.Name.StartsWith("Setup", StringComparison.OrdinalIgnoreCase));
 
-                if (installerAsset != null)
+                if (portableAsset != null)
                 {
                     return new UpdateInfo
                     {
                         VersionTag = latestPcRelease.TagName,
                         ReleaseNotes = latestPcRelease.Body ?? "Pembaruan versi terbaru tersedia.",
-                        DownloadUrl = installerAsset.BrowserDownloadUrl,
-                        FileName = installerAsset.Name
+                        DownloadUrl = portableAsset.BrowserDownloadUrl,
+                        FileName = portableAsset.Name
                     };
                 }
             }
@@ -103,47 +127,74 @@ public class GitHubUpdateService
     }
 
     /// <summary>
-    /// Mengunduh installer ke folder Temp dan menjalankannya secara otomatis.
+    /// Mengunduh executable baru ke direktori aplikasi saat ini, menukar file aktif (.old),
+    /// lalu menjalankan ulang versi terbaru secara otomatis (mode portabel).
     /// </summary>
     public async Task DownloadAndInstallAsync(UpdateInfo update, IProgress<double>? progress = null)
     {
-        string tempFilePath = Path.Combine(Path.GetTempPath(), update.FileName);
+        string currentExe = Environment.ProcessPath
+            ?? throw new InvalidOperationException("Lokasi executable saat ini tidak dapat dideteksi.");
 
-        using var response = await _httpClient.GetAsync(update.DownloadUrl, HttpCompletionOption.ResponseHeadersRead);
-        response.EnsureSuccessStatusCode();
+        string newExe = currentExe + ".new";
+        string oldExe = currentExe + ".old";
 
-        long? totalBytes = response.Content.Headers.ContentLength;
-        await using var contentStream = await response.Content.ReadAsStreamAsync();
-        await using var fileStream = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true);
-
-        var buffer = new byte[8192];
-        long totalRead = 0;
-        int bytesRead;
-
-        while ((bytesRead = await contentStream.ReadAsync(buffer)) > 0)
+        try
         {
-            await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead));
-            totalRead += bytesRead;
+            // 1. Unduh file .exe baru langsung ke folder aplikasi dengan ekstensi .new
+            // (Harus di drive/folder yang sama agar File.Move berjalan instan tanpa cross-volume copy)
+            using var response = await _httpClient.GetAsync(update.DownloadUrl, HttpCompletionOption.ResponseHeadersRead);
+            response.EnsureSuccessStatusCode();
 
-            if (totalBytes.HasValue && totalBytes.Value > 0)
+            long? totalBytes = response.Content.Headers.ContentLength;
+            await using var contentStream = await response.Content.ReadAsStreamAsync();
+            await using (var fileStream = new FileStream(newExe, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
             {
-                double percentage = (double)totalRead / totalBytes.Value * 100;
-                progress?.Report(percentage);
+                var buffer = new byte[8192];
+                long totalRead = 0;
+                int bytesRead;
+
+                while ((bytesRead = await contentStream.ReadAsync(buffer)) > 0)
+                {
+                    await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead));
+                    totalRead += bytesRead;
+
+                    if (totalBytes.HasValue && totalBytes.Value > 0)
+                    {
+                        double percentage = (double)totalRead / totalBytes.Value * 100;
+                        progress?.Report(percentage);
+                    }
+                }
             }
+
+            // 2. Hapus sisa file .old jika masih tertinggal
+            if (File.Exists(oldExe))
+            {
+                File.Delete(oldExe);
+            }
+
+            // 3. Rename .exe yang sedang berjalan -> .old, lalu .new -> .exe asli
+            File.Move(currentExe, oldExe);
+            File.Move(newExe, currentExe);
+
+            // 4. Jalankan executable versi baru dan tutup proses lama
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = currentExe,
+                WorkingDirectory = Path.GetDirectoryName(currentExe),
+                UseShellExecute = true
+            });
+
+            Environment.Exit(0);
         }
-
-        fileStream.Close();
-
-        // Jalankan Inno Setup secara silent dan otomatis buka ulang aplikasi setelah selesai
-        Process.Start(new ProcessStartInfo
+        catch
         {
-            FileName = tempFilePath,
-            Arguments = "/SILENT /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS",
-            UseShellExecute = true
-        });
-
-        // Tutup aplikasi saat ini agar file .exe bisa ditimpa installer
-        Environment.Exit(0);
+            // Bersihkan file .new yang gagal/korup agar tidak mengotori folder user
+            if (File.Exists(newExe))
+            {
+                try { File.Delete(newExe); } catch { }
+            }
+            throw;
+        }
     }
 
     private static Version ParseCalVer(string tag)
