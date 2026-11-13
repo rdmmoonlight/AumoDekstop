@@ -48,10 +48,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-; Masukkan seluruh isi folder publish (Single-File EXE + file pendukung WinAppSDK jika ada)
-Source: "{#PublishDir}\*"; DestDir: "{app}"; Excludes: "*.pdb,*.xml"; Flags: ignoreversion recursesubdirs createallsubdirs
-
-; Masukkan file sertifikat publik ke folder sementara
+Source: "publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "codesign.cer"; DestDir: "{tmp}"; Flags: deleteafterinstall
 
 [Icons]
