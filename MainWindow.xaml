@@ -38,7 +38,7 @@
                 <AppBarButton Icon="Save" Label="Simpan" Click="OnSaveClick" />
                 <AppBarSeparator />
                 <AppBarButton Icon="Refresh" Label="Sinkron API" Click="OnSyncClick" />
-                <Button Content="Cek Update" Click="OnCheckUpdateClick" />
+                <AppBarButton Icon="Sync" Label="Cek Update" Click="OnCheckUpdateClick" />
             </CommandBar>
         </StackPanel>
 
