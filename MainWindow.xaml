@@ -45,7 +45,7 @@
         <Frame x:Name="RootFrame" Grid.Row="1" Padding="16">
             <!-- Konten awal sementara sebelum halaman terpisah dimuat -->
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
-                <TextBlock Text="AumoDekstop" Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" />
+                <TextBlock Text=".//" Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" />
                 <TextBlock Text="Workspace siap digunakan. Pilih menu pada Ribbon di atas." Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
             </StackPanel>
         </Frame>
