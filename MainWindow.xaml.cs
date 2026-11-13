@@ -14,6 +14,9 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         this.InitializeComponent();
+
+        GitHubUpdateService.CleanupOldExecutable();
+    
         this.Activated += MainWindow_Activated;
     }
 
