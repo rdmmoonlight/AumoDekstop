@@ -7,6 +7,9 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build & Publish (${{ matrix.configuration }} | win-x64)
@@ -23,6 +26,56 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Menghasilkan versi CalVer (yy.M.N.PC) lanjutan dari rilis PC GitHub terakhir
+      - name: Generate CalVer version (.PC)
+        id: version
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          # Format yy.M (contoh: 26.11 untuk November 2026)
+          $now = (Get-Date).ToUniversalTime()
+          $yearMonth = $now.ToString("yy") + "." + $now.Month
+
+          # Cari tag rilis terakhir khusus yang berakhiran .PC (abaikan rilis Android)
+          $latestTag = ""
+          try {
+            $tags = gh release list --repo "${{ github.repository }}" --limit 20 --json tagName -q '.[].tagName' 2>$null
+            $latestTag = $tags | Where-Object { $_ -like "*.PC" } | Select-Object -First 1
+          } catch {
+            $latestTag = ""
+          }
+
+          # Bersihkan awalan 'v' dan akhiran '.PC' untuk mengambil angka yy.M.N
+          $cleanVersion = if ($latestTag) { $latestTag -replace '^v', '' -replace '\.PC$', '' } else { "" }
+
+          if (-not [string]::IsNullOrWhiteSpace($cleanVersion)) {
+            $parts = $cleanVersion.Split('.')
+            $latestYearMonth = "$($parts[0]).$($parts[1])"
+            $latestBuild = [int]$parts[2]
+          } else {
+            $latestYearMonth = ""
+            $latestBuild = 0
+          }
+
+          if ($yearMonth -eq $latestYearMonth) {
+            $newBuild = $latestBuild + 1
+          } else {
+            $newBuild = 1
+          }
+
+          $numericVersion = "$yearMonth.$newBuild"          # Contoh: 26.11.1
+          $appVersion = "$numericVersion.PC"                # Contoh: 26.11.1.PC
+          $semverVersion = "$numericVersion-PC"             # Contoh: 26.11.1-PC (valid untuk NuGet/MSBuild)
+          $assemblyVersion = "$numericVersion.0"            # Contoh: 26.11.1.0 (wajib 4 angka untuk Windows)
+
+          Write-Host "Rilis PC terakhir: $(if ($latestTag) { $latestTag } else { '<tidak ada>' }) -> versi baru: v$appVersion"
+          "app_version=$appVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "semver_version=$semverVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "assembly_version=$assemblyVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
         with:
@@ -34,12 +87,31 @@ jobs:
           Configuration: ${{ matrix.configuration }}
           
       - name: Build application
-        run: dotnet build $env:Project_Path -c $env:Configuration -r win-x64 -p:Platform=x64 --no-restore
+        run: >
+          dotnet build $env:Project_Path
+          -c $env:Configuration
+          -r win-x64
+          -p:Platform=x64
+          -p:Version=${{ steps.version.outputs.semver_version }}
+          -p:InformationalVersion=${{ steps.version.outputs.app_version }}
+          -p:AssemblyVersion=${{ steps.version.outputs.assembly_version }}
+          -p:FileVersion=${{ steps.version.outputs.assembly_version }}
+          --no-restore
         env:
           Configuration: ${{ matrix.configuration }}
 
       - name: Publish single-file executable
-        run: dotnet publish $env:Project_Path -c $env:Configuration -r win-x64 -p:Platform=x64 --no-build -o ./publish
+        run: >
+          dotnet publish $env:Project_Path
+          -c $env:Configuration
+          -r win-x64
+          -p:Platform=x64
+          -p:Version=${{ steps.version.outputs.semver_version }}
+          -p:InformationalVersion=${{ steps.version.outputs.app_version }}
+          -p:AssemblyVersion=${{ steps.version.outputs.assembly_version }}
+          -p:FileVersion=${{ steps.version.outputs.assembly_version }}
+          --no-build
+          -o ./publish
         env:
           Configuration: ${{ matrix.configuration }}
 
@@ -49,6 +121,8 @@ jobs:
         env:
           CERT_BASE64: ${{ secrets.CERT_BASE64 }}
           CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }}
+          APP_VERSION: ${{ steps.version.outputs.app_version }}
+          ASSEMBLY_VERSION: ${{ steps.version.outputs.assembly_version }}
         run: |
           $ErrorActionPreference = "Stop"
 
@@ -64,8 +138,8 @@ jobs:
           # 3. Tandatangani file utama AumoDekstop.exe
           & $signtool sign /f $pfxPath /p $env:CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "./publish/AumoDekstop.exe"
 
-          # 4. Compile Inno Setup untuk membuat Setup.exe (sudah termasuk codesign.cer)
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "setup.iss"
+          # 4. Compile Inno Setup (kirim versi display .PC dan versi numerik untuk Windows)
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=$env:APP_VERSION" "/DMyAppNumericVersion=$env:ASSEMBLY_VERSION" "setup.iss"
 
           # 5. Cari & tandatangani file Setup.exe hasil Inno Setup secara dinamis
           $installerFile = Get-ChildItem -Path "./OutputInstaller" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty FullName
@@ -78,7 +152,7 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
-          name: AumoDekstop-Installer-win-x64
+          name: AumoDekstop-Installer-win-x64-v${{ steps.version.outputs.app_version }}
           path: ./OutputInstaller/*.exe
           retention-days: 7
 
@@ -86,6 +160,6 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
-          name: AumoDekstop-win-x64-Unsigned
+          name: AumoDekstop-win-x64-Unsigned-v${{ steps.version.outputs.app_version }}
           path: ./publish/AumoDekstop.exe
           retention-days: 1
