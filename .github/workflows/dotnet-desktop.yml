@@ -43,27 +43,46 @@ jobs:
         env:
           Configuration: ${{ matrix.configuration }}
 
-      - name: Sign Executable
+      - name: Sign Executable, Build Installer & Sign Installer
         if: github.event_name != 'pull_request'
         shell: pwsh
         env:
           CERT_BASE64: ${{ secrets.CERT_BASE64 }}
           CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }}
         run: |
+          # 1. Siapkan file .pfx sementara
           $pfxPath = "$env:TEMP\codesign.pfx"
           [IO.File]::WriteAllBytes($pfxPath, [Convert]::FromBase64String($env:CERT_BASE64))
 
+          # 2. Cari signtool.exe
           $signtool = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse | 
                       Where-Object { $_.FullName -like "*\x64\*" } | 
                       Select-Object -First 1 -ExpandProperty FullName
 
+          # 3. Tandatangani file utama AumoDekstop.exe
           & $signtool sign /f $pfxPath /p $env:CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "./publish/AumoDekstop.exe"
 
+          # 4. Compile Inno Setup untuk membuat Setup.exe (sudah termasuk codesign.cer)
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "setup.iss"
+
+          # 5. Tandatangani juga file Setup.exe hasil Inno Setup
+          & $signtool sign /f $pfxPath /p $env:CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "./OutputInstaller/Setup_AumoDekstop_win-x64.exe"
+
+          # 6. Bersihkan file .pfx sementara
           Remove-Item $pfxPath -Force
 
-      - name: Upload build artifacts
+      - name: Upload Installer Artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
-          name: AumoDekstop-win-x64-SingleFile
+          name: AumoDekstop-Installer-win-x64
+          path: ./OutputInstaller/Setup_AumoDekstop_win-x64.exe
+          retention-days: 7
+
+      - name: Upload Raw Executable (Fallback for PRs)
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: AumoDekstop-win-x64-Unsigned
           path: ./publish/AumoDekstop.exe
           retention-days: 7
