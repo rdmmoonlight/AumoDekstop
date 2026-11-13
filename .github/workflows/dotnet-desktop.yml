@@ -50,6 +50,8 @@ jobs:
           CERT_BASE64: ${{ secrets.CERT_BASE64 }}
           CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }}
         run: |
+          $ErrorActionPreference = "Stop"
+
           # 1. Siapkan file .pfx sementara
           $pfxPath = "$env:TEMP\codesign.pfx"
           [IO.File]::WriteAllBytes($pfxPath, [Convert]::FromBase64String($env:CERT_BASE64))
@@ -65,8 +67,9 @@ jobs:
           # 4. Compile Inno Setup untuk membuat Setup.exe (sudah termasuk codesign.cer)
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "setup.iss"
 
-          # 5. Tandatangani juga file Setup.exe hasil Inno Setup
-          & $signtool sign /f $pfxPath /p $env:CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "./OutputInstaller/Setup_AumoDekstop_win-x64.exe"
+          # 5. Cari & tandatangani file Setup.exe hasil Inno Setup secara dinamis
+          $installerFile = Get-ChildItem -Path "./OutputInstaller" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty FullName
+          & $signtool sign /f $pfxPath /p $env:CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "$installerFile"
 
           # 6. Bersihkan file .pfx sementara
           Remove-Item $pfxPath -Force
@@ -76,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: AumoDekstop-Installer-win-x64
-          path: ./OutputInstaller/Setup_AumoDekstop_win-x64.exe
+          path: ./OutputInstaller/*.exe
           retention-days: 7
 
       - name: Upload Raw Executable (Fallback for PRs)
@@ -85,4 +88,4 @@ jobs:
         with:
           name: AumoDekstop-win-x64-Unsigned
           path: ./publish/AumoDekstop.exe
-          retention-days: 7
+          retention-days: 1
