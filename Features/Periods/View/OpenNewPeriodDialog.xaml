@@ -1,0 +1,67 @@
+<ContentDialog
+    x:Class="AumoDekstop.Features.Periods.Views.OpenNewPeriodDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Buka Periode Baru"
+    PrimaryButtonText="Simpan &amp; Buka Periode"
+    CloseButtonText="Batal"
+    DefaultButton="Primary"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick">
+
+    <StackPanel Spacing="16" MinWidth="360">
+        <!-- DialogDescription -->
+        <TextBlock
+            Text="Pilih rentang tanggal untuk membuka periode buku kas baru."
+            Style="{ThemeResource BodyTextBlockStyle}"
+            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+            TextWrapping="Wrap" />
+
+        <!-- Tanggal Mulai -->
+        <StackPanel Spacing="6">
+            <CalendarDatePicker
+                x:Name="StartDatePicker"
+                Header="Tanggal Mulai"
+                PlaceholderText="Pilih tanggal mulai"
+                HorizontalAlignment="Stretch"
+                Date="{x:Bind FormState.StartDate, Mode=TwoWay}"
+                DateChanged="OnDateChanged" />
+            <TextBlock
+                x:Name="StartDateErrorText"
+                Text="Tanggal mulai wajib diisi"
+                Style="{ThemeResource CaptionTextBlockStyle}"
+                Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                Visibility="Collapsed" />
+        </StackPanel>
+
+        <!-- Tanggal Selesai -->
+        <StackPanel Spacing="6">
+            <CalendarDatePicker
+                x:Name="EndDatePicker"
+                Header="Tanggal Selesai"
+                PlaceholderText="Pilih tanggal selesai"
+                HorizontalAlignment="Stretch"
+                Date="{x:Bind FormState.EndDate, Mode=TwoWay}"
+                DateChanged="OnDateChanged" />
+            <TextBlock
+                x:Name="EndDateErrorText"
+                Text="Tanggal selesai wajib diisi"
+                Style="{ThemeResource CaptionTextBlockStyle}"
+                Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                Visibility="Collapsed" />
+        </StackPanel>
+
+        <!-- Indikator Loading saat Submit berlangsung -->
+        <StackPanel
+            x:Name="LoadingPanel"
+            Orientation="Horizontal"
+            Spacing="8"
+            Visibility="Collapsed">
+            <ProgressRing IsActive="True" Width="16" Height="16" />
+            <TextBlock
+                Text="Menyimpan periode..."
+                Style="{ThemeResource CaptionTextBlockStyle}"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                VerticalAlignment="Center" />
+        </StackPanel>
+    </StackPanel>
+</ContentDialog>
