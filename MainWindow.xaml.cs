@@ -139,13 +139,45 @@ public sealed partial class MainWindow : Window
         StatusText.Text = "● Membuat entri baru...";
     }
 
-    private void OnSimpanClick(object sender, RoutedEventArgs e)
-    {
-        StatusText.Text = "● Mengirim data ke server...";
-    }
+// Di dalam MainWindow.xaml.cs
 
-    private void OnSyncClick(object sender, RoutedEventArgs e)
+private async void OnSyncClick(object sender, RoutedEventArgs e)
+{
+    StatusText.Text = "● Menghubungi server https://aumo.onrender.com (mohon tunggu)...";
+
+    // Ganti "api/health" atau "" sesuai endpoint root/health backend Anda
+    bool isOnline = await ApiService.Instance.CheckServerHealthAsync("");
+
+    if (isOnline)
     {
-        StatusText.Text = "● Menyinkronkan dengan https://aumo.onrender.com...";
+        StatusText.Text = $"● Terhubung ke Server ({ApiService.BaseServerUrl}) | Versi: {GitHubUpdateService.GetCurrentVersionString()}";
     }
+    else
+    {
+        StatusText.Text = "● Server tidak merespons atau masih dalam proses bangun (cold start).";
+    }
+}
+
+private async void OnSaveClick(object sender, RoutedEventArgs e)
+{
+    StatusText.Text = "● Mengirim data ke server...";
+
+    // Contoh payload yang dikirim ke endpoint POST /api/data
+    var payload = new
+    {
+        Client = "AumoDekstop",
+        Timestamp = DateTime.UtcNow
+    };
+
+    var result = await ApiService.Instance.PostAsync<object, object>("api/data", payload);
+
+    if (result.IsSuccess)
+    {
+        StatusText.Text = "● Data berhasil disimpan ke server.";
+    }
+    else
+    {
+        StatusText.Text = $"● Gagal menyimpan: {result.ErrorMessage}";
+    }
+}
 }
