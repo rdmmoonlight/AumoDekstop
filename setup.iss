@@ -42,7 +42,6 @@ MinVersion=10.0.17763
 PrivilegesRequired=admin
 
 [Languages]
-Name: "indonesian"; MessagesFile: "compiler:Languages\Indonesian.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
