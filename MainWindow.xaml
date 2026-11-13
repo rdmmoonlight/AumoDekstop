@@ -27,6 +27,7 @@
             <!-- Baris Tab Ribbon -->
             <SelectorBar x:Name="RibbonTabs" SelectionChanged="RibbonTabs_SelectionChanged" Padding="8,4,8,0">
                 <SelectorBarItem Text="Beranda" Tag="home" IsSelected="True" />
+                <SelectorBarItem Text="Periods" Tag="periods" />
                 <SelectorBarItem Text="Data &amp; Transaksi" Tag="data" />
                 <SelectorBarItem Text="Laporan" Tag="report" />
                 <SelectorBarItem Text="Pengaturan" Tag="settings" />
