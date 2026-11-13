@@ -34,8 +34,8 @@
 
             <!-- Baris Tombol Perintah (CommandBar) -->
             <CommandBar DefaultLabelPosition="Right" HorizontalAlignment="Left" Background="Transparent">
-                <AppBarButton Icon="Add" Label="Baru" Click="OnBaruClick" />
-                <AppBarButton Icon="Save" Label="Simpan" Click="OnSimpanClick" />
+                <AppBarButton Icon="Add" Label="Baru" Click="OnNewClick" />
+                <AppBarButton Icon="Save" Label="Simpan" Click="OnSaveClick" />
                 <AppBarSeparator />
                 <AppBarButton Icon="Refresh" Label="Sinkron API" Click="OnSyncClick" />
             </CommandBar>
