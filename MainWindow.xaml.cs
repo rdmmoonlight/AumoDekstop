@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using AumoDekstop.Features.Periods.Views;
 using AumoDekstop.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -168,55 +169,85 @@ public sealed partial class MainWindow : Window
     {
         if (sender.SelectedItem is SelectorBarItem selected)
         {
-            StatusText.Text = $"● Tab aktif: {selected.Text} | Server: https://aumo.onrender.com";
-            // Nantinya di sini kita arahkan RootFrame.Navigate(typeof(...)) sesuai tab
+            string currentVer = GitHubUpdateService.GetCurrentVersionString();
+            StatusText.Text = $"● Tab aktif: {selected.Text} | Versi: v{currentVer} | Server: {ApiService.BaseServerUrl}";
+
+            switch (selected.Tag?.ToString())
+            {
+                case "periods":
+                    if (RootFrame.CurrentSourcePageType != typeof(PeriodsPage))
+                    {
+                        RootFrame.Navigate(typeof(PeriodsPage));
+                    }
+                    break;
+
+                // Tambahkan case untuk tab lainnya ("home", "data", "report", "settings") di sini
+            }
         }
     }
 
-    private void OnNewClick(object sender, RoutedEventArgs e)
+    private async void OnNewClick(object sender, RoutedEventArgs e)
     {
+        // Jika sedang berada di halaman Periods, tombol "Baru" di Ribbon langsung membuka dialog Buka Periode Baru
+        if (RootFrame.Content is PeriodsPage periodsPage && this.Content?.XamlRoot != null)
+        {
+            StatusText.Text = "● Membuka form periode baru...";
+            var dialog = new OpenNewPeriodDialog
+            {
+                XamlRoot = this.Content.XamlRoot,
+                OnSubmitAsync = async payload =>
+                {
+                    await periodsPage.ViewModel.CreatePeriodCommand.ExecuteAsync(payload);
+                }
+            };
+            await dialog.ShowAsync();
+            return;
+        }
+
         StatusText.Text = "● Membuat entri baru...";
     }
 
-// Di dalam MainWindow.xaml.cs
-
-private async void OnSyncClick(object sender, RoutedEventArgs e)
-{
-    StatusText.Text = "● Menghubungi server https://aumo.onrender.com (mohon tunggu)...";
-
-    // Ganti "api/health" atau "" sesuai endpoint root/health backend Anda
-    bool isOnline = await ApiService.Instance.CheckServerHealthAsync("");
-
-    if (isOnline)
+    private async void OnSyncClick(object sender, RoutedEventArgs e)
     {
-        StatusText.Text = $"● Terhubung ke Server ({ApiService.BaseServerUrl}) | Versi: {GitHubUpdateService.GetCurrentVersionString()}";
+        StatusText.Text = $"● Menghubungi server {ApiService.BaseServerUrl} (mohon tunggu)...";
+
+        bool isOnline = await ApiService.Instance.CheckServerHealthAsync("");
+
+        if (isOnline)
+        {
+            // Jika halaman Periods sedang terbuka, ikut segarkan daftar periodenya
+            if (RootFrame.Content is PeriodsPage periodsPage)
+            {
+                await periodsPage.ViewModel.FetchPeriodsCommand.ExecuteAsync(null);
+            }
+
+            StatusText.Text = $"● Terhubung ke Server ({ApiService.BaseServerUrl}) | Versi: v{GitHubUpdateService.GetCurrentVersionString()}";
+        }
+        else
+        {
+            StatusText.Text = "● Server tidak merespons atau masih dalam proses bangun (cold start).";
+        }
     }
-    else
+
+    private async void OnSaveClick(object sender, RoutedEventArgs e)
     {
-        StatusText.Text = "● Server tidak merespons atau masih dalam proses bangun (cold start).";
+        StatusText.Text = "● Mengirim data ke server...";
+
+        var payload = new
+        {
+            Client = "AumoDekstop",
+            Timestamp = DateTime.UtcNow
+        };
+
+        var result = await ApiService.Instance.PostAsync<object, object>("api/data", payload);
+
+        if (result.IsSuccess)
+        {
+            StatusText.Text = "● Data berhasil disimpan ke server.";
+        }
+        else
+        {
+            StatusText.Text = $"● Gagal menyimpan: {result.ErrorMessage}";
+        }
     }
-}
-
-private async void OnSaveClick(object sender, RoutedEventArgs e)
-{
-    StatusText.Text = "● Mengirim data ke server...";
-
-    // Contoh payload yang dikirim ke endpoint POST /api/data
-    var payload = new
-    {
-        Client = "AumoDekstop",
-        Timestamp = DateTime.UtcNow
-    };
-
-    var result = await ApiService.Instance.PostAsync<object, object>("api/data", payload);
-
-    if (result.IsSuccess)
-    {
-        StatusText.Text = "● Data berhasil disimpan ke server.";
-    }
-    else
-    {
-        StatusText.Text = $"● Gagal menyimpan: {result.ErrorMessage}";
-    }
-}
 }
