@@ -1,0 +1,47 @@
+<UserControl
+    x:Class="AumoDekstop.Features.Periods.Views.PeriodsAlertsControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <StackPanel Spacing="12">
+        <!-- Alert Peringatan Jika Ada Pesan Error/Warning -->
+        <InfoBar
+            x:Name="WarningInfoBar"
+            Severity="Error"
+            Title="Perhatian"
+            Message="{x:Bind WarningMessage, Mode=OneWay}"
+            IsClosable="False"
+            IsOpen="{x:Bind HasWarningMessage, Mode=OneWay}"
+            Visibility="{x:Bind HasWarningMessage, Mode=OneWay}" />
+
+        <!-- Alert Periode Aktif -->
+        <InfoBar
+            x:Name="ActivePeriodInfoBar"
+            Severity="Success"
+            Title="Periode Aktif"
+            IsClosable="False"
+            IsOpen="{x:Bind HasActivePeriod, Mode=OneWay}"
+            Visibility="{x:Bind HasActivePeriod, Mode=OneWay}">
+            <InfoBar.Content>
+                <TextBlock
+                    TextWrapping="Wrap"
+                    Margin="0,0,0,12"
+                    Style="{ThemeResource BodyTextBlockStyle}">
+                    <Run Text="Saat ini periode " />
+                    <Run Text="{x:Bind ActivePeriodName, Mode=OneWay}" FontWeight="SemiBold" />
+                    <Run Text=" sedang berjalan. Semua transaksi baru akan dicatat ke dalam periode ini." />
+                </TextBlock>
+            </InfoBar.Content>
+        </InfoBar>
+
+        <!-- Alert Belum Ada Periode (tampil jika !hasActivePeriod && !warningMessage) -->
+        <InfoBar
+            x:Name="NoActivePeriodInfoBar"
+            Severity="Informational"
+            Title="Tidak Ada Periode Aktif"
+            Message="Belum ada periode buku kas yang dibuka. Silakan buka periode baru untuk mulai mencatat transaksi."
+            IsClosable="False"
+            IsOpen="{x:Bind ShowNoActivePeriodAlert, Mode=OneWay}"
+            Visibility="{x:Bind ShowNoActivePeriodAlert, Mode=OneWay}" />
+    </StackPanel>
+</UserControl>
