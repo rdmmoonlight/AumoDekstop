@@ -134,7 +134,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void OnBaruClick(object sender, RoutedEventArgs e)
+    private void OnNewClick(object sender, RoutedEventArgs e)
     {
         StatusText.Text = "● Membuat entri baru...";
     }
