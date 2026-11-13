@@ -1,6 +1,7 @@
 ; --- KONFIGURASI DASAR (MERUJUK KE AumoDekstop.csproj) ---
 #define MyAppName "AumoDekstop"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.0.PC"
+#define MyAppNumericVersion "1.0.0.0"
 #define MyAppPublisher "B&RC"
 #define MyAppExeName "AumoDekstop.exe"
 #define CertThumbprint "0569E0943DADA39CE0CD06CE2F09A0CA1B6A4B4E"
@@ -14,6 +15,8 @@
 AppId={{8A9B2C1D-4E5F-6A7B-8C9D-0E1F2A3B4C5D}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
+VersionInfoVersion={#MyAppNumericVersion}
+OutputBaseFilename=AumoDekstop-Setup-v{#MyAppVersion}
 AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
