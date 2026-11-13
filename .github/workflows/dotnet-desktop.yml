@@ -1,4 +1,4 @@
-name: Build AumoDekstop (.NET 10 WinUI 3 Single-File)
+name: Build AumoDekstop (.NET 10 WinUI 3 Portable Single-File)
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   build:
-    name: Build & Publish (${{ matrix.configuration }} | win-x64)
+    name: Build & Publish Portable (${{ matrix.configuration }} | win-x64)
     runs-on: windows-latest
 
     strategy:
@@ -81,7 +81,7 @@ jobs:
         run: dotnet restore $env:Project_Path -r win-x64 -p:Configuration=$env:Configuration
         env:
           Configuration: ${{ matrix.configuration }}
-          
+
       - name: Build application
         run: >
           dotnet build $env:Project_Path
@@ -111,14 +111,11 @@ jobs:
         env:
           Configuration: ${{ matrix.configuration }}
 
-      - name: Sign Executable, Build Installer & Sign Installer
-        if: github.event_name != 'pull_request'
+      - name: Sign Portable Executable
         shell: pwsh
         env:
           CERT_BASE64: ${{ secrets.CERT_BASE64 }}
           CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }}
-          APP_VERSION: ${{ steps.version.outputs.app_version }}
-          ASSEMBLY_VERSION: ${{ steps.version.outputs.assembly_version }}
         run: |
           $ErrorActionPreference = "Stop"
 
@@ -131,43 +128,35 @@ jobs:
                       Where-Object { $_.FullName -like "*\x64\*" } | 
                       Select-Object -First 1 -ExpandProperty FullName
 
-          # 3. Tandatangani file utama AumoDekstop.exe
+          # 3. Tandatangani file portabel AumoDekstop.exe
           & $signtool sign /f $pfxPath /p $env:CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "./publish/AumoDekstop.exe"
 
-          # 4. Compile Inno Setup (kirim versi display .PC dan versi numerik untuk Windows)
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=$env:APP_VERSION" "/DMyAppNumericVersion=$env:ASSEMBLY_VERSION" "setup.iss"
-
-          # 5. Cari & tandatangani file Setup.exe hasil Inno Setup secara dinamis
-          $installerFile = Get-ChildItem -Path "./OutputInstaller" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty FullName
-          & $signtool sign /f $pfxPath /p $env:CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "$installerFile"
-
-          # 6. Bersihkan file .pfx sementara
+          # 4. Bersihkan file .pfx sementara
           Remove-Item $pfxPath -Force
 
-      - name: Upload Installer Artifact
-        if: github.event_name != 'pull_request'
+      - name: Upload Portable Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: AumoDekstop-Installer-win-x64-v${{ steps.version.outputs.app_version }}
-          path: ./OutputInstaller/*.exe
+          name: AumoDekstop-Portable-win-x64-v${{ steps.version.outputs.app_version }}
+          path: ./publish/AumoDekstop.exe
           retention-days: 7
 
-      - name: Upload Raw Executable (Fallback for PRs)
-        if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v4
-        with:
-          name: AumoDekstop-win-x64-Unsigned-v${{ steps.version.outputs.app_version }}
-          path: ./publish/AumoDekstop.exe
-          retention-days: 1
-          
       - name: Create GitHub Release
-        if: github.event_name != 'pull_request'
+        shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APP_VERSION: ${{ steps.version.outputs.app_version }}
         run: |
-          $installerFile = Get-ChildItem -Path "./OutputInstaller" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty FullName
-          gh release create "v$env:APP_VERSION" "$installerFile" `
+          $ErrorActionPreference = "Stop"
+          $portableExe = "./publish/AumoDekstop.exe"
+
+          # Sertakan codesign.cer jika tersedia di root repo agar pengguna bisa memasang sertifikat secara opsional
+          $assets = @($portableExe)
+          if (Test-Path "./codesign.cer") {
+            $assets += "./codesign.cer"
+          }
+
+          gh release create "v$env:APP_VERSION" @assets `
             --repo "${{ github.repository }}" `
-            --title "AumoDekstop v$env:APP_VERSION" `
+            --title "AumoDekstop v$env:APP_VERSION (Portable)" `
             --generate-notes
