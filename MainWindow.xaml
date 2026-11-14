@@ -3,28 +3,22 @@
     x:Class="AumoDekstop.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="using:AumoDekstop"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="AumoDekstop"
-    mc:Ignorable="d">
+    Title="AumoDekstop">
 
-    <!-- Menggunakan Background solid agar bebas layar hitam & ringan di RAM 4GB -->
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" /> <!-- Baris 0: Ribbon Tab & Command Bar ala Office -->
-            <RowDefinition Height="*" />    <!-- Baris 1: Workspace Utama (Frame Halaman) -->
-            <RowDefinition Height="28" />   <!-- Baris 2: Status Bar Bawah -->
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="28" />
         </Grid.RowDefinitions>
 
-        <!-- 1. OFFICE RIBBON RINGAN (Tab Menu + Tombol Aksi) -->
+        <!-- 1. Ribbon: tab menu dan tombol aksi -->
         <StackPanel
             Grid.Row="0"
             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
             BorderThickness="0,0,0,1">
 
-            <!-- Baris Tab Ribbon -->
             <SelectorBar x:Name="RibbonTabs" SelectionChanged="RibbonTabs_SelectionChanged" Padding="8,4,8,0">
                 <SelectorBarItem Text="Beranda" Tag="home" IsSelected="True" />
                 <SelectorBarItem Text="Periods" Tag="periods" />
@@ -33,7 +27,6 @@
                 <SelectorBarItem Text="Pengaturan" Tag="settings" />
             </SelectorBar>
 
-            <!-- Baris Tombol Perintah (CommandBar) -->
             <CommandBar DefaultLabelPosition="Right" HorizontalAlignment="Left" Background="Transparent">
                 <AppBarButton Icon="Add" Label="Baru" Click="OnNewClick" />
                 <AppBarButton Icon="Save" Label="Simpan" Click="OnSaveClick" />
@@ -43,16 +36,10 @@
             </CommandBar>
         </StackPanel>
 
-        <!-- 2. WORKSPACE UTAMA -->
-        <Frame x:Name="RootFrame" Grid.Row="1" Padding="16">
-            <!-- Konten awal sementara sebelum halaman terpisah dimuat -->
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
-                <TextBlock Text=".//" Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" />
-                <TextBlock Text="Workspace siap digunakan. Pilih menu pada Ribbon di atas." Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            </StackPanel>
-        </Frame>
+        <!-- 2. Workspace utama (diisi lewat kode) -->
+        <Frame x:Name="RootFrame" Grid.Row="1" Padding="16" />
 
-        <!-- 3. STATUS BAR BAWAH ALA MS OFFICE -->
+        <!-- 3. Status bar bawah -->
         <Grid
             Grid.Row="2"
             Padding="12,0"
@@ -70,7 +57,7 @@
                 VerticalAlignment="Center"
                 FontSize="12"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                Text="● Siap | Server: https://aumo.onrender.com" />
+                Text="● Siap" />
 
             <TextBlock
                 Grid.Column="1"

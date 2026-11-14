@@ -1,7 +1,7 @@
-using System;
-using System.Threading.Tasks;
+using AumoDekstop.Features.Periods.ViewModels;
 using AumoDekstop.Features.Periods.Views;
 using AumoDekstop.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -9,16 +9,20 @@ namespace AumoDekstop;
 
 public sealed partial class MainWindow : Window
 {
-    private bool _hasCheckedUpdate = false;
+    private bool _hasCheckedUpdate;
     private readonly GitHubUpdateService _updateService = new();
+    private readonly ApiService _api = App.Current.Services.GetRequiredService<ApiService>();
+
+    // Halaman Periods dibuat lewat DI (konstruktor membutuhkan ViewModel), lalu disimpan agar tidak dimuat ulang.
+    private PeriodsPage? _periodsPage;
 
     public MainWindow()
     {
-        this.InitializeComponent();
+        InitializeComponent();
         GitHubUpdateService.CleanupOldExecutable();
 
-        // Gunakan event Loaded pada Content agar XamlRoot dijamin sudah siap 100%
-        if (this.Content is FrameworkElement rootElement)
+        // Event Loaded pada Content menjamin XamlRoot sudah siap
+        if (Content is FrameworkElement rootElement)
         {
             rootElement.Loaded += RootElement_Loaded;
         }
@@ -29,16 +33,38 @@ public sealed partial class MainWindow : Window
         if (_hasCheckedUpdate) return;
         _hasCheckedUpdate = true;
 
-        // Tampilkan versi aktif di StatusBar saat pertama kali terbuka
-        string currentVer = GitHubUpdateService.GetCurrentVersionString();
-        StatusText.Text = $"● Siap | Versi: v{currentVer} | Server: {ApiService.BaseServerUrl}";
+        ShowHome();
+        SetStatus($"● Siap | Versi: v{GitHubUpdateService.GetCurrentVersionString()} | Server: {ApiService.BaseServerUrl}");
 
         await CheckAndPromptUpdateAsync(isManualCheck: false);
     }
 
-    /// <summary>
-    /// Handler untuk tombol manual "Cek Update" di toolbar/menu Anda.
-    /// </summary>
+    private void SetStatus(string text)
+    {
+        if (StatusText is not null)
+        {
+            StatusText.Text = text;
+        }
+    }
+
+    private void ShowHome()
+    {
+        if (RootFrame.Content is not MainPage)
+        {
+            RootFrame.Content = new MainPage();
+        }
+    }
+
+    private void ShowPeriods()
+    {
+        _periodsPage ??= new PeriodsPage(App.Current.Services.GetRequiredService<PeriodsPageViewModel>());
+
+        if (!ReferenceEquals(RootFrame.Content, _periodsPage))
+        {
+            RootFrame.Content = _periodsPage;
+        }
+    }
+
     private async void OnCheckUpdateClick(object sender, RoutedEventArgs e)
     {
         await CheckAndPromptUpdateAsync(isManualCheck: true);
@@ -46,14 +72,14 @@ public sealed partial class MainWindow : Window
 
     private async Task CheckAndPromptUpdateAsync(bool isManualCheck)
     {
-        if (this.Content?.XamlRoot == null)
+        if (Content?.XamlRoot == null)
             return;
 
         string currentVer = GitHubUpdateService.GetCurrentVersionString();
 
         if (isManualCheck)
         {
-            StatusText.Text = $"● Mengecek pembaruan di GitHub (Versi saat ini: v{currentVer})...";
+            SetStatus($"● Mengecek pembaruan di GitHub (Versi saat ini: v{currentVer})...");
         }
 
         var update = await _updateService.CheckForUpdateAsync();
@@ -62,20 +88,20 @@ public sealed partial class MainWindow : Window
         {
             if (isManualCheck)
             {
-                StatusText.Text = $"● Aplikasi sudah versi terbaru (v{currentVer}).";
+                SetStatus($"● Aplikasi sudah versi terbaru (v{currentVer}).");
                 var infoDialog = new ContentDialog
                 {
                     Title = "Tidak Ada Pembaruan",
                     Content = $"Anda sudah menggunakan versi terbaru (v{currentVer}).",
                     CloseButtonText = "OK",
-                    XamlRoot = this.Content.XamlRoot
+                    XamlRoot = Content.XamlRoot
                 };
                 await infoDialog.ShowAsync();
             }
             return;
         }
 
-        StatusText.Text = $"● Pembaruan ditemukan: {update.VersionTag}!";
+        SetStatus($"● Pembaruan ditemukan: {update.VersionTag}!");
 
         var confirmDialog = new ContentDialog
         {
@@ -92,7 +118,7 @@ public sealed partial class MainWindow : Window
             PrimaryButtonText = "Update Sekarang",
             CloseButtonText = "Nanti Saja",
             DefaultButton = ContentDialogButton.Primary,
-            XamlRoot = this.Content.XamlRoot
+            XamlRoot = Content.XamlRoot
         };
 
         var result = await confirmDialog.ShowAsync();
@@ -132,11 +158,11 @@ public sealed partial class MainWindow : Window
         {
             Title = "Mengunduh Pembaruan",
             Content = panel,
-            XamlRoot = this.Content.XamlRoot
+            XamlRoot = Content.XamlRoot
         };
 
-        // Tampilkan dialog secara non-blocking agar proses download bisa berjalan bersamaan
-        var dialogTask = downloadDialog.ShowAsync();
+        // Dialog tampil non-blocking agar unduhan berjalan bersamaan
+        _ = downloadDialog.ShowAsync();
 
         var progressReporter = new Progress<double>(percent =>
         {
@@ -146,20 +172,20 @@ public sealed partial class MainWindow : Window
 
         try
         {
-            StatusText.Text = $"● Mengunduh pembaruan {update.VersionTag}...";
+            SetStatus($"● Mengunduh pembaruan {update.VersionTag}...");
             await _updateService.DownloadAndInstallAsync(update, progressReporter);
         }
         catch (Exception ex)
         {
             downloadDialog.Hide();
-            StatusText.Text = "● Gagal mengunduh pembaruan.";
+            SetStatus("● Gagal mengunduh pembaruan.");
 
             var errorDialog = new ContentDialog
             {
                 Title = "Gagal Memperbarui",
                 Content = $"Terjadi kesalahan saat mengunduh pembaruan:\n{ex.Message}",
                 CloseButtonText = "Tutup",
-                XamlRoot = this.Content.XamlRoot
+                XamlRoot = Content.XamlRoot
             };
             await errorDialog.ShowAsync();
         }
@@ -167,34 +193,35 @@ public sealed partial class MainWindow : Window
 
     private void RibbonTabs_SelectionChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
     {
-        if (sender.SelectedItem is SelectorBarItem selected)
+        // Event ini dapat terpicu saat InitializeComponent, sebelum RootFrame/StatusText terisi
+        if (RootFrame is null || StatusText is null) return;
+
+        if (sender.SelectedItem is not SelectorBarItem selected) return;
+
+        SetStatus($"● Tab aktif: {selected.Text} | Versi: v{GitHubUpdateService.GetCurrentVersionString()} | Server: {ApiService.BaseServerUrl}");
+
+        switch (selected.Tag?.ToString())
         {
-            string currentVer = GitHubUpdateService.GetCurrentVersionString();
-            StatusText.Text = $"● Tab aktif: {selected.Text} | Versi: v{currentVer} | Server: {ApiService.BaseServerUrl}";
+            case "periods":
+                ShowPeriods();
+                break;
 
-            switch (selected.Tag?.ToString())
-            {
-                case "periods":
-                    if (RootFrame.CurrentSourcePageType != typeof(PeriodsPage))
-                    {
-                        RootFrame.Navigate(typeof(PeriodsPage));
-                    }
-                    break;
-
-                // Tambahkan case untuk tab lainnya ("home", "data", "report", "settings") di sini
-            }
+            default:
+                // "home", "data", "report", "settings": sementara menampilkan Beranda
+                ShowHome();
+                break;
         }
     }
 
     private async void OnNewClick(object sender, RoutedEventArgs e)
     {
-        // Jika sedang berada di halaman Periods, tombol "Baru" di Ribbon langsung membuka dialog Buka Periode Baru
-        if (RootFrame.Content is PeriodsPage periodsPage && this.Content?.XamlRoot != null)
+        // Di halaman Periods, tombol "Baru" membuka dialog Buka Periode Baru
+        if (RootFrame.Content is PeriodsPage periodsPage && Content?.XamlRoot != null)
         {
-            StatusText.Text = "● Membuka form periode baru...";
+            SetStatus("● Membuka form periode baru...");
             var dialog = new OpenNewPeriodDialog
             {
-                XamlRoot = this.Content.XamlRoot,
+                XamlRoot = Content.XamlRoot,
                 OnSubmitAsync = async payload =>
                 {
                     await periodsPage.ViewModel.CreatePeriodCommand.ExecuteAsync(payload);
@@ -204,34 +231,33 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        StatusText.Text = "● Membuat entri baru...";
+        SetStatus("● Membuat entri baru...");
     }
 
     private async void OnSyncClick(object sender, RoutedEventArgs e)
     {
-        StatusText.Text = $"● Menghubungi server {ApiService.BaseServerUrl} (mohon tunggu)...";
+        SetStatus($"● Menghubungi server {ApiService.BaseServerUrl} (mohon tunggu)...");
 
-        bool isOnline = await ApiService.Instance.CheckServerHealthAsync("");
+        bool isOnline = await _api.CheckServerHealthAsync("");
 
         if (isOnline)
         {
-            // Jika halaman Periods sedang terbuka, ikut segarkan daftar periodenya
             if (RootFrame.Content is PeriodsPage periodsPage)
             {
                 await periodsPage.ViewModel.FetchPeriodsCommand.ExecuteAsync(null);
             }
 
-            StatusText.Text = $"● Terhubung ke Server ({ApiService.BaseServerUrl}) | Versi: v{GitHubUpdateService.GetCurrentVersionString()}";
+            SetStatus($"● Terhubung ke Server ({ApiService.BaseServerUrl}) | Versi: v{GitHubUpdateService.GetCurrentVersionString()}");
         }
         else
         {
-            StatusText.Text = "● Server tidak merespons atau masih dalam proses bangun (cold start).";
+            SetStatus("● Server tidak merespons atau masih dalam proses bangun (cold start).");
         }
     }
 
     private async void OnSaveClick(object sender, RoutedEventArgs e)
     {
-        StatusText.Text = "● Mengirim data ke server...";
+        SetStatus("● Mengirim data ke server...");
 
         var payload = new
         {
@@ -239,15 +265,10 @@ public sealed partial class MainWindow : Window
             Timestamp = DateTime.UtcNow
         };
 
-        var result = await ApiService.Instance.PostAsync<object, object>("api/data", payload);
+        var result = await _api.PostAsync<object, object>("api/data", payload);
 
-        if (result.IsSuccess)
-        {
-            StatusText.Text = "● Data berhasil disimpan ke server.";
-        }
-        else
-        {
-            StatusText.Text = $"● Gagal menyimpan: {result.ErrorMessage}";
-        }
+        SetStatus(result.IsSuccess
+            ? "● Data berhasil disimpan ke server."
+            : $"● Gagal menyimpan: {result.ErrorMessage}");
     }
 }

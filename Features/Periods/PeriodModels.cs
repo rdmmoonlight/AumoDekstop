@@ -29,6 +29,13 @@ public sealed class PeriodItem
 
     [JsonIgnore]
     public string FormattedEndDate => PeriodFormatter.FormatPeriodDate(EndDate);
+
+    // Dipakai oleh PeriodsTableControl.xaml (x:Bind IsOpen, x:Bind CanSelect)
+    [JsonIgnore]
+    public bool IsOpen => !IsClosed;
+
+    [JsonIgnore]
+    public bool CanSelect => !IsClosed && !IsSelected;
 }
 
 public sealed class GetPeriodsResponse
