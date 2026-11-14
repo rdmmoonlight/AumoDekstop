@@ -1,17 +1,31 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using AumoDekstop.Features.Periods.Models;
 using AumoDekstop.Features.Periods.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace AumoDekstop.Features.Periods.ViewModels;
 
-public partial class CreatePeriodFormViewModel : ObservableObject
+public sealed partial class CreatePeriodFormViewModel : ObservableObject
 {
     private readonly IPeriodsApiService _periodsApiService;
     private readonly Func<Task>? _onSuccessCallback;
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasError))]
     private string? _error;
+
+    public string? Error
+    {
+        get => _error;
+        set
+        {
+            if (SetProperty(ref _error, value))
+            {
+                OnPropertyChanged(nameof(HasError));
+            }
+        }
+    }
 
     public bool HasError => !string.IsNullOrWhiteSpace(Error);
 
@@ -23,8 +37,6 @@ public partial class CreatePeriodFormViewModel : ObservableObject
         _onSuccessCallback = onSuccessCallback;
     }
 
-    // [RelayCommand] otomatis menghasilkan properti 'SubmitFormCommand'
-    // beserta state 'SubmitFormCommand.IsRunning' (setara dengan isLoading / isPending di Vue)
     [RelayCommand]
     public async Task SubmitFormAsync(CreatePeriodPayload payload, CancellationToken cancellationToken = default)
     {
@@ -34,7 +46,7 @@ public partial class CreatePeriodFormViewModel : ObservableObject
         {
             await _periodsApiService.CreatePeriodAsync(payload, cancellationToken);
 
-            if (_onSuccessCallback is not null)
+            if (_onSuccessCallback != null)
             {
                 await _onSuccessCallback.Invoke();
             }
