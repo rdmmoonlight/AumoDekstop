@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
@@ -23,11 +24,15 @@ public interface IPeriodsApiService
 
 public sealed class PeriodsApiService : IPeriodsApiService
 {
+    private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     private readonly ApiService _apiService;
 
     public event EventHandler? PeriodContextChanged;
 
-    // Menggunakan ApiService.Instance secara default agar token Bearer & sesi dari proses Login otomatis terbawa
     public PeriodsApiService(ApiService? apiService = null)
     {
         _apiService = apiService ?? ApiService.Instance;
@@ -45,14 +50,14 @@ public sealed class PeriodsApiService : IPeriodsApiService
             throw new HttpRequestException(
                 response.ErrorMessage ?? "Gagal memuat daftar periode.",
                 null,
-                (System.Net.HttpStatusCode)response.StatusCode);
+                (HttpStatusCode)response.StatusCode);
         }
 
         var root = response.Data;
 
         if (root.ValueKind == JsonValueKind.Array)
         {
-            var list = root.Deserialize<List<PeriodItem>>() ?? [];
+            var list = root.Deserialize<List<PeriodItem>>(JsonOptions) ?? new List<PeriodItem>();
             return new GetPeriodsResponse { Periods = list };
         }
 
@@ -60,11 +65,11 @@ public sealed class PeriodsApiService : IPeriodsApiService
             root.TryGetProperty("items", out var itemsProp) &&
             itemsProp.ValueKind == JsonValueKind.Array)
         {
-            var list = itemsProp.Deserialize<List<PeriodItem>>() ?? [];
+            var list = itemsProp.Deserialize<List<PeriodItem>>(JsonOptions) ?? new List<PeriodItem>();
             return new GetPeriodsResponse { Periods = list };
         }
 
-        return root.Deserialize<GetPeriodsResponse>() ?? new GetPeriodsResponse();
+        return root.Deserialize<GetPeriodsResponse>(JsonOptions) ?? new GetPeriodsResponse();
     }
 
     public async Task<PeriodsOpenInfo> GetPeriodsOpenInfoAsync(CancellationToken cancellationToken = default)
@@ -76,7 +81,7 @@ public sealed class PeriodsApiService : IPeriodsApiService
             throw new HttpRequestException(
                 response.ErrorMessage ?? "Gagal memuat informasi pembukaan periode.",
                 null,
-                (System.Net.HttpStatusCode)response.StatusCode);
+                (HttpStatusCode)response.StatusCode);
         }
 
         return response.Data ?? new PeriodsOpenInfo();
@@ -94,7 +99,7 @@ public sealed class PeriodsApiService : IPeriodsApiService
             throw new HttpRequestException(
                 response.ErrorMessage ?? "Gagal membuat periode baru.",
                 null,
-                (System.Net.HttpStatusCode)response.StatusCode);
+                (HttpStatusCode)response.StatusCode);
         }
 
         NotifyPeriodChanged();
@@ -112,7 +117,7 @@ public sealed class PeriodsApiService : IPeriodsApiService
             throw new HttpRequestException(
                 response.ErrorMessage ?? "Gagal memilih periode.",
                 null,
-                (System.Net.HttpStatusCode)response.StatusCode);
+                (HttpStatusCode)response.StatusCode);
         }
 
         NotifyPeriodChanged();
@@ -130,7 +135,7 @@ public sealed class PeriodsApiService : IPeriodsApiService
             throw new HttpRequestException(
                 response.ErrorMessage ?? "Gagal menghapus pilihan periode.",
                 null,
-                (System.Net.HttpStatusCode)response.StatusCode);
+                (HttpStatusCode)response.StatusCode);
         }
 
         NotifyPeriodChanged();
@@ -148,7 +153,7 @@ public sealed class PeriodsApiService : IPeriodsApiService
             throw new HttpRequestException(
                 response.ErrorMessage ?? "Gagal menutup periode.",
                 null,
-                (System.Net.HttpStatusCode)response.StatusCode);
+                (HttpStatusCode)response.StatusCode);
         }
 
         NotifyPeriodChanged();
