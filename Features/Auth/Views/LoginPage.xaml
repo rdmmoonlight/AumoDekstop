@@ -9,7 +9,6 @@
     Background="#09090B">
 
     <Grid Padding="24">
-        <!-- Container form dengan lebar maksimal nyaman dibaca -->
         <StackPanel
             MaxWidth="400"
             HorizontalAlignment="Stretch"
@@ -54,7 +53,15 @@
                         CornerRadius="6"/>
                 </StackPanel>
 
-                <!-- Pesan Error (text-sm text-red-400) -->
+                <!-- Checkbox Remember Me -->
+                <CheckBox
+                    Content="Ingat saya (Remember Me)"
+                    IsChecked="{x:Bind ViewModel.RememberMe, Mode=TwoWay}"
+                    IsEnabled="{x:Bind ViewModel.IsNotPending, Mode=OneWay}"
+                    Foreground="#FAFAFA"
+                    FontSize="14"/>
+
+                <!-- Pesan Error -->
                 <TextBlock
                     Visibility="{x:Bind ViewModel.HasError, Mode=OneWay}"
                     Text="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}"
