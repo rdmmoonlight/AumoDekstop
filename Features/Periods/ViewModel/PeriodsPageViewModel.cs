@@ -15,35 +15,35 @@ public partial class PeriodsPageViewModel : ObservableObject
     private readonly IPeriodsApiService _periodsApiService;
 
     [ObservableProperty]
-    private ObservableCollection<PeriodItem> _periods = [];
+    private ObservableCollection<PeriodItem> _periods = new();
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasActivePeriod))]
-    private PeriodItem? _activePeriod;
+    private PeriodItem? _activePeriod = null;
 
     public bool HasActivePeriod => ActivePeriod is not null;
 
     [ObservableProperty]
-    private bool _isLoading;
+    private bool _isLoading = false;
 
     [ObservableProperty]
-    private bool _isCreating;
+    private bool _isCreating = false;
 
     [ObservableProperty]
-    private bool _isClosing;
+    private bool _isClosing = false;
 
     [ObservableProperty]
-    private bool _isSelecting;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ErrorMessage))]
-    [NotifyPropertyChangedFor(nameof(HasError))]
-    private string? _actionError;
+    private bool _isSelecting = false;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ErrorMessage))]
     [NotifyPropertyChangedFor(nameof(HasError))]
-    private string? _queryError;
+    private string? _actionError = null;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ErrorMessage))]
+    [NotifyPropertyChangedFor(nameof(HasError))]
+    private string? _queryError = null;
 
     // Gabungkan error dari aksi mutasi terakhir maupun error dari query daftar periode
     public string? ErrorMessage => !string.IsNullOrWhiteSpace(ActionError) ? ActionError : QueryError;
@@ -73,7 +73,13 @@ public partial class PeriodsPageViewModel : ObservableObject
         try
         {
             var response = await _periodsApiService.GetPeriodsAsync(cancellationToken);
-            Periods = new ObservableCollection<PeriodItem>(response.Periods);
+
+            Periods.Clear();
+            foreach (var item in response.Periods)
+            {
+                Periods.Add(item);
+            }
+
             UpdateActivePeriod();
         }
         catch (OperationCanceledException)
@@ -93,8 +99,10 @@ public partial class PeriodsPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public async Task CreatePeriodAsync(CreatePeriodPayload payload, CancellationToken cancellationToken = default)
+    public async Task CreatePeriodAsync(CreatePeriodPayload? payload, CancellationToken cancellationToken = default)
     {
+        if (payload is null) return;
+
         ActionError = null;
         IsCreating = true;
 
