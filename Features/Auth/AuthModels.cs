@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace AumoDekstop.Models.Auth;
+namespace AumoDekstop.Features.Auth.Models;
 
 // ==========================================
 // 1. Model dari types.ts

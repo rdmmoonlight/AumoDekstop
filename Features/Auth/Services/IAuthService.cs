@@ -1,6 +1,6 @@
-using AumoDekstop.Models.Auth;
+using AumoDekstop.Features.Auth.Models;
 
-namespace AumoDekstop.Services.Auth;
+namespace AumoDekstop.Features.Auth.Services;
 
 public interface IAuthService
 {

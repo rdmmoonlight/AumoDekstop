@@ -1,12 +1,12 @@
-using AumoDekstop.Helpers;
-using AumoDekstop.ViewModels.Auth;
+using AumoDekstop.Features.Auth.Helpers;
+using AumoDekstop.Features.Auth.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Navigation;
 using Windows.System;
 
-namespace AumoDekstop.Views.Auth;
+namespace AumoDekstop.Features.Auth.Views.LoginPage;
 
 public sealed partial class LoginPage : Page
 {
@@ -17,7 +17,9 @@ public sealed partial class LoginPage : Page
 
     public LoginPage()
     {
-        this.InitializeComponent();
+        Microsoft.UI.Xaml.Application.LoadComponent(
+            this,
+            new Uri("ms-appx:///Features/Auth/Views/LoginPage.xaml"));
         ViewModel = App.Current.Services.GetRequiredService<LoginViewModel>();
         ViewModel.LoginSucceeded += OnAuthSuccess;
     }

@@ -1,4 +1,4 @@
-namespace AumoDekstop.Services.Auth;
+namespace AumoDekstop.Features.Auth.Services;
 
 public interface IGoogleAuthProvider
 {

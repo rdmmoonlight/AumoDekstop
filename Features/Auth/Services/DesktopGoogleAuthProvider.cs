@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json;
 using Windows.System;
 
-namespace AumoDekstop.Services.Auth;
+namespace AumoDekstop.Features.Auth.Services;
 
 public sealed class DesktopGoogleAuthProvider : IGoogleAuthProvider
 {

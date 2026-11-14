@@ -2,13 +2,13 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 
-namespace AumoDekstop.Controls.Auth;
+namespace AumoDekstop.Features.Auth.Controls;
 
 public sealed partial class AuthFormSkeleton : UserControl
 {
     public AuthFormSkeleton()
     {
-        this.InitializeComponent();
+        Application.LoadComponent(this, new System.Uri("ms-appx:///Features/Auth/Controls/AuthFormSkeleton.xaml"));
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)

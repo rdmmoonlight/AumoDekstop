@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace AumoDekstop.ViewModels.Auth;
+namespace AumoDekstop.Features.Auth.ViewModels;
 
 public partial class RegisterViewModel : ObservableObject
 {

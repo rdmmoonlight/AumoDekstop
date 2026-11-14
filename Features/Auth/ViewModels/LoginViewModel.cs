@@ -1,9 +1,9 @@
-using AumoDekstop.Models.Auth;
-using AumoDekstop.Services.Auth;
+using AumoDekstop.Features.Auth.Models;
+using AumoDekstop.Features.Auth.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-namespace AumoDekstop.ViewModels.Auth;
+namespace AumoDekstop.Features.Auth.ViewModels;
 
 public partial class LoginViewModel : ObservableObject
 {
@@ -43,8 +43,8 @@ public partial class LoginViewModel : ObservableObject
 
     private bool CanSubmit() =>
         !IsPending &&
-        !string.IsNullOrWhiteSpace(Email) &&
-        !string.IsNullOrWhiteSpace(Password);
+        !string.IsNullOrWhiteSpace(_email) &&
+        !string.IsNullOrWhiteSpace(_password);
 
     [RelayCommand(CanExecute = nameof(CanSubmit))]
     private async Task SubmitAsync()

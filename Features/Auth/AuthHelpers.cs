@@ -1,8 +1,8 @@
 using System.Text.Json;
-using AumoDekstop.Models.Auth;
+using AumoDekstop.Features.Auth.Models;
 using AumoDekstop.Services;
 
-namespace AumoDekstop.Helpers;
+namespace AumoDekstop.Features.Auth.Helpers;
 
 public static class AuthHelpers
 {

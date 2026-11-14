@@ -1,9 +1,9 @@
-using System;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
-using AumoDekstop.Features.Periods.Models;
 
 namespace AumoDekstop.Features.Periods.ViewModels;
+
+public sealed record CreatePeriodPayload(string StartDate, string EndDate);
 
 public partial class PeriodFormState : ObservableObject
 {

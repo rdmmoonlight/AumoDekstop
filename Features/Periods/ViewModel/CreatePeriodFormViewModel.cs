@@ -1,10 +1,6 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+using AumoDekstop.Features.Periods.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using AumoDekstop.Features.Periods.Models;
-using AumoDekstop.Features.Periods.Services;
 
 namespace AumoDekstop.Features.Periods.ViewModels;
 

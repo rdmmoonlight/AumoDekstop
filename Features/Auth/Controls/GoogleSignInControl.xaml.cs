@@ -1,8 +1,8 @@
-using AumoDekstop.ViewModels.Auth;
+using AumoDekstop.Features.Auth.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 
-namespace AumoDekstop.Controls.Auth;
+namespace AumoDekstop.Features.Auth.Controls;
 
 public sealed partial class GoogleSignInControl : UserControl
 {
@@ -13,7 +13,6 @@ public sealed partial class GoogleSignInControl : UserControl
 
     public GoogleSignInControl()
     {
-        this.InitializeComponent();
         ViewModel = App.Current.Services.GetRequiredService<GoogleSignInViewModel>();
         ViewModel.LoginSucceeded += (_, args) => LoginSucceeded?.Invoke(this, args);
     }

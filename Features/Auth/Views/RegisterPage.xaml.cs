@@ -1,10 +1,10 @@
-using AumoDekstop.Helpers;
-using AumoDekstop.ViewModels.Auth;
+using AumoDekstop.Features.Auth.Helpers;
+using AumoDekstop.Features.Auth.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
-namespace AumoDekstop.Views.Auth;
+namespace AumoDekstop.Features.Auth.Views.RegisterPage;
 
 public sealed partial class RegisterPage : Page
 {
@@ -15,7 +15,9 @@ public sealed partial class RegisterPage : Page
 
     public RegisterPage()
     {
-        this.InitializeComponent();
+        Microsoft.UI.Xaml.Application.LoadComponent(
+            this,
+            new Uri("ms-appx:///Features/Auth/Views/RegisterPage.xaml"));
         ViewModel = App.Current.Services.GetRequiredService<RegisterViewModel>();
         ViewModel.RegisterSucceeded += OnAuthSuccess;
     }

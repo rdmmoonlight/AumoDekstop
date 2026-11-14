@@ -1,10 +1,10 @@
 <Page
-    x:Class="AumoDekstop.Views.Auth.LoginPage"
+    x:Class="AumoDekstop.Features.Auth.Views.LoginPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:controls="using:AumoDekstop.Controls.Auth"
+    xmlns:controls="using:AumoDekstop.Features.Auth.Controls"
     mc:Ignorable="d"
     Background="#09090B">
 
@@ -33,8 +33,7 @@
                         Background="#18181B"
                         BorderBrush="#27272A"
                         Foreground="#FFFFFF"
-                        CornerRadius="6"
-                        KeyDown="OnInputKeyDown"/>
+                        CornerRadius="6"/>
                 </StackPanel>
 
                 <!-- Field Kata Sandi -->
@@ -50,8 +49,7 @@
                         Background="#18181B"
                         BorderBrush="#27272A"
                         Foreground="#FFFFFF"
-                        CornerRadius="6"
-                        KeyDown="OnInputKeyDown"/>
+                        CornerRadius="6"/>
                 </StackPanel>
 
                 <!-- Pesan Error (text-sm text-red-400) -->
@@ -92,7 +90,7 @@
             </Grid>
 
             <!-- Komponen Google Sign-In -->
-            <controls:GoogleSignInControl LoginSucceeded="OnGoogleLoginSucceeded"/>
+            <controls:GoogleSignInControl/>
 
         </StackPanel>
     </Grid>

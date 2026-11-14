@@ -1,10 +1,10 @@
-﻿using AumoDekstop.Services;
-using AumoDekstop.Services.Auth;
-using AumoDekstop.ViewModels.Auth;
+﻿using AumoDekstop.Features.Auth.Services;
+using AumoDekstop.Features.Auth.ViewModels;
+using AumoDekstop.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 
-namespace AumoDekstop;
+namespace AumoDekstop.App;
 
 public partial class App : Application
 {
@@ -22,7 +22,6 @@ public partial class App : Application
 
     public App()
     {
-        InitializeComponent();
         Services = ConfigureServices();
     }
 

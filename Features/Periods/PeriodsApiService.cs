@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using AumoDekstop.Features.Periods.Models;
 
 namespace AumoDekstop.Features.Periods.Services;
