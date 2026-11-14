@@ -53,11 +53,7 @@ public partial class App : Application
         services.AddSingleton<IGoogleAuthProvider, DesktopGoogleAuthProvider>();
 
         // 4. Periods
-        services.AddSingleton<IPeriodsApiService>(sp =>
-        {
-            var factory = sp.GetRequiredService<IHttpClientFactory>();
-            return new PeriodsApiService(factory.CreateClient("AumoApi"));
-        });
+        services.AddSingleton<IPeriodsApiService>(_ => new PeriodsApiService(ApiService.Instance));
 
         // 5. ViewModels (Transient: instance baru setiap halaman/kontrol dibuka)
         services.AddTransient<GoogleSignInViewModel>();
