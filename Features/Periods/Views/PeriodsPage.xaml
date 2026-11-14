@@ -32,7 +32,7 @@
                     Grid.Column="1"
                     Style="{ThemeResource AccentButtonStyle}"
                     VerticalAlignment="Center"
-                    IsEnabled="{x:Bind ViewModel.IsCreating.Equals(false), Mode=OneWay}"
+                    IsEnabled="{x:Bind IsNotCreating, Mode=OneWay}"
                     Click="OpenNewPeriodButton_Click">
                     <StackPanel Orientation="Horizontal"
                                 Spacing="8">
