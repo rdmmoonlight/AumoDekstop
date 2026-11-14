@@ -45,7 +45,7 @@
             <views:PeriodsAlertsControl
                 HasActivePeriod="{x:Bind ViewModel.HasActivePeriod, Mode=OneWay}"
                 ActivePeriodName="{x:Bind ActivePeriodName, Mode=OneWay}"
-                WarningMessage="{x:Bind ErrorMessage, Mode=OneWay}" />
+                WarningMessage="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}" />
 
             <!-- Tabel Data Periode -->
             <views:PeriodsTableControl
