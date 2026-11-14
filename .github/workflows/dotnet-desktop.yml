@@ -93,6 +93,8 @@ jobs:
           -p:AssemblyVersion=${{ steps.version.outputs.assembly_version }}
           -p:FileVersion=${{ steps.version.outputs.assembly_version }}
           --no-restore
+          -v normal
+          --consoleloggerparameters:ErrorsOnly;ShowEventId;ShowTimestamp
         env:
           Configuration: ${{ matrix.configuration }}
 
