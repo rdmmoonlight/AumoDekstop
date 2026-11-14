@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
-namespace AumoDekstop.Features.Auth.Views.RegisterPage;
+namespace AumoDekstop.Features.Auth.Views;
 
 public sealed partial class RegisterPage : Page
 {

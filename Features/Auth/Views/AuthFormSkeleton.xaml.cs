@@ -2,7 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 
-namespace AumoDekstop.Features.Auth.Controls;
+namespace AumoDekstop.Features.Auth.Views;
 
 public sealed partial class AuthFormSkeleton : UserControl
 {

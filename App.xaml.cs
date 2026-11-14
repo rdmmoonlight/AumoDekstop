@@ -4,7 +4,7 @@ using AumoDekstop.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 
-namespace AumoDekstop.App;
+namespace AumoDekstop;
 
 public partial class App : Application
 {

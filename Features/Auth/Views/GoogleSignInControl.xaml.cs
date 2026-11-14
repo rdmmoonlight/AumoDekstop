@@ -2,7 +2,7 @@ using AumoDekstop.Features.Auth.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 
-namespace AumoDekstop.Features.Auth.Controls;
+namespace AumoDekstop.Features.Auth.Views;
 
 public sealed partial class GoogleSignInControl : UserControl
 {

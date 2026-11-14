@@ -6,7 +6,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Navigation;
 using Windows.System;
 
-namespace AumoDekstop.Features.Auth.Views.LoginPage;
+namespace AumoDekstop.Features.Auth.Views;
 
 public sealed partial class LoginPage : Page
 {
