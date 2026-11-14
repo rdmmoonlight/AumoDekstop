@@ -10,3 +10,7 @@ AumoDekstop/
 ├── App.xaml         # Konfigurasi tema, resource global, & Dependency Injection
 └── MainWindow.xaml  # Kerangka utama jendela (NavigationView / Frame)
 ````
+
+command:
+build+log: dotnet build -c Debug -r win-x64 -p:Platform=x64 -v normal
+
