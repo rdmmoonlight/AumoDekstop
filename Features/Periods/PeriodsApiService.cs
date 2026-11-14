@@ -1,6 +1,11 @@
-using System.Net.Http.Json;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using AumoDekstop.Features.Periods.Models;
+using AumoDekstop.Services;
 
 namespace AumoDekstop.Features.Periods.Services;
 
@@ -16,23 +21,34 @@ public interface IPeriodsApiService
     Task ClosePeriodAsync(int id, CancellationToken cancellationToken = default);
 }
 
-public sealed class PeriodsApiService(HttpClient httpClient) : IPeriodsApiService
+public sealed class PeriodsApiService : IPeriodsApiService
 {
+    private readonly ApiService _apiService;
+
     public event EventHandler? PeriodContextChanged;
+
+    // Menggunakan ApiService.Instance secara default agar token Bearer & sesi dari proses Login otomatis terbawa
+    public PeriodsApiService(ApiService? apiService = null)
+    {
+        _apiService = apiService ?? ApiService.Instance;
+    }
 
     private void NotifyPeriodChanged() => PeriodContextChanged?.Invoke(this, EventArgs.Empty);
 
     // Mendukung 3 bentuk respons API: PeriodItem[], { items: [...] }, atau GetPeriodsResponse
     public async Task<GetPeriodsResponse> GetPeriodsAsync(CancellationToken cancellationToken = default)
     {
-        using var response = await httpClient.GetAsync("/api/v1/periods", cancellationToken);
-        response.EnsureSuccessStatusCode();
+        var response = await _apiService.GetAsync<JsonElement>("api/v1/periods", cancellationToken);
 
-        using var doc = await JsonDocument.ParseAsync(
-            await response.Content.ReadAsStreamAsync(cancellationToken),
-            cancellationToken: cancellationToken);
+        if (!response.IsSuccess)
+        {
+            throw new HttpRequestException(
+                response.ErrorMessage ?? "Gagal memuat daftar periode.",
+                null,
+                (System.Net.HttpStatusCode)response.StatusCode);
+        }
 
-        var root = doc.RootElement;
+        var root = response.Data;
 
         if (root.ValueKind == JsonValueKind.Array)
         {
@@ -40,7 +56,9 @@ public sealed class PeriodsApiService(HttpClient httpClient) : IPeriodsApiServic
             return new GetPeriodsResponse { Periods = list };
         }
 
-        if (root.TryGetProperty("items", out var itemsProp) && itemsProp.ValueKind == JsonValueKind.Array)
+        if (root.ValueKind == JsonValueKind.Object &&
+            root.TryGetProperty("items", out var itemsProp) &&
+            itemsProp.ValueKind == JsonValueKind.Array)
         {
             var list = itemsProp.Deserialize<List<PeriodItem>>() ?? [];
             return new GetPeriodsResponse { Periods = list };
@@ -51,55 +69,88 @@ public sealed class PeriodsApiService(HttpClient httpClient) : IPeriodsApiServic
 
     public async Task<PeriodsOpenInfo> GetPeriodsOpenInfoAsync(CancellationToken cancellationToken = default)
     {
-        var result = await httpClient.GetFromJsonAsync<PeriodsOpenInfo>(
-            "/api/v1/periods/open-info",
-            cancellationToken);
+        var response = await _apiService.GetAsync<PeriodsOpenInfo>("api/v1/periods/open-info", cancellationToken);
 
-        return result ?? new PeriodsOpenInfo();
+        if (!response.IsSuccess)
+        {
+            throw new HttpRequestException(
+                response.ErrorMessage ?? "Gagal memuat informasi pembukaan periode.",
+                null,
+                (System.Net.HttpStatusCode)response.StatusCode);
+        }
+
+        return response.Data ?? new PeriodsOpenInfo();
     }
 
-    // Catatan: Tipe parameter 'createPeriodRequest' akan kita spesifikkan sesuai struktur di use-create-period-form.ts
     public async Task CreatePeriodAsync(object createPeriodRequest, CancellationToken cancellationToken = default)
     {
-        using var response = await httpClient.PostAsJsonAsync(
-            "/api/v1/periods",
+        var response = await _apiService.PostAsync<object, JsonElement>(
+            "api/v1/periods",
             createPeriodRequest,
             cancellationToken);
 
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccess)
+        {
+            throw new HttpRequestException(
+                response.ErrorMessage ?? "Gagal membuat periode baru.",
+                null,
+                (System.Net.HttpStatusCode)response.StatusCode);
+        }
+
         NotifyPeriodChanged();
     }
 
     public async Task SelectPeriodAsync(int id, CancellationToken cancellationToken = default)
     {
-        using var response = await httpClient.PostAsync(
-            $"/api/v1/periods/{id}/select",
-            content: null,
+        var response = await _apiService.PostAsync<object?, JsonElement>(
+            $"api/v1/periods/{id}/select",
+            null,
             cancellationToken);
 
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccess)
+        {
+            throw new HttpRequestException(
+                response.ErrorMessage ?? "Gagal memilih periode.",
+                null,
+                (System.Net.HttpStatusCode)response.StatusCode);
+        }
+
         NotifyPeriodChanged();
     }
 
     public async Task ClearPeriodSelectionAsync(CancellationToken cancellationToken = default)
     {
-        using var response = await httpClient.PostAsync(
-            "/api/v1/periods/clear-selection",
-            content: null,
+        var response = await _apiService.PostAsync<object?, JsonElement>(
+            "api/v1/periods/clear-selection",
+            null,
             cancellationToken);
 
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccess)
+        {
+            throw new HttpRequestException(
+                response.ErrorMessage ?? "Gagal menghapus pilihan periode.",
+                null,
+                (System.Net.HttpStatusCode)response.StatusCode);
+        }
+
         NotifyPeriodChanged();
     }
 
     public async Task ClosePeriodAsync(int id, CancellationToken cancellationToken = default)
     {
-        using var response = await httpClient.PostAsync(
-            $"/api/v1/periods/{id}/close",
-            content: null,
+        var response = await _apiService.PostAsync<object?, JsonElement>(
+            $"api/v1/periods/{id}/close",
+            null,
             cancellationToken);
 
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccess)
+        {
+            throw new HttpRequestException(
+                response.ErrorMessage ?? "Gagal menutup periode.",
+                null,
+                (System.Net.HttpStatusCode)response.StatusCode);
+        }
+
         NotifyPeriodChanged();
     }
 }
