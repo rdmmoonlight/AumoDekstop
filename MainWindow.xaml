@@ -6,40 +6,282 @@
     Title="AumoDekstop">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.Resources>
+            <!-- Gaya tombol ribbon: ikon besar di atas, label di bawah -->
+            <Style x:Key="RibbonButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Padding" Value="10,6" />
+                <Setter Property="MinWidth" Value="68" />
+                <Setter Property="VerticalAlignment" Value="Stretch" />
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+            </Style>
+        </Grid.Resources>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="28" />
         </Grid.RowDefinitions>
 
-        <!-- 1. Ribbon: tab menu dan tombol aksi -->
+        <!-- 1. RIBBON (tersembunyi sebelum login) -->
         <StackPanel
+            x:Name="RibbonHost"
             Grid.Row="0"
+            Visibility="Collapsed"
             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
             BorderThickness="0,0,0,1">
 
-            <SelectorBar x:Name="RibbonTabs" SelectionChanged="RibbonTabs_SelectionChanged" Padding="8,4,8,0">
-                <SelectorBarItem Text="Beranda" Tag="home" IsSelected="True" />
-                <SelectorBarItem Text="Periods" Tag="periods" />
-                <SelectorBarItem Text="Data &amp; Transaksi" Tag="data" />
-                <SelectorBarItem Text="Laporan" Tag="report" />
-                <SelectorBarItem Text="Pengaturan" Tag="settings" />
-            </SelectorBar>
+            <!-- Baris tab -->
+            <Grid Padding="8,4,8,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-            <CommandBar DefaultLabelPosition="Right" HorizontalAlignment="Left" Background="Transparent">
-                <AppBarButton Icon="Add" Label="Baru" Click="OnNewClick" />
-                <AppBarButton Icon="Save" Label="Simpan" Click="OnSaveClick" />
-                <AppBarSeparator />
-                <AppBarButton Icon="Refresh" Label="Sinkron API" Click="OnSyncClick" />
-                <AppBarButton Icon="Sync" Label="Cek Update" Click="OnCheckUpdateClick" />
-            </CommandBar>
+                <SelectorBar x:Name="RibbonTabs" Grid.Column="0" SelectionChanged="RibbonTabs_SelectionChanged">
+                    <SelectorBarItem x:Name="HomeTab" Text="Beranda" Tag="home" IsSelected="True" />
+                    <SelectorBarItem Text="Periods" Tag="periods" />
+                    <SelectorBarItem Text="Data &amp; Transaksi" Tag="data" />
+                    <SelectorBarItem Text="Laporan" Tag="report" />
+                    <SelectorBarItem Text="Pengaturan" Tag="settings" />
+                </SelectorBar>
+
+                <Button Grid.Column="1" Content="Keluar" Click="OnLogoutClick" Background="Transparent" BorderThickness="0" />
+            </Grid>
+
+            <!-- Isi ribbon: grup tombol sesuai tab aktif -->
+            <Border Height="96" Padding="8,4" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="0,1,0,0">
+                <StackPanel x:Name="RibbonHome" Orientation="Horizontal">
+                    <Grid Padding="4,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButtonStyle}" Click="OnNewClick">
+                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE710;" FontSize="24" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Baru" FontSize="12" TextAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButtonStyle}" Click="OnSaveClick">
+                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE74E;" FontSize="24" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Simpan" FontSize="12" TextAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="Berkas" FontSize="11" HorizontalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </Grid>
+                    <Rectangle Width="1" Height="64" Margin="4,0" VerticalAlignment="Center"
+                               Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                    <Grid Padding="4,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButtonStyle}" Click="OnSyncClick">
+                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE72C;" FontSize="24" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Sinkron API" FontSize="12" TextAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="Server" FontSize="11" HorizontalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </Grid>
+                    <Rectangle Width="1" Height="64" Margin="4,0" VerticalAlignment="Center"
+                               Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                    <Grid Padding="4,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButtonStyle}" Click="OnCheckUpdateClick">
+                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE895;" FontSize="24" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Cek Update" FontSize="12" TextAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="Aplikasi" FontSize="11" HorizontalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </Grid>
+                </StackPanel>
+                <StackPanel x:Name="RibbonPeriods" Orientation="Horizontal" Visibility="Collapsed">
+                    <Grid Padding="4,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButtonStyle}" Click="OnNewClick">
+                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE787;" FontSize="24" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Buka Periode" FontSize="12" TextAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButtonStyle}" Click="OnRefreshPeriodsClick">
+                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE72C;" FontSize="24" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Muat Ulang" FontSize="12" TextAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="Periode" FontSize="11" HorizontalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </Grid>
+                </StackPanel>
+                <StackPanel x:Name="RibbonData" Orientation="Horizontal" Visibility="Collapsed">
+                    <Grid Padding="4,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButtonStyle}" Click="OnComingSoonClick">
+                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE710;" FontSize="24" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Tambah" FontSize="12" TextAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButtonStyle}" Click="OnComingSoonClick">
+                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE70F;" FontSize="24" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Ubah" FontSize="12" TextAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButtonStyle}" Click="OnComingSoonClick">
+                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE74D;" FontSize="24" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Hapus" FontSize="12" TextAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="Transaksi" FontSize="11" HorizontalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </Grid>
+                    <Rectangle Width="1" Height="64" Margin="4,0" VerticalAlignment="Center"
+                               Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                    <Grid Padding="4,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButtonStyle}" Click="OnComingSoonClick">
+                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE8C8;" FontSize="24" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Salin" FontSize="12" TextAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="Berkas" FontSize="11" HorizontalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </Grid>
+                </StackPanel>
+                <StackPanel x:Name="RibbonReport" Orientation="Horizontal" Visibility="Collapsed">
+                    <Grid Padding="4,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButtonStyle}" Click="OnComingSoonClick">
+                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE9D2;" FontSize="24" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Laba Rugi" FontSize="12" TextAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButtonStyle}" Click="OnComingSoonClick">
+                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE8A5;" FontSize="24" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Neraca" FontSize="12" TextAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="Laporan" FontSize="11" HorizontalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </Grid>
+                    <Rectangle Width="1" Height="64" Margin="4,0" VerticalAlignment="Center"
+                               Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                    <Grid Padding="4,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButtonStyle}" Click="OnComingSoonClick">
+                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE749;" FontSize="24" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Cetak" FontSize="12" TextAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButtonStyle}" Click="OnComingSoonClick">
+                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE896;" FontSize="24" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Ekspor" FontSize="12" TextAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="Keluaran" FontSize="11" HorizontalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </Grid>
+                </StackPanel>
+                <StackPanel x:Name="RibbonSettings" Orientation="Horizontal" Visibility="Collapsed">
+                    <Grid Padding="4,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButtonStyle}" Click="OnLogoutClick">
+                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE7E8;" FontSize="24" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Keluar" FontSize="12" TextAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="Akun" FontSize="11" HorizontalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </Grid>
+                    <Rectangle Width="1" Height="64" Margin="4,0" VerticalAlignment="Center"
+                               Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                    <Grid Padding="4,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonButtonStyle}" Click="OnCheckUpdateClick">
+                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE895;" FontSize="24" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Cek Update" FontSize="12" TextAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButtonStyle}" Click="OnComingSoonClick">
+                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE713;" FontSize="24" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Preferensi" FontSize="12" TextAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="Aplikasi" FontSize="11" HorizontalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
         </StackPanel>
 
-        <!-- 2. Workspace utama (diisi lewat kode) -->
+        <!-- 2. WORKSPACE UTAMA (halaman login atau halaman aplikasi) -->
         <Frame x:Name="RootFrame" Grid.Row="1" Padding="16" />
 
-        <!-- 3. Status bar bawah -->
+        <!-- 3. STATUS BAR -->
         <Grid
             Grid.Row="2"
             Padding="12,0"

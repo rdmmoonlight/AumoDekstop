@@ -1,3 +1,5 @@
+using AumoDekstop.Features.Auth.Services;
+using AumoDekstop.Features.Auth.Views;
 using AumoDekstop.Features.Periods.ViewModels;
 using AumoDekstop.Features.Periods.Views;
 using AumoDekstop.Services;
@@ -15,6 +17,9 @@ public sealed partial class MainWindow : Window
 
     // Halaman Periods dibuat lewat DI (konstruktor membutuhkan ViewModel), lalu disimpan agar tidak dimuat ulang.
     private PeriodsPage? _periodsPage;
+    private LoginPage? _loginPage;
+
+    private readonly IAuthService _auth = App.Current.Services.GetRequiredService<IAuthService>();
 
     public MainWindow()
     {
@@ -33,8 +38,15 @@ public sealed partial class MainWindow : Window
         if (_hasCheckedUpdate) return;
         _hasCheckedUpdate = true;
 
-        ShowHome();
-        SetStatus($"● Siap | Versi: v{GitHubUpdateService.GetCurrentVersionString()} | Server: {ApiService.BaseServerUrl}");
+        // Gerbang autentikasi: tanpa sesi login, tampilkan halaman login dan sembunyikan ribbon
+        if (_auth.IsAuthenticated)
+        {
+            EnterApp();
+        }
+        else
+        {
+            ShowLogin();
+        }
 
         await CheckAndPromptUpdateAsync(isManualCheck: false);
     }
@@ -44,6 +56,78 @@ public sealed partial class MainWindow : Window
         if (StatusText is not null)
         {
             StatusText.Text = text;
+        }
+    }
+
+    private void ShowLogin()
+    {
+        RibbonHost.Visibility = Visibility.Collapsed;
+        _periodsPage = null;
+
+        if (_loginPage is not null)
+        {
+            _loginPage.LoginSucceeded -= OnLoginSucceeded;
+        }
+
+        _loginPage = new LoginPage();
+        _loginPage.LoginSucceeded += OnLoginSucceeded;
+        RootFrame.Content = _loginPage;
+
+        SetStatus($"● Silakan masuk | Server: {ApiService.BaseServerUrl}");
+    }
+
+    private void OnLoginSucceeded(object? sender, EventArgs e)
+    {
+        EnterApp();
+    }
+
+    private void EnterApp()
+    {
+        RibbonHost.Visibility = Visibility.Visible;
+        RibbonTabs.SelectedItem = HomeTab;
+        ShowRibbonPanel("home");
+        ShowHome();
+        SetStatus($"● Siap | Versi: v{GitHubUpdateService.GetCurrentVersionString()} | Server: {ApiService.BaseServerUrl}");
+    }
+
+    private async void OnLogoutClick(object sender, RoutedEventArgs e)
+    {
+        SetStatus("● Keluar dari akun...");
+
+        try
+        {
+            await _auth.LogoutAsync();
+        }
+        catch
+        {
+            // Sesi lokal tetap dibersihkan walau server tidak merespons
+            _auth.ClearSession();
+        }
+
+        ShowLogin();
+    }
+
+    private void ShowRibbonPanel(string? tag)
+    {
+        RibbonHome.Visibility = tag == "home" ? Visibility.Visible : Visibility.Collapsed;
+        RibbonPeriods.Visibility = tag == "periods" ? Visibility.Visible : Visibility.Collapsed;
+        RibbonData.Visibility = tag == "data" ? Visibility.Visible : Visibility.Collapsed;
+        RibbonReport.Visibility = tag == "report" ? Visibility.Visible : Visibility.Collapsed;
+        RibbonSettings.Visibility = tag == "settings" ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void OnComingSoonClick(object sender, RoutedEventArgs e)
+    {
+        SetStatus("● Fitur ini belum tersedia.");
+    }
+
+    private async void OnRefreshPeriodsClick(object sender, RoutedEventArgs e)
+    {
+        if (RootFrame.Content is PeriodsPage periodsPage)
+        {
+            SetStatus("● Memuat ulang daftar periode...");
+            await periodsPage.ViewModel.FetchPeriodsCommand.ExecuteAsync(null);
+            SetStatus("● Daftar periode diperbarui.");
         }
     }
 
@@ -198,9 +282,12 @@ public sealed partial class MainWindow : Window
 
         if (sender.SelectedItem is not SelectorBarItem selected) return;
 
+        string? tag = selected.Tag?.ToString();
+        ShowRibbonPanel(tag);
+
         SetStatus($"● Tab aktif: {selected.Text} | Versi: v{GitHubUpdateService.GetCurrentVersionString()} | Server: {ApiService.BaseServerUrl}");
 
-        switch (selected.Tag?.ToString())
+        switch (tag)
         {
             case "periods":
                 ShowPeriods();

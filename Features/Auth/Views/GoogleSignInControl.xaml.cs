@@ -15,5 +15,8 @@ public sealed partial class GoogleSignInControl : UserControl
     {
         ViewModel = App.Current.Services.GetRequiredService<GoogleSignInViewModel>();
         ViewModel.LoginSucceeded += (_, args) => LoginSucceeded?.Invoke(this, args);
+
+        // Wajib dipanggil agar tampilan dan binding XAML dimuat
+        InitializeComponent();
     }
 }

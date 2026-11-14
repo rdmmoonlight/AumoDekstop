@@ -28,6 +28,7 @@
                     <TextBox
                         Text="{x:Bind ViewModel.Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         PlaceholderText="nama@email.com"
+                        KeyDown="OnInputKeyDown"
                         InputScope="EmailSmtpAddress"
                         IsEnabled="{x:Bind ViewModel.IsNotPending, Mode=OneWay}"
                         Background="#18181B"
@@ -45,6 +46,7 @@
                         Foreground="#FAFAFA"/>
                     <PasswordBox
                         Password="{x:Bind ViewModel.Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        KeyDown="OnInputKeyDown"
                         IsEnabled="{x:Bind ViewModel.IsNotPending, Mode=OneWay}"
                         Background="#18181B"
                         BorderBrush="#27272A"
@@ -90,7 +92,7 @@
             </Grid>
 
             <!-- Komponen Google Sign-In -->
-            <controls:GoogleSignInControl/>
+            <controls:GoogleSignInControl LoginSucceeded="OnGoogleLoginSucceeded"/>
 
         </StackPanel>
     </Grid>
