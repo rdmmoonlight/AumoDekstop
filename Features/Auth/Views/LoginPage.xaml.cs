@@ -17,24 +17,29 @@ public sealed partial class LoginPage : Page
 
     public LoginPage()
     {
-        Microsoft.UI.Xaml.Application.LoadComponent(
-            this,
-            new Uri("ms-appx:///Features/Auth/Views/LoginPage.xaml"));
+        // 1. Resolve ViewModel TERLEBIH DAHULU sebelum InitializeComponent()
         ViewModel = App.Current.Services.GetRequiredService<LoginViewModel>();
         ViewModel.LoginSucceeded += OnAuthSuccess;
+
+        // 2. Gunakan InitializeComponent() agar {x:Bind} terhubung dengan benar
+        this.InitializeComponent();
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        // Jika halaman dipanggil dengan parameter rute redirect (misal "/dashboard")
         if (e.Parameter is string redirectPath)
         {
             _redirectPath = redirectPath;
         }
     }
 
-    // Menggantikan perilaku submit <form> saat pengguna menekan tombol Enter
+    protected override void OnNavigatedFrom(NavigationEventArgs e)
+    {
+        base.OnNavigatedFrom(e);
+        ViewModel.LoginSucceeded -= OnAuthSuccess;
+    }
+
     private void OnInputKeyDown(object sender, KeyRoutedEventArgs e)
     {
         if (e.Key == VirtualKey.Enter && ViewModel.SubmitCommand.CanExecute(null))
@@ -53,7 +58,6 @@ public sealed partial class LoginPage : Page
     {
         LoginSucceeded?.Invoke(this, EventArgs.Empty);
 
-        // Jika LoginPage digunakan dalam Frame navigasi utama, arahkan otomatis ke halaman tujuan
         if (Frame is not null)
         {
             var targetPage = AuthHelpers.ResolvePostLoginPage(_redirectPath);
