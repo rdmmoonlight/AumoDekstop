@@ -97,14 +97,13 @@ jobs:
             '--consoleloggerparameters:ErrorsOnly;ShowEventId;ShowTimestamp'
 
           if ($LASTEXITCODE -ne 0) {
-            Write-Host "=== Menjalankan XamlCompiler.exe secara langsung untuk menangkap Exception ==="
             $xamlExe = Get-ChildItem -Path "$env:USERPROFILE\.nuget\packages\microsoft.windowsappsdk.winui" -Recurse -Filter "XamlCompiler.exe" | Select-Object -First 1
-            $inputJson = Get-ChildItem -Path "obj" -Recurse -Filter "input.json" | Select-Object -First 1
+            $inputJson = Get-ChildItem -Path . -Recurse -Filter "input.json" | Select-Object -First 1
+            Write-Host "XamlExe: $($xamlExe.FullName)"
+            Write-Host "InputJson: $($inputJson.FullName)"
             if ($xamlExe -and $inputJson) {
-              & $xamlExe.FullName $inputJson.FullName "obj\debug_pass2_output.json"
-              if (Test-Path "obj\debug_pass2_output.json") {
-                Get-Content "obj\debug_pass2_output.json"
-              }
+              & $xamlExe.FullName $inputJson.FullName "debug_pass2.json" 2>&1 | Out-String | Write-Host
+              if (Test-Path "debug_pass2.json") { Get-Content "debug_pass2.json" }
             }
             exit 1
           }
