@@ -1,9 +1,10 @@
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using AumoDekstop.Features.Periods.Helpers;
 
 namespace AumoDekstop.Features.Periods.Models;
 
-public sealed class PeriodItem
+public class PeriodItem
 {
     [JsonPropertyName("id")]
     public int Id { get; set; }
@@ -38,7 +39,7 @@ public sealed class PeriodItem
     public bool CanSelect => !IsClosed && !IsSelected;
 }
 
-public sealed class GetPeriodsResponse
+public class GetPeriodsResponse
 {
     [JsonPropertyName("success")]
     public bool? Success { get; set; }
@@ -47,10 +48,10 @@ public sealed class GetPeriodsResponse
     public int? SelectedPeriodId { get; set; }
 
     [JsonPropertyName("periods")]
-    public List<PeriodItem> Periods { get; set; } = [];
+    public List<PeriodItem> Periods { get; set; } = new List<PeriodItem>();
 }
 
-public sealed class AccountSummary
+public class AccountSummary
 {
     [JsonPropertyName("id")]
     public int Id { get; set; }
@@ -65,7 +66,7 @@ public sealed class AccountSummary
     public string DisplayLabel => $"{Code} - {Name}";
 }
 
-public sealed class PeriodsOpenInfo
+public class PeriodsOpenInfo
 {
     [JsonPropertyName("hasExistingPermanentAccounts")]
     public bool HasExistingPermanentAccounts { get; set; }
