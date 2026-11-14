@@ -83,18 +83,26 @@ jobs:
           Configuration: ${{ matrix.configuration }}
 
       - name: Build application
-        run: >
-          dotnet build $env:Project_Path
-          -c $env:Configuration
-          -r win-x64
-          -p:Platform=x64
-          -p:Version=${{ steps.version.outputs.semver_version }}
-          -p:InformationalVersion=${{ steps.version.outputs.app_version }}
-          -p:AssemblyVersion=${{ steps.version.outputs.assembly_version }}
-          -p:FileVersion=${{ steps.version.outputs.assembly_version }}
-          --no-restore
-          -v normal
-          --consoleloggerparameters:ErrorsOnly;ShowEventId;ShowTimestamp
+        run: |
+          dotnet build $env:Project_Path `
+            -c $env:Configuration `
+            -r win-x64 `
+            -p:Platform=x64 `
+            -p:Version=${{ steps.version.outputs.semver_version }} `
+            -p:InformationalVersion=${{ steps.version.outputs.app_version }} `
+            -p:AssemblyVersion=${{ steps.version.outputs.assembly_version }} `
+            -p:FileVersion=${{ steps.version.outputs.assembly_version }} `
+            --no-restore `
+            -v normal `
+            '--consoleloggerparameters:ErrorsOnly;ShowEventId;ShowTimestamp'
+
+          if ($LASTEXITCODE -ne 0) {
+            Get-ChildItem -Path . -Recurse -Filter "output.json" | ForEach-Object {
+              Write-Host "=== XAML Compiler Output ($($_.FullName)) ==="
+              Get-Content $_.FullName
+            }
+            exit 1
+          }
         env:
           Configuration: ${{ matrix.configuration }}
 
