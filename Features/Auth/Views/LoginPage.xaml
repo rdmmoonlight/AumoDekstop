@@ -44,7 +44,7 @@
                         FontWeight="Medium"
                         Foreground="#FAFAFA"/>
                     <PasswordBox
-                        Password="{x:Bind ViewModel.Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Password="{x:Bind ViewModel.Password, Mode=TwoWay}"
                         KeyDown="OnInputKeyDown"
                         IsEnabled="{x:Bind ViewModel.IsNotPending, Mode=OneWay}"
                         Background="#18181B"
