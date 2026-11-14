@@ -1,4 +1,6 @@
 ﻿using AumoDekstop.Services;
+using AumoDekstop.Services.Auth;
+using AumoDekstop.ViewModels.Auth;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 
@@ -28,19 +30,31 @@ public partial class App : Application
     {
         var services = new ServiceCollection();
 
-        // 1. Konfigurasi HttpClient ke backend Render
-        services.AddHttpClient<ApiService>(client =>
+        // 1. Konfigurasi Named HttpClient untuk backend Render
+        services.AddHttpClient("AumoApi", client =>
         {
-            client.BaseAddress = new Uri("https://aumo.onrender.com/");
+            client.BaseAddress = new Uri(ApiService.BaseServerUrl);
             client.DefaultRequestHeaders.Add("Accept", "application/json");
-
             // Catatan: Render (terutama paket free tier) butuh waktu ~30-50 detik untuk cold start
             client.Timeout = TimeSpan.FromSeconds(60);
         });
 
-        // 2. Daftarkan ViewModels (Transient: instance baru setiap kali halaman dibuka)
+        // 2. Daftarkan ApiService sebagai Singleton agar SetAuthToken() bertahan di seluruh sesi
+        services.AddSingleton<ApiService>(sp =>
+        {
+            var factory = sp.GetRequiredService<IHttpClientFactory>();
+            return new ApiService(factory.CreateClient("AumoApi"));
+        });
+
+        // 3. Daftarkan Layanan Autentikasi & Google OAuth Provider
+        services.AddSingleton<IAuthService, AuthService>();
+        services.AddSingleton<IGoogleAuthProvider, DesktopGoogleAuthProvider>();
+
+        // 4. Daftarkan ViewModels (Transient: instance baru setiap kali halaman/kontrol dibuka)
         // services.AddTransient<DashboardViewModel>();
-        // services.AddTransient<LoginViewModel>();
+        services.AddTransient<GoogleSignInViewModel>();
+        services.AddTransient<LoginViewModel>();
+        services.AddTransient<RegisterViewModel>();
 
         return services.BuildServiceProvider();
     }

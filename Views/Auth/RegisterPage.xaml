@@ -1,0 +1,30 @@
+<Page
+    x:Class="AumoDekstop.Views.Auth.RegisterPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:AumoDekstop.Controls.Auth"
+    mc:Ignorable="d"
+    Background="#09090B">
+
+    <Grid Padding="24">
+        <StackPanel
+            MaxWidth="400"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Center"
+            Spacing="16">
+
+            <!-- Teks keterangan (text-sm text-zinc-400) -->
+            <TextBlock
+                Text="Pendaftaran akun baru dilakukan melalui akun Google Anda."
+                FontSize="14"
+                Foreground="#A1A1AA"
+                TextWrapping="Wrap"/>
+
+            <!-- Komponen Google Sign-In -->
+            <controls:GoogleSignInControl LoginSucceeded="OnGoogleRegisterSucceeded"/>
+
+        </StackPanel>
+    </Grid>
+</Page>

@@ -1,0 +1,79 @@
+<UserControl
+    x:Class="AumoDekstop.Controls.Auth.GoogleSignInControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <!-- space-y-2 (Spacing="8") -->
+    <StackPanel Spacing="8">
+
+        <!-- Peringatan jika GOOGLE_CLIENT_ID kosong -->
+        <Border
+            Visibility="{x:Bind ViewModel.HasNoClientId, Mode=OneWay}"
+            Background="#18181B"
+            BorderBrush="#27272A"
+            BorderThickness="1"
+            CornerRadius="6"
+            Padding="12">
+            <TextBlock
+                Text="Login Google belum dikonfigurasi (GOOGLE_CLIENT_ID kosong)."
+                FontSize="12"
+                Foreground="#A1A1AA"
+                TextWrapping="Wrap"/>
+        </Border>
+
+        <!-- Tombol Login Google jika Client ID tersedia -->
+        <Button
+            Visibility="{x:Bind ViewModel.HasClientId, Mode=OneWay}"
+            Command="{x:Bind ViewModel.SignInWithGoogleCommand}"
+            HorizontalAlignment="Stretch"
+            Height="40"
+            CornerRadius="6"
+            Background="#FFFFFF"
+            Foreground="#18181B">
+            <StackPanel Orientation="Horizontal"
+                    Spacing="10"
+                    HorizontalAlignment="Center">
+                <ProgressRing
+                    IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
+                    Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
+                    Width="16"
+                    Height="16"
+                    Foreground="#18181B"/>
+
+                <!-- Ikon G standar Google berbasis Path vector -->
+                <Viewbox Width="16"
+                        Height="16">
+                    <Canvas Width="24"
+                            Height="24">
+                        <Path Fill="#4285F4"
+                                Data="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
+                        <Path Fill="#34A853"
+                                Data="M12 24c3.3 0 6.08-1.09 8.1-2.96l-3.88-3.05c-1.1.74-2.51 1.18-4.22 1.18-3.24 0-5.99-2.19-6.97-5.13H1.02v3.14C3.05 21.2 7.24 24 12 24Z"/>
+                        <Path Fill="#FBBC05"
+                                Data="M5.03 14.04c-.25-.74-.39-1.54-.39-2.36 0-.82.14-1.62.39-2.36V6.18H1.02C.37 7.47 0 8.93 0 10.5s.37 3.03 1.02 4.32l4.01-3.14Z"/>
+                        <Path Fill="#EA4335"
+                                Data="M12 4.75c1.79 0 3.41.62 4.68 1.82l3.51-3.51C18.07 1.19 15.3 0 12 0 7.24 0 3.05 2.8 1.02 6.82l4.01 3.14c.98-2.94 3.73-5.21 6.97-5.21Z"/>
+                    </Canvas>
+                </Viewbox>
+
+                <TextBlock
+                    Text="Masuk dengan Google"
+                    FontWeight="SemiBold"
+                    VerticalAlignment="Center"/>
+            </StackPanel>
+        </Button>
+
+        <!-- Pesan Error (text-center text-xs text-red-400) -->
+        <TextBlock
+            Visibility="{x:Bind ViewModel.HasError, Mode=OneWay}"
+            Text="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}"
+            Foreground="#F87171"
+            FontSize="12"
+            TextAlignment="Center"
+            TextWrapping="Wrap"/>
+
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,108 @@
+<UserControl
+        x:Class="AumoDekstop.Controls.Auth.AuthFormSkeleton"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Loaded="OnLoaded"
+        Unloaded="OnUnloaded">
+
+        <UserControl.Resources>
+                <!-- Warna setara bg-zinc-800 (#27272A) -->
+                <SolidColorBrush x:Key="SkeletonBrush"
+                                 Color="#27272A"/>
+
+                <!-- Animasi pulse halus menggunakan Storyboard standar WinUI 3 -->
+                <Storyboard x:Key="PulseAnimation"
+                            RepeatBehavior="Forever"
+                            AutoReverse="True">
+                        <DoubleAnimation
+                                Storyboard.TargetName="RootPanel"
+                                Storyboard.TargetProperty="Opacity"
+                                From="1.0"
+                                To="0.45"
+                                Duration="0:0:0.9"/>
+                </Storyboard>
+        </UserControl.Resources>
+
+        <!-- space-y-4 (Spacing="16") -->
+        <StackPanel x:Name="RootPanel"
+                    Spacing="16">
+
+                <!-- Header Skeleton (space-y-2 -> Spacing="8") -->
+                <StackPanel Spacing="8">
+                        <Grid>
+                                <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- h-4 (Height="16") w-3/4 -->
+                                <Border Grid.Column="0"
+                                        Height="16"
+                                        CornerRadius="4"
+                                        Background="{StaticResource SkeletonBrush}"/>
+                        </Grid>
+
+                        <Grid>
+                                <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="1*"/>
+                                        <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- h-3 (Height="12") w-1/2 -->
+                                <Border Grid.Column="0"
+                                        Height="12"
+                                        CornerRadius="4"
+                                        Background="{StaticResource SkeletonBrush}"/>
+                        </Grid>
+                </StackPanel>
+
+                <!-- Form Input Skeletons (space-y-3 pt-2 -> Spacing="12" Margin="0,8,0,0") -->
+                <StackPanel Spacing="12"
+                            Margin="0,8,0,0">
+                        <!-- Input 1 (space-y-1.5 -> Spacing="6") -->
+                        <StackPanel Spacing="6">
+                                <!-- h-3 w-16 (Height="12" Width="64") -->
+                                <Border Height="12"
+                                        Width="64"
+                                        HorizontalAlignment="Left"
+                                        CornerRadius="4"
+                                        Background="{StaticResource SkeletonBrush}"/>
+                                <!-- h-10 w-full rounded-md (Height="40" CornerRadius="6") -->
+                                <Border Height="40"
+                                        CornerRadius="6"
+                                        Background="{StaticResource SkeletonBrush}"/>
+                        </StackPanel>
+
+                        <!-- Input 2 (space-y-1.5 -> Spacing="6") -->
+                        <StackPanel Spacing="6">
+                                <!-- h-3 w-20 (Height="12" Width="80") -->
+                                <Border Height="12"
+                                        Width="80"
+                                        HorizontalAlignment="Left"
+                                        CornerRadius="4"
+                                        Background="{StaticResource SkeletonBrush}"/>
+                                <!-- h-10 w-full rounded-md (Height="40" CornerRadius="6") -->
+                                <Border Height="40"
+                                        CornerRadius="6"
+                                        Background="{StaticResource SkeletonBrush}"/>
+                        </StackPanel>
+                </StackPanel>
+
+                <!-- Button Skeleton (h-10 w-full rounded-md) -->
+                <Border Height="40"
+                        CornerRadius="6"
+                        Background="{StaticResource SkeletonBrush}"/>
+
+                <!-- Divider Skeleton (py-2 -> Margin="0,8" h-[1px]) -->
+                <Border Height="1"
+                        Margin="0,8"
+                        Background="{StaticResource SkeletonBrush}"/>
+
+                <!-- Social/Google Button Skeleton (h-10 w-full rounded-md) -->
+                <Border Height="40"
+                        CornerRadius="6"
+                        Background="{StaticResource SkeletonBrush}"/>
+
+        </StackPanel>
+</UserControl>

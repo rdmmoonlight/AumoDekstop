@@ -2,15 +2,25 @@
 <Application
     x:Class="AumoDekstop.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:AumoDekstop">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls"/>
                 <!-- Other merged dictionaries here -->
             </ResourceDictionary.MergedDictionaries>
             <!-- Other app resources here -->
+            <!-- Palet Warna Auth (Setara Tailwind Zinc) -->
+            <SolidColorBrush x:Key="AuthBackgroundBrush"
+                    Color="#09090B"/>
+            <SolidColorBrush x:Key="AuthSurfaceBrush"
+                    Color="#18181B"/>
+            <SolidColorBrush x:Key="AuthBorderBrush"
+                    Color="#27272A"/>
+            <SolidColorBrush x:Key="AuthMutedTextBrush"
+                    Color="#A1A1AA"/>
+            <SolidColorBrush x:Key="AuthErrorTextBrush"
+                    Color="#F87171"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
