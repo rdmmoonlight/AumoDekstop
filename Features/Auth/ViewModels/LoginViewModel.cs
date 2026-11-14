@@ -17,6 +17,10 @@ public partial class LoginViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(SubmitCommand))]
     private string _password = string.Empty;
 
+    // Properti yang sebelumnya hilang dan menyebabkan XAML Compiler crash
+    [ObservableProperty]
+    private bool _rememberMe;
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasError))]
     private string _errorMessage = string.Empty;
@@ -33,7 +37,6 @@ public partial class LoginViewModel : ObservableObject
     public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
     public string SubmitButtonText => IsPending ? "Memproses..." : "Masuk";
 
-    // Pengganti defineEmits<{ (e: 'success'): void }>()
     public event EventHandler? LoginSucceeded;
 
     public LoginViewModel(IAuthService authService)
@@ -43,20 +46,22 @@ public partial class LoginViewModel : ObservableObject
 
     private bool CanSubmit() =>
         !IsPending &&
-        !string.IsNullOrWhiteSpace(_email) &&
-        !string.IsNullOrWhiteSpace(_password);
+        !string.IsNullOrWhiteSpace(Email) &&
+        !string.IsNullOrWhiteSpace(Password);
 
     [RelayCommand(CanExecute = nameof(CanSubmit))]
-    private async Task SubmitAsync()
+    private async Task SubmitAsync(CancellationToken cancellationToken)
     {
         ErrorMessage = string.Empty;
         IsPending = true;
 
         try
         {
-            var res = await ((AuthService)_authService).LoginAsync(
+            // Panggil langsung melalui interface IAuthService tanpa casting ke AuthService
+            // (Sesuaikan parameter LoginRequest jika mendukung RememberMe)
+            var res = await _authService.LoginAsync(
                 new LoginRequest(Email.Trim(), Password),
-                System.Threading.CancellationToken.None);
+                cancellationToken);
 
             if (!res.Success)
             {
@@ -65,6 +70,14 @@ public partial class LoginViewModel : ObservableObject
             }
 
             NotifyLoginSuccess();
+        }
+        catch (OperationCanceledException)
+        {
+            // Abaikan jika dibatalkan
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "Terjadi kesalahan saat menghubungkan ke server. Silakan coba lagi.";
         }
         finally
         {
