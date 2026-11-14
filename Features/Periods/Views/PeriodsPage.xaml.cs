@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using AumoDekstop.Features.Periods.ViewModels;
@@ -14,7 +15,11 @@ public sealed partial class PeriodsPage : Page
 
     public bool IsNotCreating => !ViewModel.IsCreating;
 
-    // Constructor untuk Dependency Injection (misal via Microsoft.Extensions.DependencyInjection)
+    // Parameterless constructor WAJIB ada untuk WinUI 3 Frame.Navigate() & XamlTypeInfo generator
+    public PeriodsPage() : this(App.Current.Services.GetRequiredService<PeriodsPageViewModel>())
+    {
+    }
+
     public PeriodsPage(PeriodsPageViewModel viewModel)
     {
         ViewModel = viewModel;
