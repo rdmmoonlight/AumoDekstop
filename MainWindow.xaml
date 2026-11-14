@@ -53,6 +53,7 @@
 
             <!-- Isi ribbon: grup tombol sesuai tab aktif -->
             <Border Height="96" Padding="8,4" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="0,1,0,0">
+                <Grid>
                 <StackPanel x:Name="RibbonHome" Orientation="Horizontal">
                     <Grid Padding="4,0">
                         <Grid.RowDefinitions>
@@ -275,6 +276,7 @@
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     </Grid>
                 </StackPanel>
+                </Grid>
             </Border>
         </StackPanel>
 
