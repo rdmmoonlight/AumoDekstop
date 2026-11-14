@@ -24,7 +24,7 @@ public sealed partial class PeriodsAlertsControl : UserControl
             nameof(WarningMessage),
             typeof(string),
             typeof(PeriodsAlertsControl),
-            new PropertyMetadata(null, OnAlertStateChanged));
+            new PropertyMetadata(string.Empty, OnAlertStateChanged));
 
     public bool HasActivePeriod
     {
@@ -34,14 +34,14 @@ public sealed partial class PeriodsAlertsControl : UserControl
 
     public string ActivePeriodName
     {
-        get => (string)GetValue(ActivePeriodNameProperty);
-        set => SetValue(ActivePeriodNameProperty, value);
+        get => (string)(GetValue(ActivePeriodNameProperty) ?? string.Empty);
+        set => SetValue(ActivePeriodNameProperty, value ?? string.Empty);
     }
 
-    public string? WarningMessage
+    public string WarningMessage
     {
-        get => (string?)GetValue(WarningMessageProperty);
-        set => SetValue(WarningMessageProperty, value);
+        get => (string)(GetValue(WarningMessageProperty) ?? string.Empty);
+        set => SetValue(WarningMessageProperty, value ?? string.Empty);
     }
 
     public bool HasWarningMessage => !string.IsNullOrWhiteSpace(WarningMessage);
