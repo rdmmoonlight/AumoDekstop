@@ -1,9 +1,9 @@
+namespace AumoDekstop.Features.Auth.Services;
+
 using System;
 using System.Linq;
+using AumoDekstop.Services;
 using Windows.Security.Credentials;
-using Windows.Storage;
-
-namespace AumoDekstop.Features.Auth.Services;
 
 public static class SessionStorageService
 {
@@ -13,28 +13,26 @@ public static class SessionStorageService
 
     public static void SaveSession(string email, string authToken, bool rememberMe)
     {
-        var localSettings = ApplicationData.Current.LocalSettings;
-        localSettings.Values[RememberMeKey] = rememberMe;
+        AppLocalSettings.SetBool(RememberMeKey, rememberMe);
 
         // Hapus kredensial lama jika ada
         ClearVault();
 
         if (rememberMe && !string.IsNullOrEmpty(authToken))
         {
-            localSettings.Values[SavedEmailKey] = email;
+            AppLocalSettings.SetString(SavedEmailKey, email);
             var vault = new PasswordVault();
             vault.Add(new PasswordCredential(VaultResourceName, email, authToken));
         }
         else
         {
-            localSettings.Values.Remove(SavedEmailKey);
+            AppLocalSettings.Remove(SavedEmailKey);
         }
     }
 
     public static (string? Email, string? Token) GetSavedSession()
     {
-        var localSettings = ApplicationData.Current.LocalSettings;
-        bool isRemembered = localSettings.Values[RememberMeKey] as bool? ?? false;
+        bool isRemembered = AppLocalSettings.GetBool(RememberMeKey, false);
 
         if (!isRemembered)
             return (null, null);
@@ -59,9 +57,8 @@ public static class SessionStorageService
 
     public static void ClearSession()
     {
-        var localSettings = ApplicationData.Current.LocalSettings;
-        localSettings.Values[RememberMeKey] = false;
-        localSettings.Values.Remove(SavedEmailKey);
+        AppLocalSettings.SetBool(RememberMeKey, false);
+        AppLocalSettings.Remove(SavedEmailKey);
         ClearVault();
     }
 
