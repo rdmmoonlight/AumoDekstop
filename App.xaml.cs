@@ -1,3 +1,5 @@
+namespace AumoDekstop;
+
 using System;
 using System.Net;
 using System.Net.Http;
@@ -8,8 +10,6 @@ using AumoDekstop.Features.Periods.ViewModels;
 using AumoDekstop.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
-
-namespace AumoDekstop;
 
 public partial class App : Application
 {
@@ -88,6 +88,9 @@ public partial class App : Application
         SetTheme(savedTheme);
 
         _window.Activate();
+
+        // Bangunkan server Render sejak aplikasi dibuka (cold start), tanpa menunggu hasilnya
+        _ = Services.GetRequiredService<ApiService>().CheckServerHealthAsync("");
     }
 
     /// <summary>
