@@ -8,7 +8,6 @@ using AumoDekstop.Features.Periods.ViewModels;
 using AumoDekstop.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
-using Windows.Storage;
 
 namespace AumoDekstop;
 
@@ -103,7 +102,7 @@ public partial class App : Application
             rootElement.RequestedTheme = theme;
         }
 
-        ApplicationData.Current.LocalSettings.Values[ThemeSettingKey] = theme.ToString();
+        AppLocalSettings.SetString(ThemeSettingKey, theme.ToString());
     }
 
     /// <summary>
@@ -111,9 +110,8 @@ public partial class App : Application
     /// </summary>
     private static ElementTheme GetSavedTheme()
     {
-        if (ApplicationData.Current.LocalSettings.Values.TryGetValue(ThemeSettingKey, out var value)
-            && value is string themeName
-            && Enum.TryParse<ElementTheme>(themeName, out var parsedTheme))
+        var themeName = AppLocalSettings.GetString(ThemeSettingKey);
+        if (themeName is not null && Enum.TryParse<ElementTheme>(themeName, out var parsedTheme))
         {
             return parsedTheme;
         }
