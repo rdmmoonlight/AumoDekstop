@@ -1,3 +1,5 @@
+namespace AumoDekstop.Services;
+
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -5,8 +7,6 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-
-namespace AumoDekstop.Services;
 
 /// <summary>
 /// Pembungkus standar untuk semua respons dari backend Aumo.
@@ -22,6 +22,11 @@ public sealed class ApiResponse<T>
 public class ApiService
 {
     public const string BaseServerUrl = "https://aumo.onrender.com/";
+
+    // Cold start Render (free tier): nginx sudah aktif, tetapi backend dotnet belum listen -> 502/503.
+    // Request diulang otomatis sampai backend siap (maks. 12 x 5 detik = 60 detik).
+    private const int MaxColdStartRetries = 12;
+    private static readonly TimeSpan ColdStartRetryDelay = TimeSpan.FromSeconds(5);
 
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
@@ -87,17 +92,17 @@ public class ApiService
 
     public async Task<ApiResponse<T>> GetAsync<T>(string endpoint, CancellationToken ct = default)
     {
-        return await SendRequestAsync<T>(() => _httpClient.GetAsync(endpoint.TrimStart('/'), ct), ct);
+        return await SendRequestAsync<T>(() => _httpClient.GetAsync(endpoint.TrimStart('/'), ct), ct, isIdempotent: true);
     }
 
     public async Task<ApiResponse<TResponse>> PostAsync<TRequest, TResponse>(string endpoint, TRequest payload, CancellationToken ct = default)
     {
-        return await SendRequestAsync<TResponse>(() => _httpClient.PostAsJsonAsync(endpoint.TrimStart('/'), payload, _jsonOptions, ct), ct);
+        return await SendRequestAsync<TResponse>(() => _httpClient.PostAsJsonAsync(endpoint.TrimStart('/'), payload, _jsonOptions, ct), ct, isIdempotent: false);
     }
 
     public async Task<ApiResponse<TResponse>> PutAsync<TRequest, TResponse>(string endpoint, TRequest payload, CancellationToken ct = default)
     {
-        return await SendRequestAsync<TResponse>(() => _httpClient.PutAsJsonAsync(endpoint.TrimStart('/'), payload, _jsonOptions, ct), ct);
+        return await SendRequestAsync<TResponse>(() => _httpClient.PutAsJsonAsync(endpoint.TrimStart('/'), payload, _jsonOptions, ct), ct, isIdempotent: true);
     }
 
     public async Task<ApiResponse<bool>> DeleteAsync(string endpoint, CancellationToken ct = default)
@@ -124,49 +129,117 @@ public class ApiService
         }
     }
 
-    private async Task<ApiResponse<T>> SendRequestAsync<T>(Func<Task<HttpResponseMessage>> httpCall, CancellationToken ct)
+    private async Task<ApiResponse<T>> SendRequestAsync<T>(
+        Func<Task<HttpResponseMessage>> httpCall,
+        CancellationToken ct,
+        bool isIdempotent)
     {
-        try
+        for (int attempt = 0; ; attempt++)
         {
-            using var response = await httpCall();
-            int statusCode = (int)response.StatusCode;
+            bool shouldRetry = false;
 
-            if (response.IsSuccessStatusCode)
+            try
             {
-                // Jika server mengembalikan 204 No Content
-                if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
-                {
-                    return new ApiResponse<T> { IsSuccess = true, StatusCode = statusCode };
-                }
+                using var response = await httpCall();
 
-                var data = await response.Content.ReadFromJsonAsync<T>(_jsonOptions, ct);
-                return new ApiResponse<T>
+                if (attempt < MaxColdStartRetries && IsColdStartStatus(response.StatusCode, isIdempotent))
                 {
-                    IsSuccess = true,
-                    StatusCode = statusCode,
-                    Data = data
-                };
+                    shouldRetry = true;
+                }
+                else
+                {
+                    return await BuildResponseAsync<T>(response, ct);
+                }
+            }
+            catch (HttpRequestException) when (isIdempotent && attempt < MaxColdStartRetries)
+            {
+                shouldRetry = true;
+            }
+            catch (Exception ex)
+            {
+                return HandleException<T>(ex);
             }
 
-            string errorBody = await response.Content.ReadAsStringAsync(ct);
+            if (shouldRetry)
+            {
+                try
+                {
+                    await Task.Delay(ColdStartRetryDelay, ct);
+                }
+                catch (OperationCanceledException ex)
+                {
+                    return HandleException<T>(ex);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 502/503 berarti request belum sampai ke backend (aman diulang untuk semua method).
+    /// 504 hanya diulang untuk request idempotent (GET/PUT).
+    /// </summary>
+    private static bool IsColdStartStatus(System.Net.HttpStatusCode status, bool isIdempotent) =>
+        status == System.Net.HttpStatusCode.BadGateway ||
+        status == System.Net.HttpStatusCode.ServiceUnavailable ||
+        (isIdempotent && status == System.Net.HttpStatusCode.GatewayTimeout);
+
+    private async Task<ApiResponse<T>> BuildResponseAsync<T>(HttpResponseMessage response, CancellationToken ct)
+    {
+        int statusCode = (int)response.StatusCode;
+
+        if (response.IsSuccessStatusCode)
+        {
+            // Jika server mengembalikan 204 No Content
+            if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+            {
+                return new ApiResponse<T> { IsSuccess = true, StatusCode = statusCode };
+            }
+
+            var data = await response.Content.ReadFromJsonAsync<T>(_jsonOptions, ct);
             return new ApiResponse<T>
             {
-                IsSuccess = false,
+                IsSuccess = true,
                 StatusCode = statusCode,
-                ErrorMessage = string.IsNullOrWhiteSpace(errorBody) ? $"HTTP {statusCode}: {response.ReasonPhrase}" : errorBody
+                Data = data
             };
         }
-        catch (Exception ex)
+
+        string errorBody = await response.Content.ReadAsStringAsync(ct);
+        string trimmed = errorBody.TrimStart();
+
+        // Body error berbentuk JSON (misal {"success":false,"message":"..."}) tetap dipetakan ke model
+        T? errorData = default;
+        if (trimmed.StartsWith('{'))
         {
-            return HandleException<T>(ex);
+            try
+            {
+                errorData = JsonSerializer.Deserialize<T>(errorBody, _jsonOptions);
+            }
+            catch (JsonException)
+            {
+                // Bukan format model yang diharapkan
+            }
         }
+
+        // Body HTML (halaman error nginx/Render) tidak ditampilkan mentah
+        bool isHtml = trimmed.StartsWith('<');
+
+        return new ApiResponse<T>
+        {
+            IsSuccess = false,
+            StatusCode = statusCode,
+            Data = errorData,
+            ErrorMessage = string.IsNullOrWhiteSpace(errorBody) || isHtml
+                ? $"HTTP {statusCode}: {response.ReasonPhrase}"
+                : errorBody
+        };
     }
 
     private static ApiResponse<T> HandleException<T>(Exception ex)
     {
         string message = ex switch
         {
-            TaskCanceledException => "Koneksi timeout. Server Render mungkin sedang bangun (cold start), silakan coba lagi.",
+            TaskCanceledException => "Koneksi timeout. Server Render sedang bangun (cold start), silakan coba lagi.",
             HttpRequestException httpEx => $"Gagal terhubung ke server: {httpEx.Message}",
             JsonException => "Format respons JSON dari server tidak sesuai.",
             _ => $"Kesalahan tidak terduga: {ex.Message}"
