@@ -1,4 +1,7 @@
+namespace AumoDekstop.Services;
+
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -7,8 +10,6 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-
-namespace AumoDekstop.Services;
 
 public sealed class UpdateInfo
 {
@@ -28,7 +29,7 @@ public class GitHubUpdateService
         DefaultRequestHeaders =
         {
             // GitHub API wajib menyertakan User-Agent
-            { "User-Agent", "AumoDekstop-Portable-Updater" }
+            { "User-Agent", "AumoDekstop-Installer-Updater" }
         }
     };
 
@@ -71,7 +72,7 @@ public class GitHubUpdateService
     }
 
     /// <summary>
-    /// Mengecek apakah ada versi .PC portabel yang lebih baru di GitHub Releases.
+    /// Mengecek apakah ada versi .PC (installer) yang lebih baru di GitHub Releases.
     /// </summary>
     public async Task<UpdateInfo?> CheckForUpdateAsync()
     {
@@ -101,10 +102,10 @@ public class GitHubUpdateService
 
             if (latestVersion > currentVersion)
             {
-                // Cari file executable portabel (.exe) dan pastikan bukan file Setup installer
+                // Cari file installer (Setup_*.exe) pada aset rilis
                 var portableAsset = latestPcRelease.Assets.FirstOrDefault(a =>
                     a.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) &&
-                    !a.Name.StartsWith("Setup", StringComparison.OrdinalIgnoreCase));
+                    a.Name.StartsWith("Setup", StringComparison.OrdinalIgnoreCase));
 
                 if (portableAsset != null)
                 {
@@ -127,27 +128,22 @@ public class GitHubUpdateService
     }
 
     /// <summary>
-    /// Mengunduh executable baru ke direktori aplikasi saat ini, menukar file aktif (.old),
-    /// lalu menjalankan ulang versi terbaru secara otomatis (mode portabel).
+    /// Mengunduh installer terbaru ke folder sementara, lalu menjalankannya secara silent.
+    /// Installer (Inno Setup) menutup aplikasi, memperbarui file, dan membuka ulang aplikasi.
     /// </summary>
     public async Task DownloadAndInstallAsync(UpdateInfo update, IProgress<double>? progress = null)
     {
-        string currentExe = Environment.ProcessPath
-            ?? throw new InvalidOperationException("Lokasi executable saat ini tidak dapat dideteksi.");
-
-        string newExe = currentExe + ".new";
-        string oldExe = currentExe + ".old";
+        string installerPath = Path.Combine(Path.GetTempPath(), update.FileName);
 
         try
         {
-            // 1. Unduh file .exe baru langsung ke folder aplikasi dengan ekstensi .new
-            // (Harus di drive/folder yang sama agar File.Move berjalan instan tanpa cross-volume copy)
+            // 1. Unduh installer ke folder Temp
             using var response = await _httpClient.GetAsync(update.DownloadUrl, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
 
             long? totalBytes = response.Content.Headers.ContentLength;
             await using var contentStream = await response.Content.ReadAsStreamAsync();
-            await using (var fileStream = new FileStream(newExe, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
+            await using (var fileStream = new FileStream(installerPath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
             {
                 var buffer = new byte[8192];
                 long totalRead = 0;
@@ -166,32 +162,30 @@ public class GitHubUpdateService
                 }
             }
 
-            // 2. Hapus sisa file .old jika masih tertinggal
-            if (File.Exists(oldExe))
+            // 2. Jalankan installer (butuh Administrator, sehingga muncul UAC) lalu tutup aplikasi ini
+            try
             {
-                File.Delete(oldExe);
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = installerPath,
+                    Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS",
+                    UseShellExecute = true,
+                    Verb = "runas"
+                });
             }
-
-            // 3. Rename .exe yang sedang berjalan -> .old, lalu .new -> .exe asli
-            File.Move(currentExe, oldExe);
-            File.Move(newExe, currentExe);
-
-            // 4. Jalankan executable versi baru dan tutup proses lama
-            Process.Start(new ProcessStartInfo
+            catch (Win32Exception ex) when (ex.NativeErrorCode == 1223)
             {
-                FileName = currentExe,
-                WorkingDirectory = Path.GetDirectoryName(currentExe),
-                UseShellExecute = true
-            });
+                throw new InvalidOperationException("Pemasangan dibatalkan: izin Administrator tidak diberikan.");
+            }
 
             Environment.Exit(0);
         }
         catch
         {
-            // Bersihkan file .new yang gagal/korup agar tidak mengotori folder user
-            if (File.Exists(newExe))
+            // Bersihkan installer yang gagal/korup
+            if (File.Exists(installerPath))
             {
-                try { File.Delete(newExe); } catch { }
+                try { File.Delete(installerPath); } catch { }
             }
             throw;
         }
