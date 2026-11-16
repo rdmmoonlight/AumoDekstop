@@ -13,7 +13,7 @@
     <PublishProfile Condition="'$(RuntimeIdentifier)' != '' and Exists('Properties\PublishProfiles\win-$(Platform).pubxml')">win-$(Platform).pubxml</PublishProfile>
     <UseWinUI>true</UseWinUI>
 
-    <!-- Konfigurasi Unpackaged & Self-Contained Mandiri -->
+    <!-- Konfigurasi Unpackaged & Self-Contained (dipasang lewat installer Inno Setup) -->
     <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <EnableMsixTooling>true</EnableMsixTooling>
@@ -25,8 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- ExcludeFromSingleFile mencegah folder Assets ikut muncul di samping file .exe -->
-    <Content Include="Assets\AppIcon.ico" CopyToPublishDirectory="Never" ExcludeFromSingleFile="true" />
+    <Content Include="Assets\AppIcon.ico" CopyToPublishDirectory="Never" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
@@ -53,8 +52,7 @@
     <DebugSymbols>false</DebugSymbols>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <SelfContained>true</SelfContained>
-    <PublishSingleFile>true</PublishSingleFile>
-    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <!-- Mode installer: publish sebagai folder biasa (tanpa single-file) lalu dibungkus Inno Setup -->
+    <PublishSingleFile>false</PublishSingleFile>
   </PropertyGroup>
 </Project>
