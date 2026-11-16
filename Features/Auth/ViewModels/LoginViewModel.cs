@@ -1,9 +1,9 @@
+namespace AumoDekstop.Features.Auth.ViewModels;
+
 using AumoDekstop.Features.Auth.Models;
 using AumoDekstop.Features.Auth.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-
-namespace AumoDekstop.Features.Auth.ViewModels;
 
 public partial class LoginViewModel : ObservableObject
 {
@@ -65,7 +65,9 @@ public partial class LoginViewModel : ObservableObject
 
             if (!res.Success)
             {
-                ErrorMessage = "Email atau kata sandi salah.";
+                ErrorMessage = string.IsNullOrWhiteSpace(res.Message)
+                    ? "Email atau kata sandi salah."
+                    : res.Message;
                 return;
             }
 
