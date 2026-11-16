@@ -1,7 +1,7 @@
+namespace AumoDekstop.Features.Auth.Services;
+
 using AumoDekstop.Features.Auth.Models;
 using AumoDekstop.Services;
-
-namespace AumoDekstop.Features.Auth.Services;
 
 public class AuthService : IAuthService
 {
@@ -27,7 +27,7 @@ public class AuthService : IAuthService
             CachedProfile = null; // Invalidate cache profil
         }
 
-        return response.Data!;
+        return ToAuthResponse(response);
     }
 
     public async Task<AuthResponse> GoogleLoginAsync(GoogleLoginRequest request, CancellationToken ct = default)
@@ -40,7 +40,7 @@ public class AuthService : IAuthService
             CachedProfile = null;
         }
 
-        return response.Data!;
+        return ToAuthResponse(response);
     }
 
     public async Task<ProfileResponse> GetProfileAsync(bool forceRefresh = false, CancellationToken ct = default)
@@ -57,7 +57,7 @@ public class AuthService : IAuthService
             CachedProfile = profileRes.Data;
         }
 
-        return response.Data!;
+        return response.Data ?? new ProfileResponse(false, null, response.ErrorMessage);
     }
 
     public async Task<CommonActionResponse> LogoutAsync(CancellationToken ct = default)
@@ -66,7 +66,7 @@ public class AuthService : IAuthService
         {
             // Endpoint logout tanpa body payload
             var response = await _apiService.PostAsync<object, CommonActionResponse>("api/v1/auth/logout", new { }, ct);
-            return response.Data!;
+            return response.Data ?? new CommonActionResponse(response.IsSuccess, response.ErrorMessage ?? string.Empty);
         }
         finally
         {
@@ -79,6 +79,27 @@ public class AuthService : IAuthService
         _accessToken = null;
         CachedProfile = null;
         _apiService.SetAuthToken(null);
+    }
+
+    /// <summary>
+    /// Memastikan hasil login tidak pernah null. Jika server tidak mengirim JSON
+    /// (misal 502 saat cold start), kembalikan respons gagal dengan pesan yang jelas.
+    /// </summary>
+    private static AuthResponse ToAuthResponse(ApiResponse<AuthResponse> response)
+    {
+        if (response.Data is not null)
+        {
+            return response.Data;
+        }
+
+        string message = response.StatusCode switch
+        {
+            400 or 401 => "Email atau kata sandi salah.",
+            0 or >= 500 => "Server belum siap atau tidak merespons. Silakan coba lagi.",
+            _ => "Permintaan ditolak oleh server."
+        };
+
+        return new AuthResponse(false, message);
     }
 
     private void ApplyToken(string? token)
