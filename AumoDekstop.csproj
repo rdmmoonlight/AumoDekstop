@@ -55,4 +55,9 @@
     <!-- Mode installer: publish sebagai folder biasa (tanpa single-file) lalu dibungkus Inno Setup -->
     <PublishSingleFile>false</PublishSingleFile>
   </PropertyGroup>
+
+  <Target Name="CleanBeforeBuild" BeforeTargets="BeforeBuild">
+    <RemoveDir Directories="$(BaseIntermediateOutputPath)" />
+    <RemoveDir Directories="$(BaseOutputPath)" />
+  </Target>
 </Project>
