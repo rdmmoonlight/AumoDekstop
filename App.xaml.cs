@@ -1,15 +1,15 @@
 namespace AumoDekstop;
 
-using System;
 using System.Net;
-using System.Net.Http;
 using AumoDekstop.Features.Auth.Services;
 using AumoDekstop.Features.Auth.ViewModels;
+using AumoDekstop.Features.ChartOfAccounts.Services;
 using AumoDekstop.Features.Periods.Services;
 using AumoDekstop.Features.Periods.ViewModels;
 using AumoDekstop.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
+using Windows.Storage;
 
 public partial class App : Application
 {
@@ -69,6 +69,8 @@ public partial class App : Application
         // 4. Periods — WAJIB mengambil ApiService yang SAMA dari DI container (bukan ApiService.Instance)
         services.AddSingleton<IPeriodsApiService>(sp =>
             new PeriodsApiService(sp.GetRequiredService<ApiService>()));
+
+        services.AddHttpClient<IChartOfAccountsService, ChartOfAccountsService>();
 
         // 5. ViewModels (Transient: instance baru setiap halaman/kontrol dibuka)
         services.AddTransient<GoogleSignInViewModel>();
