@@ -1,0 +1,104 @@
+<ContentDialog
+    x:Class="AumoDekstop.Features.ChartOfAccounts.Dialogs.AccountFormDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Tambah Akun Baru"
+    PrimaryButtonText="Tambah Akun"
+    CloseButtonText="Batal"
+    DefaultButton="Primary"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick">
+
+    <StackPanel Spacing="14"
+                MinWidth="420"
+                Padding="0,4,0,0">
+        <TextBlock
+            Text="Isi rincian informasi akun buku besar di bawah ini."
+            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+            TextWrapping="Wrap"/>
+
+        <!-- Tipe Akun -->
+        <StackPanel Spacing="4">
+            <ComboBox
+                x:Name="TypeComboBox"
+                Header="Tipe Akun"
+                HorizontalAlignment="Stretch"
+                DisplayMemberPath="Label"
+                SelectedValuePath="Value"
+                SelectionChanged="TypeComboBox_SelectionChanged"/>
+            <TextBlock
+                x:Name="TypeErrorText"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                Visibility="Collapsed"/>
+        </StackPanel>
+
+        <!-- Kode Akun -->
+        <StackPanel Spacing="4">
+            <TextBox
+                x:Name="ReferenceNumberBox"
+                Header="Kode Akun"
+                PlaceholderText="Contoh: 100"
+                InputScope="Number"
+                TextChanged="ReferenceNumberBox_TextChanged"/>
+            <TextBlock
+                x:Name="ReferenceErrorText"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                Visibility="Collapsed"/>
+        </StackPanel>
+
+        <!-- Nama Akun -->
+        <StackPanel Spacing="4">
+            <TextBox
+                x:Name="AccountNameBox"
+                Header="Nama Akun"
+                PlaceholderText="Contoh: Kas Utama"
+                TextChanged="AccountNameBox_TextChanged"/>
+            <TextBlock
+                x:Name="NameErrorText"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                Visibility="Collapsed"/>
+        </StackPanel>
+
+        <!-- Peran Akun -->
+        <StackPanel Spacing="4">
+            <ComboBox
+                x:Name="RoleComboBox"
+                Header="Peran Akun"
+                HorizontalAlignment="Stretch"
+                DisplayMemberPath="Label"
+                SelectedValuePath="Value"/>
+            <TextBlock
+                x:Name="RoleErrorText"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                Visibility="Collapsed"/>
+        </StackPanel>
+
+        <!-- Status Aktif (Hanya muncul saat Edit) -->
+        <Border
+            x:Name="IsActiveContainer"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="6"
+            Padding="12,8"
+            Visibility="Collapsed">
+            <Grid>
+                <TextBlock
+                    Text="Akun Aktif"
+                    VerticalAlignment="Center"
+                    FontWeight="Medium"/>
+                <ToggleSwitch
+                    x:Name="IsActiveSwitch"
+                    HorizontalAlignment="Right"
+                    OnContent="Aktif"
+                    OffContent="Nonaktif"
+                    MinWidth="0"/>
+            </Grid>
+        </Border>
+    </StackPanel>
+</ContentDialog>
