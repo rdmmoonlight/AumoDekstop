@@ -43,6 +43,7 @@
                 <SelectorBar x:Name="RibbonTabs" Grid.Column="0" SelectionChanged="RibbonTabs_SelectionChanged">
                     <SelectorBarItem x:Name="HomeTab" Text="Beranda" Tag="home" IsSelected="True" />
                     <SelectorBarItem Text="Periods" Tag="periods" />
+                    <SelectorBarItem Text="Chart Of Accounts" Tag="coa" />
                     <SelectorBarItem Text="Data &amp; Transaksi" Tag="data" />
                     <SelectorBarItem Text="Laporan" Tag="report" />
                     <SelectorBarItem Text="Pengaturan" Tag="settings" />
