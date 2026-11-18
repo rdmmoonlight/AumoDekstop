@@ -96,7 +96,8 @@ jobs:
           Configuration: ${{ matrix.configuration }}
         run: |
           msbuild $env:Project_Path `
-            /t:Restore,Publish `
+            /restore `
+            /t:Publish `
             /p:Configuration=$env:Configuration `
             /p:Platform=x64 `
             /p:RuntimeIdentifier=win-x64 `
