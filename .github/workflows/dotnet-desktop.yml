@@ -78,13 +78,21 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Restore dependencies
-        run: dotnet restore $env:Project_Path -r win-x64 -p:Configuration=$env:Configuration
+        shell: pwsh
         env:
           Configuration: ${{ matrix.configuration }}
-
-      - name: Build application
         run: |
-          dotnet build $env:Project_Path `
+          dotnet restore $env:Project_Path `
+            -r win-x64 `
+            -p:Platform=x64 `
+            -p:Configuration=$env:Configuration
+
+      - name: Build & Publish application
+        shell: pwsh
+        env:
+          Configuration: ${{ matrix.configuration }}
+        run: |
+          dotnet publish $env:Project_Path `
             -c $env:Configuration `
             -r win-x64 `
             -p:Platform=x64 `
@@ -93,6 +101,7 @@ jobs:
             -p:AssemblyVersion=${{ steps.version.outputs.assembly_version }} `
             -p:FileVersion=${{ steps.version.outputs.assembly_version }} `
             --no-restore `
+            -o ./publish `
             -v normal `
             '--consoleloggerparameters:ErrorsOnly;ShowEventId;ShowTimestamp'
 
@@ -107,23 +116,6 @@ jobs:
             }
             exit 1
           }
-        env:
-          Configuration: ${{ matrix.configuration }}
-
-      - name: Publish application folder
-        run: >
-          dotnet publish $env:Project_Path
-          -c $env:Configuration
-          -r win-x64
-          -p:Platform=x64
-          -p:Version=${{ steps.version.outputs.semver_version }}
-          -p:InformationalVersion=${{ steps.version.outputs.app_version }}
-          -p:AssemblyVersion=${{ steps.version.outputs.assembly_version }}
-          -p:FileVersion=${{ steps.version.outputs.assembly_version }}
-          --no-build
-          -o ./publish
-        env:
-          Configuration: ${{ matrix.configuration }}
 
       - name: Sign Application Executable
         shell: pwsh
