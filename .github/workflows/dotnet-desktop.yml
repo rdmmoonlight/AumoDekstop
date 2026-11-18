@@ -100,10 +100,8 @@ jobs:
             -p:InformationalVersion=${{ steps.version.outputs.app_version }} `
             -p:AssemblyVersion=${{ steps.version.outputs.assembly_version }} `
             -p:FileVersion=${{ steps.version.outputs.assembly_version }} `
-            --no-restore `
             -o ./publish `
-            -v normal `
-            '--consoleloggerparameters:ErrorsOnly;ShowEventId;ShowTimestamp'
+            -v minimal
 
           if ($LASTEXITCODE -ne 0) {
             $xamlExe = Get-ChildItem -Path "$env:USERPROFILE\.nuget\packages\microsoft.windowsappsdk.winui" -Recurse -Filter "XamlCompiler.exe" | Select-Object -First 1
