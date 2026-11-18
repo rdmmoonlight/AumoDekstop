@@ -77,16 +77,6 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Restore dependencies
-        shell: pwsh
-        env:
-          Configuration: ${{ matrix.configuration }}
-        run: |
-          dotnet restore $env:Project_Path `
-            -r win-x64 `
-            -p:Platform=x64 `
-            -p:Configuration=$env:Configuration
-
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
@@ -101,7 +91,6 @@ jobs:
             /p:Configuration=$env:Configuration `
             /p:Platform=x64 `
             /p:RuntimeIdentifier=win-x64 `
-            /p:BaseIntermediateOutputPath=obj\ `
             /p:PublishDir=./publish/ `
             /p:Version=${{ steps.version.outputs.semver_version }} `
             /p:InformationalVersion=${{ steps.version.outputs.app_version }} `
