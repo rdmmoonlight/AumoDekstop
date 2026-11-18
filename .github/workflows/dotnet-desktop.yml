@@ -87,31 +87,27 @@ jobs:
             -p:Platform=x64 `
             -p:Configuration=$env:Configuration
 
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
       - name: Build & Publish application
         shell: pwsh
         env:
           Configuration: ${{ matrix.configuration }}
         run: |
-          dotnet publish $env:Project_Path `
-            -c $env:Configuration `
-            -r win-x64 `
-            -p:Platform=x64 `
-            -p:Version=${{ steps.version.outputs.semver_version }} `
-            -p:InformationalVersion=${{ steps.version.outputs.app_version }} `
-            -p:AssemblyVersion=${{ steps.version.outputs.assembly_version }} `
-            -p:FileVersion=${{ steps.version.outputs.assembly_version }} `
-            -o ./publish `
-            -v minimal
+          msbuild $env:Project_Path `
+            /t:Restore,Publish `
+            /p:Configuration=$env:Configuration `
+            /p:Platform=x64 `
+            /p:RuntimeIdentifier=win-x64 `
+            /p:PublishDir=./publish/ `
+            /p:Version=${{ steps.version.outputs.semver_version }} `
+            /p:InformationalVersion=${{ steps.version.outputs.app_version }} `
+            /p:AssemblyVersion=${{ steps.version.outputs.assembly_version }} `
+            /p:FileVersion=${{ steps.version.outputs.assembly_version }} `
+            /v:minimal
 
           if ($LASTEXITCODE -ne 0) {
-            $xamlExe = Get-ChildItem -Path "$env:USERPROFILE\.nuget\packages\microsoft.windowsappsdk.winui" -Recurse -Filter "XamlCompiler.exe" | Select-Object -First 1
-            $inputJson = Get-ChildItem -Path . -Recurse -Filter "input.json" | Select-Object -First 1
-            Write-Host "XamlExe: $($xamlExe.FullName)"
-            Write-Host "InputJson: $($inputJson.FullName)"
-            if ($xamlExe -and $inputJson) {
-              & $xamlExe.FullName $inputJson.FullName "debug_pass2.json" 2>&1 | Out-String | Write-Host
-              if (Test-Path "debug_pass2.json") { Get-Content "debug_pass2.json" }
-            }
             exit 1
           }
 
