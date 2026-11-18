@@ -1,13 +1,14 @@
+namespace AumoDekstop;
+
 using AumoDekstop.Features.Auth.Services;
 using AumoDekstop.Features.Auth.Views;
+using AumoDekstop.Features.Periods.Dialogs;
 using AumoDekstop.Features.Periods.ViewModels;
 using AumoDekstop.Features.Periods.Views;
 using AumoDekstop.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-
-namespace AumoDekstop;
 
 public sealed partial class MainWindow : Window
 {
