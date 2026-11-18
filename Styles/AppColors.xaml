@@ -62,6 +62,68 @@
             <SolidColorBrush x:Key="SidebarAccentForegroundBrush" Color="#F5F5F5"/>
             <SolidColorBrush x:Key="SidebarBorderBrush" Color="#181818"/>       <!-- hsl(0 0% 9.5%) -->
             <SolidColorBrush x:Key="SidebarRingBrush" Color="#D4D4D4"/>
+
+            <!-- =====================================================
+                 9. JEMBATAN KE KONTROL WINUI
+                 Kunci sistem WinUI diarahkan ke token di atas, sehingga
+                 seluruh {ThemeResource ...} & kontrol bawaan otomatis
+                 memakai palet aplikasi (tanpa mengubah XAML halaman).
+                 ===================================================== -->
+
+            <!-- Latar & permukaan -->
+            <StaticResource x:Key="ApplicationPageBackgroundThemeBrush" ResourceKey="BackgroundBrush"/>
+            <StaticResource x:Key="SolidBackgroundFillColorBaseBrush" ResourceKey="BackgroundBrush"/>
+            <StaticResource x:Key="SolidBackgroundFillColorSecondaryBrush" ResourceKey="SidebarBrush"/>
+            <StaticResource x:Key="SolidBackgroundFillColorTertiaryBrush" ResourceKey="CardBrush"/>
+            <StaticResource x:Key="LayerFillColorDefaultBrush" ResourceKey="CardBrush"/>
+            <StaticResource x:Key="LayerFillColorAltBrush" ResourceKey="CardBrush"/>
+            <StaticResource x:Key="CardBackgroundFillColorDefaultBrush" ResourceKey="CardBrush"/>
+            <StaticResource x:Key="CardBackgroundFillColorSecondaryBrush" ResourceKey="MutedBrush"/>
+
+            <!-- Garis & batas -->
+            <StaticResource x:Key="CardStrokeColorDefaultBrush" ResourceKey="BorderBrush"/>
+            <StaticResource x:Key="DividerStrokeColorDefaultBrush" ResourceKey="BorderBrush"/>
+            <StaticResource x:Key="SurfaceStrokeColorDefaultBrush" ResourceKey="BorderBrush"/>
+            <StaticResource x:Key="ControlStrokeColorDefaultBrush" ResourceKey="InputBrush"/>
+            <StaticResource x:Key="ControlStrokeColorSecondaryBrush" ResourceKey="InputBrush"/>
+            <StaticResource x:Key="FocusStrokeColorOuterBrush" ResourceKey="RingBrush"/>
+
+            <!-- Teks -->
+            <StaticResource x:Key="TextFillColorPrimaryBrush" ResourceKey="ForegroundBrush"/>
+            <StaticResource x:Key="TextFillColorSecondaryBrush" ResourceKey="MutedForegroundBrush"/>
+            <StaticResource x:Key="TextFillColorTertiaryBrush" ResourceKey="MutedForegroundBrush"/>
+
+            <!-- Kontrol (Button, TextBox, ComboBox, dll.) -->
+            <StaticResource x:Key="ControlFillColorDefaultBrush" ResourceKey="SecondaryBrush"/>
+            <StaticResource x:Key="ControlFillColorSecondaryBrush" ResourceKey="AccentBrush"/>
+            <StaticResource x:Key="ControlFillColorTertiaryBrush" ResourceKey="MutedBrush"/>
+            <StaticResource x:Key="ControlFillColorInputActiveBrush" ResourceKey="BackgroundBrush"/>
+            <StaticResource x:Key="ControlFillColorDisabledBrush" ResourceKey="MutedBrush"/>
+            <StaticResource x:Key="SubtleFillColorSecondaryBrush" ResourceKey="AccentBrush"/>
+            <StaticResource x:Key="SubtleFillColorTertiaryBrush" ResourceKey="MutedBrush"/>
+
+            <!-- Aksi utama (AccentButtonStyle) -->
+            <StaticResource x:Key="AccentFillColorDefaultBrush" ResourceKey="PrimaryBrush"/>
+            <StaticResource x:Key="TextOnAccentFillColorPrimaryBrush" ResourceKey="PrimaryForegroundBrush"/>
+            <StaticResource x:Key="TextOnAccentFillColorSecondaryBrush" ResourceKey="PrimaryForegroundBrush"/>
+
+            <!-- Umpan balik -->
+            <StaticResource x:Key="SystemFillColorCriticalBrush" ResourceKey="DestructiveBrush"/>
+
+            <!-- Dialog, flyout, popover -->
+            <StaticResource x:Key="ContentDialogBackground" ResourceKey="PopoverBrush"/>
+            <StaticResource x:Key="ContentDialogForeground" ResourceKey="PopoverForegroundBrush"/>
+            <StaticResource x:Key="ContentDialogBorderBrush" ResourceKey="BorderBrush"/>
+            <StaticResource x:Key="FlyoutPresenterBackground" ResourceKey="PopoverBrush"/>
+            <StaticResource x:Key="FlyoutPresenterBorderBrush" ResourceKey="BorderBrush"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="PopoverBrush"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="BorderBrush"/>
+
+            <!-- Varian hover/pressed/disabled (opacity, shadcn style) -->
+            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#FAFAFA" Opacity="0.9"/>
+            <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="#FAFAFA" Opacity="0.8"/>
+            <SolidColorBrush x:Key="AccentFillColorDisabledBrush" Color="#FAFAFA" Opacity="0.4"/>
+            <SolidColorBrush x:Key="TextFillColorDisabledBrush" Color="#949494" Opacity="0.5"/>
         </ResourceDictionary>
 
         <!-- LIGHT MODE -->
@@ -106,6 +168,68 @@
             <SolidColorBrush x:Key="SidebarAccentForegroundBrush" Color="#171717"/>
             <SolidColorBrush x:Key="SidebarBorderBrush" Color="#E8E8E8"/>       <!-- hsl(0 0% 91%) -->
             <SolidColorBrush x:Key="SidebarRingBrush" Color="#171717"/>
+
+            <!-- =====================================================
+                 9. JEMBATAN KE KONTROL WINUI
+                 Kunci sistem WinUI diarahkan ke token di atas, sehingga
+                 seluruh {ThemeResource ...} & kontrol bawaan otomatis
+                 memakai palet aplikasi (tanpa mengubah XAML halaman).
+                 ===================================================== -->
+
+            <!-- Latar & permukaan -->
+            <StaticResource x:Key="ApplicationPageBackgroundThemeBrush" ResourceKey="BackgroundBrush"/>
+            <StaticResource x:Key="SolidBackgroundFillColorBaseBrush" ResourceKey="BackgroundBrush"/>
+            <StaticResource x:Key="SolidBackgroundFillColorSecondaryBrush" ResourceKey="SidebarBrush"/>
+            <StaticResource x:Key="SolidBackgroundFillColorTertiaryBrush" ResourceKey="CardBrush"/>
+            <StaticResource x:Key="LayerFillColorDefaultBrush" ResourceKey="CardBrush"/>
+            <StaticResource x:Key="LayerFillColorAltBrush" ResourceKey="CardBrush"/>
+            <StaticResource x:Key="CardBackgroundFillColorDefaultBrush" ResourceKey="CardBrush"/>
+            <StaticResource x:Key="CardBackgroundFillColorSecondaryBrush" ResourceKey="MutedBrush"/>
+
+            <!-- Garis & batas -->
+            <StaticResource x:Key="CardStrokeColorDefaultBrush" ResourceKey="BorderBrush"/>
+            <StaticResource x:Key="DividerStrokeColorDefaultBrush" ResourceKey="BorderBrush"/>
+            <StaticResource x:Key="SurfaceStrokeColorDefaultBrush" ResourceKey="BorderBrush"/>
+            <StaticResource x:Key="ControlStrokeColorDefaultBrush" ResourceKey="InputBrush"/>
+            <StaticResource x:Key="ControlStrokeColorSecondaryBrush" ResourceKey="InputBrush"/>
+            <StaticResource x:Key="FocusStrokeColorOuterBrush" ResourceKey="RingBrush"/>
+
+            <!-- Teks -->
+            <StaticResource x:Key="TextFillColorPrimaryBrush" ResourceKey="ForegroundBrush"/>
+            <StaticResource x:Key="TextFillColorSecondaryBrush" ResourceKey="MutedForegroundBrush"/>
+            <StaticResource x:Key="TextFillColorTertiaryBrush" ResourceKey="MutedForegroundBrush"/>
+
+            <!-- Kontrol (Button, TextBox, ComboBox, dll.) -->
+            <StaticResource x:Key="ControlFillColorDefaultBrush" ResourceKey="SecondaryBrush"/>
+            <StaticResource x:Key="ControlFillColorSecondaryBrush" ResourceKey="AccentBrush"/>
+            <StaticResource x:Key="ControlFillColorTertiaryBrush" ResourceKey="MutedBrush"/>
+            <StaticResource x:Key="ControlFillColorInputActiveBrush" ResourceKey="BackgroundBrush"/>
+            <StaticResource x:Key="ControlFillColorDisabledBrush" ResourceKey="MutedBrush"/>
+            <StaticResource x:Key="SubtleFillColorSecondaryBrush" ResourceKey="AccentBrush"/>
+            <StaticResource x:Key="SubtleFillColorTertiaryBrush" ResourceKey="MutedBrush"/>
+
+            <!-- Aksi utama (AccentButtonStyle) -->
+            <StaticResource x:Key="AccentFillColorDefaultBrush" ResourceKey="PrimaryBrush"/>
+            <StaticResource x:Key="TextOnAccentFillColorPrimaryBrush" ResourceKey="PrimaryForegroundBrush"/>
+            <StaticResource x:Key="TextOnAccentFillColorSecondaryBrush" ResourceKey="PrimaryForegroundBrush"/>
+
+            <!-- Umpan balik -->
+            <StaticResource x:Key="SystemFillColorCriticalBrush" ResourceKey="DestructiveBrush"/>
+
+            <!-- Dialog, flyout, popover -->
+            <StaticResource x:Key="ContentDialogBackground" ResourceKey="PopoverBrush"/>
+            <StaticResource x:Key="ContentDialogForeground" ResourceKey="PopoverForegroundBrush"/>
+            <StaticResource x:Key="ContentDialogBorderBrush" ResourceKey="BorderBrush"/>
+            <StaticResource x:Key="FlyoutPresenterBackground" ResourceKey="PopoverBrush"/>
+            <StaticResource x:Key="FlyoutPresenterBorderBrush" ResourceKey="BorderBrush"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="PopoverBrush"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="BorderBrush"/>
+
+            <!-- Varian hover/pressed/disabled (opacity, shadcn style) -->
+            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#171717" Opacity="0.9"/>
+            <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="#171717" Opacity="0.8"/>
+            <SolidColorBrush x:Key="AccentFillColorDisabledBrush" Color="#171717" Opacity="0.4"/>
+            <SolidColorBrush x:Key="TextFillColorDisabledBrush" Color="#737373" Opacity="0.5"/>
         </ResourceDictionary>
 
     </ResourceDictionary.ThemeDictionaries>
