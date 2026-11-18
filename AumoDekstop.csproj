@@ -56,8 +56,4 @@
     <PublishSingleFile>false</PublishSingleFile>
   </PropertyGroup>
 
-  <Target Name="CleanBeforeBuild" BeforeTargets="BeforeBuild">
-    <RemoveDir Directories="$(BaseIntermediateOutputPath)" />
-    <RemoveDir Directories="$(BaseOutputPath)" />
-  </Target>
 </Project>
