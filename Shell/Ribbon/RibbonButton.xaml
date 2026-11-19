@@ -1,0 +1,24 @@
+<UserControl
+    x:Class="AumoDekstop.Shell.Ribbon.RibbonButton"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <UserControl.Resources>
+        <!-- Gaya tombol ribbon: ikon besar di atas, label di bawah -->
+        <Style x:Key="RibbonButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="MinWidth" Value="68" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+    </UserControl.Resources>
+
+    <Button Style="{StaticResource RibbonButtonStyle}" Click="OnButtonClick">
+        <StackPanel Spacing="4" HorizontalAlignment="Center">
+            <FontIcon Glyph="{x:Bind Glyph, Mode=OneWay}" FontSize="24" HorizontalAlignment="Center" />
+            <TextBlock Text="{x:Bind Label, Mode=OneWay}" FontSize="12" TextAlignment="Center" />
+        </StackPanel>
+    </Button>
+</UserControl>

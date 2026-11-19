@@ -1,0 +1,124 @@
+namespace AumoDekstop;
+
+using AumoDekstop.Features.Periods.Dialogs;
+using AumoDekstop.Features.Periods.Views;
+using AumoDekstop.Services;
+using AumoDekstop.Shell.Ribbon;
+
+public sealed partial class MainWindow
+{
+    // Satu pintu untuk semua tombol ribbon (lihat RibbonCommand)
+    private async void OnRibbonCommand(object? sender, string command)
+    {
+        switch (command)
+        {
+            case RibbonCommand.New:
+                await NewAsync();
+                break;
+            case RibbonCommand.Save:
+                await SaveAsync();
+                break;
+            case RibbonCommand.Sync:
+                await SyncAsync();
+                break;
+            case RibbonCommand.CheckUpdate:
+                await _updates.CheckAndPromptAsync(Content?.XamlRoot, isManualCheck: true);
+                break;
+            case RibbonCommand.RefreshPeriods:
+                await RefreshPeriodsAsync();
+                break;
+            case RibbonCommand.RefreshCoa:
+                SetStatus("● Memuat ulang daftar akun (COA)...");
+                break;
+            case RibbonCommand.ImportCoa:
+                SetStatus("● Membuka impor daftar akun (COA)...");
+                break;
+            case RibbonCommand.AddCoa:
+                SetStatus("● Membuka form tambah akun (COA)...");
+                break;
+            case RibbonCommand.EditCoa:
+                SetStatus("● Membuka form ubah akun (COA)...");
+                break;
+            case RibbonCommand.DeleteCoa:
+                SetStatus("● Menghapus akun (COA) terpilih...");
+                break;
+            case RibbonCommand.Logout:
+                await LogoutAsync();
+                break;
+            case RibbonCommand.ComingSoon:
+                SetStatus("● Fitur ini belum tersedia.");
+                break;
+        }
+    }
+
+    private async Task RefreshPeriodsAsync()
+    {
+        if (RootFrame.Content is PeriodsPage periodsPage)
+        {
+            SetStatus("● Memuat ulang daftar periode...");
+            await periodsPage.ViewModel.FetchPeriodsCommand.ExecuteAsync(null);
+            SetStatus("● Daftar periode diperbarui.");
+        }
+    }
+
+    private async Task NewAsync()
+    {
+        // Di halaman Periods, tombol "Baru" membuka dialog Buka Periode Baru
+        if (RootFrame.Content is PeriodsPage periodsPage && Content?.XamlRoot != null)
+        {
+            SetStatus("● Membuka form periode baru...");
+
+            var dialog = new OpenNewPeriodDialog
+            {
+                XamlRoot = Content.XamlRoot,
+                OnSubmitAsync = async payload =>
+                {
+                    await periodsPage.ViewModel.CreatePeriodCommand.ExecuteAsync(payload);
+                }
+            };
+
+            await dialog.ShowAsync();
+            return;
+        }
+
+        SetStatus("● Membuat entri baru...");
+    }
+
+    private async Task SyncAsync()
+    {
+        SetStatus($"● Menghubungi server {ApiService.BaseServerUrl} (mohon tunggu)...");
+
+        bool isOnline = await _api.CheckServerHealthAsync("");
+
+        if (isOnline)
+        {
+            if (RootFrame.Content is PeriodsPage periodsPage)
+            {
+                await periodsPage.ViewModel.FetchPeriodsCommand.ExecuteAsync(null);
+            }
+
+            SetStatus($"● Terhubung ke Server ({ApiService.BaseServerUrl}) | Versi: v{GitHubUpdateService.GetCurrentVersionString()}");
+        }
+        else
+        {
+            SetStatus("● Server tidak merespons atau masih dalam proses bangun (cold start).");
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        SetStatus("● Mengirim data ke server...");
+
+        var payload = new
+        {
+            Client = "AumoDekstop",
+            Timestamp = DateTime.UtcNow
+        };
+
+        var result = await _api.PostAsync<object, object>("api/data", payload);
+
+        SetStatus(result.IsSuccess
+            ? "● Data berhasil disimpan ke server."
+            : $"● Gagal menyimpan: {result.ErrorMessage}");
+    }
+}

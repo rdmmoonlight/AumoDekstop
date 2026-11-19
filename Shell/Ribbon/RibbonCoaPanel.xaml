@@ -1,0 +1,40 @@
+<UserControl
+    x:Class="AumoDekstop.Shell.Ribbon.RibbonCoaPanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:AumoDekstop.Shell.Ribbon">
+
+    <StackPanel Orientation="Horizontal">
+        <!-- Grup 1: Manajemen Akun -->
+        <Grid Padding="4,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <local:RibbonButton Glyph="&#xE710;" Label="Tambah Akun" CommandId="coa.add" Click="OnButtonClick" />
+                <local:RibbonButton Glyph="&#xE70F;" Label="Ubah" CommandId="coa.edit" Click="OnButtonClick" />
+                <local:RibbonButton Glyph="&#xE74D;" Label="Hapus" CommandId="coa.delete" Click="OnButtonClick" />
+            </StackPanel>
+            <TextBlock Grid.Row="1" Text="Akun" FontSize="11" HorizontalAlignment="Center"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        </Grid>
+
+        <Rectangle Width="1" Height="64" Margin="4,0" VerticalAlignment="Center"
+                   Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+        <!-- Grup 2: Data & Sinkronisasi -->
+        <Grid Padding="4,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <local:RibbonButton Glyph="&#xE72C;" Label="Muat Ulang" CommandId="coa.refresh" Click="OnButtonClick" />
+                <local:RibbonButton Glyph="&#xE8B5;" Label="Impor COA" CommandId="coa.import" Click="OnButtonClick" />
+            </StackPanel>
+            <TextBlock Grid.Row="1" Text="Data" FontSize="11" HorizontalAlignment="Center"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        </Grid>
+    </StackPanel>
+</UserControl>

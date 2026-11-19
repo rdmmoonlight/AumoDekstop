@@ -1,0 +1,43 @@
+<UserControl
+    x:Class="AumoDekstop.Shell.Ribbon.RibbonView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:AumoDekstop.Shell.Ribbon">
+
+    <StackPanel
+        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+        BorderThickness="0,0,0,1">
+
+        <!-- Baris tab -->
+        <Grid Padding="8,4,8,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <SelectorBar x:Name="RibbonTabs" Grid.Column="0" SelectionChanged="RibbonTabs_SelectionChanged">
+                <SelectorBarItem x:Name="HomeTab" Text="Beranda" Tag="home" IsSelected="True" />
+                <SelectorBarItem Text="Periods" Tag="periods" />
+                <SelectorBarItem Text="Chart Of Accounts" Tag="coa" />
+                <SelectorBarItem Text="Data &amp; Transaksi" Tag="data" />
+                <SelectorBarItem Text="Laporan" Tag="report" />
+                <SelectorBarItem Text="Pengaturan" Tag="settings" />
+            </SelectorBar>
+
+            <Button Grid.Column="1" Content="Keluar" Click="OnLogoutClick" Background="Transparent" BorderThickness="0" />
+        </Grid>
+
+        <!-- Isi ribbon: grup tombol sesuai tab aktif -->
+        <Border Height="96" Padding="8,4" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="0,1,0,0">
+            <Grid>
+                <local:RibbonHomePanel x:Name="RibbonHome" CommandInvoked="OnPanelCommand" />
+                <local:RibbonPeriodsPanel x:Name="RibbonPeriods" Visibility="Collapsed" CommandInvoked="OnPanelCommand" />
+                <local:RibbonCoaPanel x:Name="RibbonCoa" Visibility="Collapsed" CommandInvoked="OnPanelCommand" />
+                <local:RibbonDataPanel x:Name="RibbonData" Visibility="Collapsed" CommandInvoked="OnPanelCommand" />
+                <local:RibbonReportPanel x:Name="RibbonReport" Visibility="Collapsed" CommandInvoked="OnPanelCommand" />
+                <local:RibbonSettingsPanel x:Name="RibbonSettings" Visibility="Collapsed" CommandInvoked="OnPanelCommand" />
+            </Grid>
+        </Border>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,31 @@
+<UserControl
+    x:Class="AumoDekstop.Shell.Status.StatusBarView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid
+        Padding="12,0"
+        Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+        BorderThickness="0,1,0,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock
+            x:Name="StatusText"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            FontSize="12"
+            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+            Text="● Siap" />
+
+        <TextBlock
+            Grid.Column="1"
+            VerticalAlignment="Center"
+            FontSize="12"
+            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+            Text="Mode Hemat RAM" />
+    </Grid>
+</UserControl>
