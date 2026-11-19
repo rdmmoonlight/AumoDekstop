@@ -29,9 +29,9 @@ public sealed partial class RibbonView : UserControl
 
     private void ShowPanel(string? tag)
     {
-        // RibbonCoa sengaja tidak diatur di sini: perilaku asli dipertahankan.
         RibbonHome.Visibility = tag == "home" ? Visibility.Visible : Visibility.Collapsed;
         RibbonPeriods.Visibility = tag == "periods" ? Visibility.Visible : Visibility.Collapsed;
+        RibbonPeriods.Visibility = tag == "coa" ? Visibility.Visible : Visibility.Collapsed;
         RibbonData.Visibility = tag == "data" ? Visibility.Visible : Visibility.Collapsed;
         RibbonReport.Visibility = tag == "report" ? Visibility.Visible : Visibility.Collapsed;
         RibbonSettings.Visibility = tag == "settings" ? Visibility.Visible : Visibility.Collapsed;
