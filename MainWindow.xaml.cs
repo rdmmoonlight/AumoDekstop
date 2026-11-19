@@ -132,6 +132,31 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    private void OnRefreshCoaClick(object sender, RoutedEventArgs e)
+    {
+        SetStatus("● Memuat ulang daftar akun (COA)...");
+    }
+
+    private void OnImportCoaClick(object sender, RoutedEventArgs e)
+    {
+        SetStatus("● Membuka impor daftar akun (COA)...");
+    }
+
+    private void OnAddCoaClick(object sender, RoutedEventArgs e)
+    {
+        SetStatus("● Membuka form tambah akun (COA)...");
+    }
+
+    private void OnEditCoaClick(object sender, RoutedEventArgs e)
+    {
+        SetStatus("● Membuka form ubah akun (COA)...");
+    }
+
+    private void OnDeleteCoaClick(object sender, RoutedEventArgs e)
+    {
+        SetStatus("● Menghapus akun (COA) terpilih...");
+    }
+
     private void ShowHome()
     {
         if (RootFrame.Content is not MainPage)
