@@ -1,0 +1,67 @@
+<Page
+    x:Class="AumoDekstop.Features.JournalEntry.JournalEntryPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:AumoDekstop.Features.JournalEntry"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel
+            MaxWidth="1200"
+            Padding="32"
+            Spacing="24">
+
+            <!-- Header Halaman -->
+            <local:JournalEntryHeaderControl
+                Description="{x:Bind ViewModel.Description, Mode=TwoWay}"
+                EntryDate="{x:Bind ViewModel.TransactionDate, Mode=TwoWay}"
+                IsEditMode="{x:Bind IsEditMode, Mode=OneWay}"
+                IsReadOnly="{x:Bind IsReadOnly, Mode=OneWay}"
+                TransactionNumber="{x:Bind ViewModel.ReferenceNumber, Mode=TwoWay}" />
+
+            <!-- Component Alert Notification -->
+            <local:JournalAlertsControl
+                ErrorMessage="{x:Bind ErrorMessage, Mode=OneWay}"
+                HasLines="{x:Bind HasLines, Mode=OneWay}"
+                IsBalanced="{x:Bind ViewModel.IsBalanced, Mode=OneWay}"
+                Status="{x:Bind EntryStatus, Mode=OneWay}"
+                TotalCredit="{x:Bind ViewModel.TotalCredit, Mode=OneWay}"
+                TotalDebit="{x:Bind ViewModel.TotalDebit, Mode=OneWay}" />
+
+            <!-- Kartu Informasi Transaksi (Tanggal, Ref, Deskripsi) -->
+            <local:TransactionInfoCardControl
+                Description="{x:Bind ViewModel.Description, Mode=TwoWay}"
+                IsReadOnly="{x:Bind IsReadOnly, Mode=OneWay}"
+                ReferenceNumber="{x:Bind ViewModel.ReferenceNumber, Mode=TwoWay}"
+                TransactionDate="{x:Bind ViewModel.TransactionDate, Mode=TwoWay}" />
+
+            <!-- Tabel Baris Transaksi Debit & Kredit -->
+            <local:JournalLinesTableControl
+                Accounts="{x:Bind ViewModel.Accounts, Mode=OneWay}"
+                AddLineCommand="{x:Bind ViewModel.AddLineCommand}"
+                IsReadOnly="{x:Bind IsReadOnly, Mode=OneWay}"
+                LineUpdated="JournalLinesTable_LineUpdated"
+                Lines="{x:Bind ViewModel.Lines, Mode=OneWay}"
+                RemoveLineCommand="{x:Bind ViewModel.RemoveLineCommand}" />
+
+            <!-- Footer Summary Total Debit & Kredit -->
+            <local:JournalEntryFooterControl
+                IsBalanced="{x:Bind ViewModel.IsBalanced, Mode=OneWay}"
+                TotalCredit="{x:Bind ViewModel.TotalCredit, Mode=OneWay}"
+                TotalDebit="{x:Bind ViewModel.TotalDebit, Mode=OneWay}" />
+
+            <!-- Tombol Aksi Form (Simpan / Post / Batal) -->
+            <local:JournalFormActionsControl
+                CancelClicked="FormActions_CancelClicked"
+                DeleteClicked="FormActions_DeleteClicked"
+                IsBalanced="{x:Bind ViewModel.IsBalanced, Mode=OneWay}"
+                IsEditMode="{x:Bind IsEditMode, Mode=OneWay}"
+                IsReadOnly="{x:Bind IsReadOnly, Mode=OneWay}"
+                IsSubmitting="{x:Bind IsSubmitting, Mode=OneWay}"
+                SubmitClicked="FormActions_SubmitClicked" />
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

@@ -1,0 +1,93 @@
+<UserControl
+    x:Class="AumoDekstop.Features.JournalEntry.TransactionInfoCardControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Border
+        Padding="20"
+        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+        BorderThickness="1"
+        CornerRadius="8">
+
+        <StackPanel Spacing="16">
+            <!-- CardHeader: CardTitle -->
+            <TextBlock
+                FontSize="16"
+                FontWeight="SemiBold"
+                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                Text="Informasi Transaksi" />
+
+            <!-- CardContent: Grid 2 Kolom -->
+            <Grid ColumnSpacing="16" RowSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Tanggal Transaksi -->
+                <StackPanel Grid.Row="0" Grid.Column="0" Spacing="8">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock
+                            FontSize="14"
+                            FontWeight="Medium"
+                            Text="Tanggal Transaksi" />
+                        <TextBlock
+                            FontSize="14"
+                            FontWeight="Medium"
+                            Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                            Text="*" />
+                    </StackPanel>
+
+                    <CalendarDatePicker
+                        x:Name="TransactionDatePicker"
+                        HorizontalAlignment="Stretch"
+                        DateChanged="TransactionDatePicker_DateChanged"
+                        DateFormat="{}{year.full}-{month.integer(2)}-{day.integer(2)}"
+                        IsEnabled="{x:Bind IsEditable, Mode=OneWay}"
+                        PlaceholderText="Pilih tanggal" />
+                </StackPanel>
+
+                <!-- Nomor Referensi / Bukti -->
+                <StackPanel Grid.Row="0" Grid.Column="1" Spacing="8">
+                    <TextBlock
+                        FontSize="14"
+                        FontWeight="Medium"
+                        Text="Nomor Referensi / Bukti" />
+
+                    <TextBox
+                        IsEnabled="{x:Bind IsEditable, Mode=OneWay}"
+                        PlaceholderText="Contoh: BKK-001 atau INV/2026/001"
+                        Text="{x:Bind ReferenceNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+
+                <!-- Deskripsi / Keterangan Jurnal (Span 2 Kolom) -->
+                <StackPanel
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Spacing="8">
+                    <TextBlock
+                        FontSize="14"
+                        FontWeight="Medium"
+                        Text="Deskripsi / Keterangan Jurnal" />
+
+                    <TextBox
+                        MinHeight="68"
+                        AcceptsReturn="True"
+                        IsEnabled="{x:Bind IsEditable, Mode=OneWay}"
+                        PlaceholderText="Tuliskan keterangan mengenai jurnal umum ini..."
+                        Text="{x:Bind Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </Border>
+</UserControl>
