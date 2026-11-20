@@ -134,9 +134,14 @@
                                         IsEnabled="{Binding IsEditable, ElementName=RootControl}"
                                         Minimum="0"
                                         SpinButtonPlacementMode="Hidden"
-                                        TextAlignment="Right"
                                         Value="{x:Bind DebitValue, Mode=TwoWay}"
-                                        ValueChanged="DebitNumberBox_ValueChanged" />
+                                        ValueChanged="DebitNumberBox_ValueChanged">
+                                        <NumberBox.Resources>
+                                            <Style TargetType="TextBox">
+                                                <Setter Property="TextAlignment" Value="Right" />
+                                            </Style>
+                                        </NumberBox.Resources>
+                                    </NumberBox>
 
                                     <!-- Input Kredit -->
                                     <NumberBox
@@ -146,9 +151,14 @@
                                         IsEnabled="{Binding IsEditable, ElementName=RootControl}"
                                         Minimum="0"
                                         SpinButtonPlacementMode="Hidden"
-                                        TextAlignment="Right"
                                         Value="{x:Bind CreditValue, Mode=TwoWay}"
-                                        ValueChanged="CreditNumberBox_ValueChanged" />
+                                        ValueChanged="CreditNumberBox_ValueChanged">
+                                        <NumberBox.Resources>
+                                            <Style TargetType="TextBox">
+                                                <Setter Property="TextAlignment" Value="Right" />
+                                            </Style>
+                                        </NumberBox.Resources>
+                                    </NumberBox>
 
                                     <!-- Tombol Hapus Baris -->
                                     <Button

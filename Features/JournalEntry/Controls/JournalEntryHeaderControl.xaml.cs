@@ -1,17 +1,23 @@
 namespace AumoDekstop.Features.JournalEntry.Controls;
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-public sealed partial class JournalEntryHeaderControl : UserControl
+public sealed partial class JournalEntryHeaderControl : UserControl, INotifyPropertyChanged
 {
     private bool _isUpdatingDateFromProperty;
 
+    private CalendarDatePicker? EntryDatePicker =>
+        FindName("EntryDatePicker") as CalendarDatePicker;
+
     public JournalEntryHeaderControl()
     {
-        InitializeComponent();
+        Application.LoadComponent(
+            this,
+            new Uri("ms-appx:///Features/JournalEntry/Controls/JournalEntryHeaderControl.xaml"));
     }
 
     #region Dependency Properties
@@ -105,13 +111,21 @@ public sealed partial class JournalEntryHeaderControl : UserControl
 
     public bool CanEditJournalType => !IsReadOnly && !IsEditMode;
 
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
     #endregion
 
     private static void OnStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is JournalEntryHeaderControl control)
         {
-            control.Bindings.Update();
+            control.OnPropertyChanged(nameof(IsEditable));
+            control.OnPropertyChanged(nameof(CanEditJournalType));
         }
     }
 
@@ -127,6 +141,9 @@ public sealed partial class JournalEntryHeaderControl : UserControl
     {
         if (_isUpdatingDateFromProperty) return;
 
+        var datePicker = EntryDatePicker;
+        if (datePicker is null || !OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763)) return;
+
         _isUpdatingDateFromProperty = true;
         try
         {
@@ -138,11 +155,11 @@ public sealed partial class JournalEntryHeaderControl : UserControl
                     out var parsedDate) ||
                 DateTimeOffset.TryParse(dateStr, out parsedDate))
             {
-                EntryDatePicker.Date = parsedDate;
+                datePicker.Date = parsedDate;
             }
             else
             {
-                EntryDatePicker.Date = null;
+                datePicker.Date = null;
             }
         }
         finally
@@ -153,7 +170,7 @@ public sealed partial class JournalEntryHeaderControl : UserControl
 
     private void EntryDatePicker_DateChanged(CalendarDatePicker sender, CalendarDatePickerDateChangedEventArgs args)
     {
-        if (_isUpdatingDateFromProperty) return;
+        if (_isUpdatingDateFromProperty || !OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763)) return;
 
         _isUpdatingDateFromProperty = true;
         try

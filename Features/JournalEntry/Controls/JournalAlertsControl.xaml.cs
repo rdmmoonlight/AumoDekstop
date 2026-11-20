@@ -1,16 +1,18 @@
 namespace AumoDekstop.Features.JournalEntry;
 
+using System.ComponentModel;
 using System.Globalization;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-public sealed partial class JournalAlertsControl : UserControl
+public sealed partial class JournalAlertsControl : UserControl, INotifyPropertyChanged
 {
     private static readonly CultureInfo IdCulture = new("id-ID");
 
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     public JournalAlertsControl()
     {
-        InitializeComponent();
     }
 
     #region Dependency Properties
@@ -114,9 +116,16 @@ public sealed partial class JournalAlertsControl : UserControl
     {
         if (d is JournalAlertsControl control)
         {
-            control.Bindings.Update();
+            control.OnPropertyChanged(nameof(HasErrorMessage));
+            control.OnPropertyChanged(nameof(IsUnbalancedVisible));
+            control.OnPropertyChanged(nameof(UnbalancedMessage));
+            control.OnPropertyChanged(nameof(IsPosted));
+            control.OnPropertyChanged(nameof(IsCancelled));
         }
     }
+
+    private void OnPropertyChanged(string propertyName) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     // Nanti bisa diganti memanggil JournalEntryHelpers.FormatCurrency() setelah helpers.ts dikonversi
     private static string FormatCurrency(decimal amount)

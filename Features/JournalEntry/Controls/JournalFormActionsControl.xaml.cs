@@ -8,7 +8,6 @@ public sealed partial class JournalFormActionsControl : UserControl
 {
     public JournalFormActionsControl()
     {
-        InitializeComponent();
     }
 
     #region Events (Pengganti Vue emit)
@@ -138,8 +137,13 @@ public sealed partial class JournalFormActionsControl : UserControl
     {
         if (d is JournalFormActionsControl control)
         {
-            control.Bindings.Update();
+            control.UpdateActionState();
         }
+    }
+
+    private void UpdateActionState()
+    {
+        // Keep this hook available for state changes without depending on generated x:Bind bindings.
     }
 
     private void DeleteButton_Click(object sender, RoutedEventArgs e)

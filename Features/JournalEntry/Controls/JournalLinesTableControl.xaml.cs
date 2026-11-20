@@ -70,7 +70,9 @@ public sealed partial class JournalLinesTableControl : UserControl
 {
     public JournalLinesTableControl()
     {
-        InitializeComponent();
+        Application.LoadComponent(
+            this,
+            new Uri("ms-appx:///Features/JournalEntry/Controls/JournalLinesTableControl.xaml"));
         Lines = new ObservableCollection<JournalLineRowItem>();
         Accounts = Array.Empty<AccountOption>();
     }
@@ -166,7 +168,6 @@ public sealed partial class JournalLinesTableControl : UserControl
     {
         if (d is JournalLinesTableControl control)
         {
-            control.Bindings.Update();
         }
     }
 
@@ -185,14 +186,12 @@ public sealed partial class JournalLinesTableControl : UserControl
                 control.RefreshRowNumbers();
             }
 
-            control.Bindings.Update();
         }
     }
 
     private void Lines_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         RefreshRowNumbers();
-        Bindings.Update();
     }
 
     private void RefreshRowNumbers()

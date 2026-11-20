@@ -1,15 +1,17 @@
 namespace AumoDekstop;
 
 using System.Net;
+using System.Net.Http;
 using AumoDekstop.Features.Auth.Services;
 using AumoDekstop.Features.Auth.ViewModels;
 using AumoDekstop.Features.ChartOfAccounts.Services;
+using AumoDekstop.Features.JournalEntry.Services;
+using AumoDekstop.Features.JournalEntry.ViewModels;
 using AumoDekstop.Features.Periods.Services;
 using AumoDekstop.Features.Periods.ViewModels;
 using AumoDekstop.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
-using Windows.Storage;
 
 public partial class App : Application
 {
@@ -72,11 +74,25 @@ public partial class App : Application
 
         services.AddHttpClient<IChartOfAccountsService, ChartOfAccountsService>();
 
-        // 5. ViewModels (Transient: instance baru setiap halaman/kontrol dibuka)
+        // 5. Journal Entry Service (menggunakan named HttpClient "AumoApi")
+        services.AddSingleton<IJournalEntryService>(sp =>
+        {
+            var factory = sp.GetRequiredService<IHttpClientFactory>();
+            return new JournalEntryService(factory.CreateClient("AumoApi"));
+        });
+
+        // 6. ViewModels (Transient: instance baru setiap halaman/kontrol dibuka)
         services.AddTransient<GoogleSignInViewModel>();
         services.AddTransient<LoginViewModel>();
         services.AddTransient<RegisterViewModel>();
         services.AddTransient<PeriodsPageViewModel>();
+        services.AddTransient<JournalEntryFormViewModel>(sp =>
+        {
+            var factory = sp.GetRequiredService<IHttpClientFactory>();
+            return new JournalEntryFormViewModel(
+                factory.CreateClient("AumoApi"),
+                sp.GetRequiredService<IJournalEntryService>());
+        });
 
         return services.BuildServiceProvider();
     }

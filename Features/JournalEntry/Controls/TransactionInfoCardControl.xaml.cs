@@ -2,16 +2,17 @@ namespace AumoDekstop.Features.JournalEntry.Controls;
 
 using System;
 using System.Globalization;
+using System.Runtime.Versioning;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+[SupportedOSPlatform("windows10.0.17763")]
 public sealed partial class TransactionInfoCardControl : UserControl
 {
     private bool _isUpdatingDateFromProperty;
 
     public TransactionInfoCardControl()
     {
-        InitializeComponent();
     }
 
     #region Dependency Properties
@@ -63,7 +64,7 @@ public sealed partial class TransactionInfoCardControl : UserControl
             nameof(IsReadOnly),
             typeof(bool),
             typeof(TransactionInfoCardControl),
-            new PropertyMetadata(false, OnStateChanged));
+            new PropertyMetadata(false));
 
     public bool IsReadOnly
     {
@@ -78,14 +79,6 @@ public sealed partial class TransactionInfoCardControl : UserControl
     public bool IsEditable => !IsReadOnly;
 
     #endregion
-
-    private static void OnStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-    {
-        if (d is TransactionInfoCardControl control)
-        {
-            control.Bindings.Update();
-        }
-    }
 
     private static void OnTransactionDateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
@@ -102,6 +95,11 @@ public sealed partial class TransactionInfoCardControl : UserControl
         _isUpdatingDateFromProperty = true;
         try
         {
+            if (FindName("TransactionDatePicker") is not CalendarDatePicker datePicker)
+            {
+                return;
+            }
+
             if (DateTimeOffset.TryParseExact(
                     dateStr,
                     "yyyy-MM-dd",
@@ -110,11 +108,11 @@ public sealed partial class TransactionInfoCardControl : UserControl
                     out var parsedDate) ||
                 DateTimeOffset.TryParse(dateStr, out parsedDate))
             {
-                TransactionDatePicker.Date = parsedDate;
+                datePicker.Date = parsedDate;
             }
             else
             {
-                TransactionDatePicker.Date = null;
+                datePicker.Date = null;
             }
         }
         finally

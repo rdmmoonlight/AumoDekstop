@@ -1,18 +1,20 @@
 namespace AumoDekstop.Features.JournalEntry.Controls;
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-public sealed partial class JournalEntryFooterControl : UserControl
+public sealed partial class JournalEntryFooterControl : UserControl, INotifyPropertyChanged
 {
     private static readonly CultureInfo IdCulture = new("id-ID");
 
     public JournalEntryFooterControl()
     {
-        InitializeComponent();
     }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     #region Dependency Properties
 
@@ -74,7 +76,10 @@ public sealed partial class JournalEntryFooterControl : UserControl
     {
         if (d is JournalEntryFooterControl control)
         {
-            control.Bindings.Update();
+            control.PropertyChanged?.Invoke(control, new PropertyChangedEventArgs(nameof(IsUnbalanced)));
+            control.PropertyChanged?.Invoke(control, new PropertyChangedEventArgs(nameof(FormattedTotalDebit)));
+            control.PropertyChanged?.Invoke(control, new PropertyChangedEventArgs(nameof(FormattedTotalCredit)));
+            control.PropertyChanged?.Invoke(control, new PropertyChangedEventArgs(nameof(DifferenceText)));
         }
     }
 
