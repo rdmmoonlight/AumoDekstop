@@ -132,9 +132,10 @@ public sealed partial class JournalEntryPage : Page, INotifyPropertyChanged
 
     #region Event Handlers (Pengganti handleCancel, handleSaveDraft, handlePost)
 
-    private void JournalLinesTable_LineUpdated(object? sender, JournalLineUpdatedEventArgs e)
+    private void JournalLinesTable_LineUpdated(object? sender, EventArgs e)
     {
-        ViewModel.UpdateLine(e.Index, e.Field, e.Value);
+        dynamic lineUpdate = e;
+        ViewModel.UpdateLine(lineUpdate.Index, lineUpdate.Field, lineUpdate.Value);
     }
 
     private void FormActions_CancelClicked(object sender, RoutedEventArgs e)

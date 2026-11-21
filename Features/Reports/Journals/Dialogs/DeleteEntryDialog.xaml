@@ -1,0 +1,59 @@
+<ContentDialog
+    x:Class="AumoDekstop.Features.Reports.Journals.DeleteEntryDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Delete Journal Entry"
+    PrimaryButtonText="Delete"
+    CloseButtonText="Cancel"
+    DefaultButton="Close"
+    PrimaryButtonClick="OnPrimaryButtonClick">
+
+    <ContentDialog.Resources>
+        <!-- Styling tombol Delete agar berwarna merah (Destructive) -->
+        <Style x:Key="DestructiveButtonStyle"
+                TargetType="Button"
+                BasedOn="{StaticResource DefaultButtonStyle}">
+            <Setter Property="Background"
+                    Value="#DC2626"/>
+            <Setter Property="Foreground"
+                    Value="#FFFFFF"/>
+            <Setter Property="FontWeight"
+                    Value="SemiBold"/>
+        </Style>
+    </ContentDialog.Resources>
+
+    <ContentDialog.PrimaryButtonStyle>
+        <StaticResource ResourceKey="DestructiveButtonStyle"/>
+    </ContentDialog.PrimaryButtonStyle>
+
+    <StackPanel Spacing="12"
+            MaxWidth="420">
+        <TextBlock TextWrapping="Wrap"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                FontSize="13">
+            <Run Text="Are you sure you want to delete entry "/>
+            <Run x:Name="TransactionNumberRun"
+                    FontFamily="Consolas"
+                    FontWeight="SemiBold"
+                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"/>
+            <Run Text="? This action cannot be undone."/>
+        </TextBlock>
+
+        <!-- Indikator loading saat proses penghapusan berjalan -->
+        <StackPanel x:Name="DeletingStatusPanel"
+                Orientation="Horizontal"
+                Spacing="8"
+                Visibility="Collapsed">
+            <ProgressRing IsActive="True"
+                    Width="16"
+                    Height="16"/>
+            <TextBlock Text="Deleting..."
+                    FontSize="12"
+                    VerticalAlignment="Center"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+        </StackPanel>
+    </StackPanel>
+</ContentDialog>

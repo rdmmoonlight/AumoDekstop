@@ -2,6 +2,7 @@ namespace AumoDekstop.Features.Reports.Journals.Controls;
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using Microsoft.UI.Text;
@@ -58,13 +59,14 @@ public sealed class ClosingJournalLineDisplayItem
         ];
 }
 
-public sealed partial class ClosingGroupTableControl : UserControl
+public sealed partial class ClosingGroupTableControl : UserControl, INotifyPropertyChanged
 {
     private static readonly CultureInfo IdCulture = new("id-ID");
 
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     public ClosingGroupTableControl()
     {
-        InitializeComponent();
     }
 
     #region Dependency Properties
@@ -117,7 +119,10 @@ public sealed partial class ClosingGroupTableControl : UserControl
     {
         if (d is ClosingGroupTableControl control)
         {
-            control.Bindings.Update();
+            control.PropertyChanged?.Invoke(control, new PropertyChangedEventArgs(nameof(GroupDescription)));
+            control.PropertyChanged?.Invoke(control, new PropertyChangedEventArgs(nameof(DisplayLines)));
+            control.PropertyChanged?.Invoke(control, new PropertyChangedEventArgs(nameof(FormattedTotalDebit)));
+            control.PropertyChanged?.Invoke(control, new PropertyChangedEventArgs(nameof(FormattedTotalCredit)));
         }
     }
 

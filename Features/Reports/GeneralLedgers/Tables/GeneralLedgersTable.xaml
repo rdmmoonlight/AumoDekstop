@@ -1,0 +1,278 @@
+<UserControl
+    x:Class="AumoDekstop.Features.Reports.GeneralLedgers.GeneralLedgersTable"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:AumoDekstop.Features.Reports.GeneralLedgers"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="LedgerEntryRowTemplate"
+                x:DataType="local:LedgerEntryItem">
+            <Border
+                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="16,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.2*"/>
+                        <ColumnDefinition Width="1.3*"/>
+                        <ColumnDefinition Width="2.8*"/>
+                        <ColumnDefinition Width="1.4*"/>
+                        <ColumnDefinition Width="1.4*"/>
+                        <ColumnDefinition Width="1.6*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Tanggal -->
+                    <TextBlock
+                        Grid.Column="0"
+                        Text="{x:Bind FormattedDate}"
+                        FontSize="13"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        VerticalAlignment="Center"
+                        Padding="0,0,8,0"/>
+
+                    <!-- No. Referensi -->
+                    <TextBlock
+                        Grid.Column="1"
+                        Text="{x:Bind ReferenceDisplay}"
+                        FontFamily="Consolas"
+                        FontSize="12"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        VerticalAlignment="Center"
+                        Padding="0,0,8,0"/>
+
+                    <!-- Keterangan -->
+                    <TextBlock
+                        Grid.Column="2"
+                        Text="{x:Bind Description}"
+                        FontSize="13"
+                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                        TextWrapping="Wrap"
+                        VerticalAlignment="Center"
+                        Padding="0,0,12,0"/>
+
+                    <!-- Debit -->
+                    <TextBlock
+                        Grid.Column="3"
+                        Text="{x:Bind FormattedDebit}"
+                        FontFamily="Consolas"
+                        FontSize="13"
+                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                        TextAlignment="Right"
+                        VerticalAlignment="Center"
+                        Padding="0,0,8,0"/>
+
+                    <!-- Kredit -->
+                    <TextBlock
+                        Grid.Column="4"
+                        Text="{x:Bind FormattedCredit}"
+                        FontFamily="Consolas"
+                        FontSize="13"
+                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                        TextAlignment="Right"
+                        VerticalAlignment="Center"
+                        Padding="0,0,8,0"/>
+
+                    <!-- Saldo -->
+                    <TextBlock
+                        Grid.Column="5"
+                        Text="{x:Bind FormattedBalance}"
+                        FontFamily="Consolas"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                        TextAlignment="Right"
+                        VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <Style x:Key="LedgerRowContainerStyle"
+                TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Stretch"/>
+            <Setter Property="Padding"
+                    Value="0"/>
+            <Setter Property="Margin"
+                    Value="0"/>
+            <Setter Property="MinHeight"
+                    Value="0"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto">
+        <!-- 1. Table Header (thead) -->
+        <Border
+            Grid.Row="0"
+            Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+            BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+            BorderThickness="0,0,0,1"
+            Padding="16,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.2*"/>
+                    <ColumnDefinition Width="1.3*"/>
+                    <ColumnDefinition Width="2.8*"/>
+                    <ColumnDefinition Width="1.4*"/>
+                    <ColumnDefinition Width="1.4*"/>
+                    <ColumnDefinition Width="1.6*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                        Text="Tanggal"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                <TextBlock Grid.Column="1"
+                        Text="No. Referensi"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                <TextBlock Grid.Column="2"
+                        Text="Keterangan"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                <TextBlock Grid.Column="3"
+                        Text="Debit"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        TextAlignment="Right"
+                        Padding="0,0,8,0"/>
+                <TextBlock Grid.Column="4"
+                        Text="Kredit"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        TextAlignment="Right"
+                        Padding="0,0,8,0"/>
+                <TextBlock Grid.Column="5"
+                        Text="Saldo"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        TextAlignment="Right"/>
+            </Grid>
+        </Border>
+
+        <!-- 2. Baris Saldo Awal -->
+        <Border
+            Grid.Row="1"
+            Background="{ThemeResource SubtleFillColorTertiaryBrush}"
+            BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+            BorderThickness="0,0,0,1"
+            Padding="16,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="8.1*"/>
+                    <ColumnDefinition Width="1.6*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock
+                    Grid.Column="0"
+                    Text="Saldo Awal"
+                    FontSize="13"
+                    FontWeight="SemiBold"
+                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"/>
+
+                <TextBlock
+                    x:Name="BeginningBalanceText"
+                    Grid.Column="1"
+                    Text="Rp 0"
+                    FontFamily="Consolas"
+                    FontSize="13"
+                    FontWeight="SemiBold"
+                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                    TextAlignment="Right"/>
+            </Grid>
+        </Border>
+
+        <!-- 3. Daftar Mutasi Jurnal & Empty State -->
+        <Grid Grid.Row="2">
+            <ListView
+                x:Name="EntriesListView"
+                ItemTemplate="{StaticResource LedgerEntryRowTemplate}"
+                ItemContainerStyle="{StaticResource LedgerRowContainerStyle}"
+                SelectionMode="None"/>
+
+            <!-- Empty State Mutasi (v-if="entries.length === 0") -->
+            <Border
+                x:Name="EmptyStateBorder"
+                Padding="16,24"
+                Visibility="Collapsed">
+                <TextBlock
+                    Text="Tidak ada mutasi transaksi pada periode ini."
+                    FontSize="13"
+                    FontStyle="Italic"
+                    HorizontalAlignment="Center"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            </Border>
+        </Grid>
+
+        <!-- 4. Table Footer (tfoot: Total Mutasi & Saldo Akhir) -->
+        <Border
+            Grid.Row="3"
+            Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+            BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+            BorderThickness="0,2,0,0"
+            Padding="16,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5.3*"/>
+                    <ColumnDefinition Width="1.4*"/>
+                    <ColumnDefinition Width="1.4*"/>
+                    <ColumnDefinition Width="1.6*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock
+                    Grid.Column="0"
+                    Text="TOTAL MUTASI &amp; SALDO AKHIR"
+                    FontSize="11"
+                    FontWeight="SemiBold"
+                    CharacterSpacing="40"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    TextAlignment="Right"
+                    VerticalAlignment="Center"
+                    Padding="0,0,12,0"/>
+
+                <TextBlock
+                    x:Name="TotalDebitText"
+                    Grid.Column="1"
+                    Text="Rp 0"
+                    FontFamily="Consolas"
+                    FontSize="13"
+                    FontWeight="SemiBold"
+                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                    TextAlignment="Right"
+                    VerticalAlignment="Center"
+                    Padding="0,0,8,0"/>
+
+                <TextBlock
+                    x:Name="TotalCreditText"
+                    Grid.Column="2"
+                    Text="Rp 0"
+                    FontFamily="Consolas"
+                    FontSize="13"
+                    FontWeight="SemiBold"
+                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                    TextAlignment="Right"
+                    VerticalAlignment="Center"
+                    Padding="0,0,8,0"/>
+
+                <TextBlock
+                    x:Name="EndingBalanceText"
+                    Grid.Column="3"
+                    Text="Rp 0"
+                    FontFamily="Consolas"
+                    FontSize="13"
+                    FontWeight="Bold"
+                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                    TextAlignment="Right"
+                    VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

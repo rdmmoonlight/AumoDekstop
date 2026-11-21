@@ -1,0 +1,93 @@
+<Page
+    x:Class="AumoDekstop.Features.Reports.GeneralLedgers.Views.GeneralLedgersTemporaryPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:AumoDekstop.Features.Reports.GeneralLedgers"
+    mc:Ignorable="d">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Padding="24"
+                    Spacing="24">
+            <!-- Header Halaman -->
+            <local:GeneralLedgersPageHeader
+                x:Name="HeaderControl"
+                Title="Buku Besar - Akun Sementara"
+                Description="Rincian mutasi dan saldo akhir akun Laba Rugi (Pendapatan dan Beban)">
+
+                <Button
+                    x:Name="RefreshButton"
+                    Click="OnRefreshClicked">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="8">
+                        <ProgressRing
+                            x:Name="RefreshSpinner"
+                            Width="16"
+                            Height="16"
+                            IsActive="False"
+                            Visibility="Collapsed"/>
+                        <TextBlock
+                            x:Name="RefreshButtonText"
+                            Text="Refresh Data"
+                            FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Button>
+            </local:GeneralLedgersPageHeader>
+
+            <!-- 1. State Loading -->
+            <Grid
+                x:Name="LoadingPanel"
+                MinHeight="240"
+                Visibility="Collapsed">
+                <ProgressRing
+                    IsActive="True"
+                    Width="36"
+                    Height="36"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"/>
+            </Grid>
+
+            <!-- 2. State Error -->
+            <InfoBar
+                x:Name="ErrorInfoBar"
+                Severity="Error"
+                IsOpen="False"
+                IsClosable="False"
+                Title="Terjadi Kesalahan"
+                Visibility="Collapsed"/>
+
+            <!-- 3. State Periode Belum Dipilih / Data Kosong -->
+            <local:GeneralLedgersNoPeriodState
+                x:Name="EmptyOrNoPeriodControl"
+                Visibility="Collapsed"/>
+
+            <!-- 4. Main Content -->
+            <StackPanel
+                x:Name="MainContentPanel"
+                Spacing="24"
+                Visibility="Collapsed">
+
+                <!-- Ringkasan Laba/Rugi (v-if="data.netIncomeBeforeClosing !== undefined") -->
+                <local:GeneralLedgersNetIncomeCard
+                    x:Name="NetIncomeCardControl"
+                    TotalRevenue="0"
+                    TotalExpense="0"
+                    Visibility="Collapsed"/>
+
+                <!-- Daftar Buku Besar per Akun -->
+                <ItemsRepeater x:Name="AccountsRepeater">
+                    <ItemsRepeater.Layout>
+                        <StackLayout Spacing="16"/>
+                    </ItemsRepeater.Layout>
+
+                    <ItemsRepeater.ItemTemplate>
+                        <DataTemplate x:DataType="local:LedgerAccountGroup">
+                            <local:GeneralLedgersCard Account="{x:Bind}"/>
+                        </DataTemplate>
+                    </ItemsRepeater.ItemTemplate>
+                </ItemsRepeater>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

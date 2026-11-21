@@ -1,0 +1,46 @@
+<UserControl
+    x:Class="AumoDekstop.Features.Reports.Journals.NoPeriodState"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackPanel
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        Spacing="8"
+        Padding="0,8">
+
+        <!-- Ikon EyeOff (pengganti EyeOff dari Lucide) -->
+        <FontIcon
+            Glyph="&#xED1A;"
+            FontSize="28"
+            HorizontalAlignment="Center"
+            Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+
+        <!-- Judul: No Period Selected -->
+        <TextBlock
+            Text="No Period Selected"
+            FontSize="14"
+            FontWeight="SemiBold"
+            HorizontalAlignment="Center"
+            Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+
+        <!-- Deskripsi dengan tautan inline: Go to Periods to select a period. -->
+        <TextBlock
+            FontSize="12"
+            HorizontalAlignment="Center"
+            TextWrapping="Wrap"
+            Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+            <Run Text="Go to "/>
+            <Hyperlink
+                UnderlineStyle="Single"
+                Click="OnNavigateToPeriodsClick">
+                <Run Text="Periods"
+                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+            </Hyperlink>
+            <Run Text=" to select a period."/>
+        </TextBlock>
+    </StackPanel>
+</UserControl>
