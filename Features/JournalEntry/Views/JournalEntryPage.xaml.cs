@@ -17,8 +17,6 @@ using Microsoft.UI.Xaml.Navigation;
 
 public sealed partial class JournalEntryPage : Page, INotifyPropertyChanged
 {
-    private bool _contentLoaded;
-
     private readonly IJournalEntryService _journalEntryService;
 
     private string? _entryId;
@@ -40,17 +38,6 @@ public sealed partial class JournalEntryPage : Page, INotifyPropertyChanged
 
         ViewModel.PropertyChanged += ViewModel_PropertyChanged;
         ViewModel.Lines.CollectionChanged += Lines_CollectionChanged;
-    }
-
-    private void InitializeComponent()
-    {
-        if (_contentLoaded)
-        {
-            return;
-        }
-
-        _contentLoaded = true;
-        Application.LoadComponent(this, new Uri("ms-appx:///Features/JournalEntry/Views/JournalEntryPage.xaml"));
     }
 
     #region State Properties (Pengganti ref & computed di Vue)
