@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using AumoDekstop.Features.JournalEntry.Controls;
 using AumoDekstop.Features.JournalEntry.Models;
 using AumoDekstop.Features.JournalEntry.Services;
 using AumoDekstop.Features.JournalEntry.ViewModels;
@@ -119,10 +120,9 @@ public sealed partial class JournalEntryPage : Page, INotifyPropertyChanged
 
     #region Event Handlers (Pengganti handleCancel, handleSaveDraft, handlePost)
 
-    private void JournalLinesTable_LineUpdated(object? sender, EventArgs e)
+    private void JournalLinesTable_LineUpdated(object? sender, JournalLineUpdatedEventArgs e)
     {
-        dynamic lineUpdate = e;
-        ViewModel.UpdateLine(lineUpdate.Index, lineUpdate.Field, lineUpdate.Value);
+        ViewModel.UpdateLine(e.Index, e.Field, e.Value);
     }
 
     private void FormActions_CancelClicked(object sender, RoutedEventArgs e)
