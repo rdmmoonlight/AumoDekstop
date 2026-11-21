@@ -34,13 +34,6 @@ public sealed partial class NoPeriodState : UserControl
         this.InitializeComponent();
     }
 
-    private void InitializeComponent()
-    {
-        Microsoft.UI.Xaml.Application.LoadComponent(
-            this,
-            new Uri("ms-appx:///Features/Reports/Journals/NoPeriodState.xaml"));
-    }
-
     private void OnNavigateToPeriodsClick(Hyperlink sender, HyperlinkClickEventArgs args)
     {
         NavigateToPeriodsRequested?.Invoke(this, EventArgs.Empty);
