@@ -73,8 +73,6 @@
                 <!-- Ringkasan Laba/Rugi (v-if="data.netIncomeBeforeClosing !== undefined") -->
                 <local:GeneralLedgersNetIncomeCard
                     x:Name="NetIncomeCardControl"
-                    TotalRevenue="0"
-                    TotalExpense="0"
                     Visibility="Collapsed"/>
 
                 <!-- Daftar Buku Besar per Akun -->
