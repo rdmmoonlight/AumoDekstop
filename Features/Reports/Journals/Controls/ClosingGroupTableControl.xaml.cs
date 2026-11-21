@@ -1,139 +1,282 @@
-namespace AumoDekstop.Features.Reports.Journals.Controls;
+namespace AumoDekstop.Features.Reports.JournalEntry.Controls;
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
-using Microsoft.UI.Text;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
-using Windows.UI.Text;
 
-public record ClosingJournalLine(
-    string? ReferenceNumber,
-    string AccountName,
-    decimal Debit,
-    decimal Credit
-);
-
-public record ClosingJournalEntryGroup(
-    string Description,
-    IReadOnlyList<ClosingJournalLine>? Lines
-);
-
-public record JournalTotals(
-    decimal TotalDebit,
-    decimal TotalCredit
-);
-
-public sealed class ClosingJournalLineDisplayItem
+public record AccountOption
 {
-    public ClosingJournalLineDisplayItem(ClosingJournalLine source, Func<decimal, string> numberFormatter)
+    public AccountOption()
     {
-        FormattedReference = decimal.TryParse(source.ReferenceNumber, NumberStyles.Any, CultureInfo.InvariantCulture, out var refNum) && refNum != 0m
-            ? source.ReferenceNumber!
-            : "-";
-
-        AccountName = source.AccountName;
-        IsCreditLine = source.Credit > 0m;
-        AccountMargin = IsCreditLine ? new Thickness(24, 0, 0, 0) : new Thickness(0);
-        AccountFontWeight = IsCreditLine ? FontWeights.Normal : FontWeights.Medium;
-
-        FormattedDebit = source.Debit > 0m ? numberFormatter(source.Debit) : "-";
-        FormattedCredit = source.Credit > 0m ? numberFormatter(source.Credit) : "-";
     }
 
-    public string FormattedReference { get; }
-    public string AccountName { get; }
-    public bool IsCreditLine { get; }
-    public Thickness AccountMargin { get; }
-    public FontWeight AccountFontWeight { get; }
-    public string FormattedDebit { get; }
-    public string FormattedCredit { get; }
+    public AccountOption(string id, string code, string name)
+    {
+        Id = id;
+        Code = code;
+        Name = name;
+    }
 
-    public Brush AccountForeground =>
-        (Brush)Application.Current.Resources[
-            IsCreditLine ? "TextFillColorSecondaryBrush" : "TextFillColorPrimaryBrush"
-        ];
+    public string Id { get; set; } = string.Empty;
+
+    public string Code { get; set; } = string.Empty;
+
+    public string Name { get; set; } = string.Empty;
+
+    public string DisplayLabel => $"{Code} - {Name}";
 }
 
-public sealed partial class ClosingGroupTableControl : UserControl, INotifyPropertyChanged
+public partial class JournalLineRowItem : ObservableObject
 {
-    private static readonly CultureInfo IdCulture = new("id-ID");
+    [ObservableProperty]
+    private int _rowNumber;
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+    [ObservableProperty]
+    private string _accountId = string.Empty;
 
-    public ClosingGroupTableControl()
+    [ObservableProperty]
+    private string? _description;
+
+    [ObservableProperty]
+    private decimal _debit;
+
+    [ObservableProperty]
+    private decimal _credit;
+
+    public double DebitValue
     {
+        get => (double)Debit;
+        set
+        {
+            var sanitized = double.IsNaN(value) || value < 0 ? 0m : Convert.ToDecimal(value);
+            if (Debit != sanitized)
+            {
+                Debit = sanitized;
+                OnPropertyChanged();
+            }
+        }
     }
+
+    public double CreditValue
+    {
+        get => (double)Credit;
+        set
+        {
+            var sanitized = double.IsNaN(value) || value < 0 ? 0m : Convert.ToDecimal(value);
+            if (Credit != sanitized)
+            {
+                Credit = sanitized;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    partial void OnDebitChanged(decimal value) => OnPropertyChanged(nameof(DebitValue));
+
+    partial void OnCreditChanged(decimal value) => OnPropertyChanged(nameof(CreditValue));
+}
+
+public sealed record JournalLineUpdatedEventArgs(int Index, string Field, object? Value);
+
+public sealed partial class JournalLinesTableControl : UserControl
+{
+    public JournalLinesTableControl()
+    {
+        InitializeComponent();
+        Lines = new ObservableCollection<JournalLineRowItem>();
+        Accounts = Array.Empty<AccountOption>();
+    }
+
+    #region Events (Pengganti Vue emit)
+
+    public event RoutedEventHandler? AddLineClicked;
+    public event EventHandler<int>? RemoveLineClicked;
+    public event EventHandler<JournalLineUpdatedEventArgs>? LineUpdated;
+
+    #endregion
 
     #region Dependency Properties
 
-    public static readonly DependencyProperty GroupProperty =
+    public static readonly DependencyProperty LinesProperty =
         DependencyProperty.Register(
-            nameof(Group),
-            typeof(ClosingJournalEntryGroup),
-            typeof(ClosingGroupTableControl),
-            new PropertyMetadata(null, OnDataChanged));
+            nameof(Lines),
+            typeof(ObservableCollection<JournalLineRowItem>),
+            typeof(JournalLinesTableControl),
+            new PropertyMetadata(null, OnLinesPropertyChanged));
 
-    public ClosingJournalEntryGroup? Group
+    public ObservableCollection<JournalLineRowItem> Lines
     {
-        get => (ClosingJournalEntryGroup?)GetValue(GroupProperty);
-        set => SetValue(GroupProperty, value);
+        get => (ObservableCollection<JournalLineRowItem>)GetValue(LinesProperty);
+        set => SetValue(LinesProperty, value);
     }
 
-    public static readonly DependencyProperty TotalsProperty =
+    public static readonly DependencyProperty AccountsProperty =
         DependencyProperty.Register(
-            nameof(Totals),
-            typeof(JournalTotals),
-            typeof(ClosingGroupTableControl),
-            new PropertyMetadata(new JournalTotals(0m, 0m), OnDataChanged));
+            nameof(Accounts),
+            typeof(IList<AccountOption>),
+            typeof(JournalLinesTableControl),
+            new PropertyMetadata(null));
 
-    public JournalTotals Totals
+    public IList<AccountOption> Accounts
     {
-        get => (JournalTotals)GetValue(TotalsProperty);
-        set => SetValue(TotalsProperty, value);
+        get => (IList<AccountOption>)GetValue(AccountsProperty);
+        set => SetValue(AccountsProperty, value);
+    }
+
+    public static readonly DependencyProperty IsReadOnlyProperty =
+        DependencyProperty.Register(
+            nameof(IsReadOnly),
+            typeof(bool),
+            typeof(JournalLinesTableControl),
+            new PropertyMetadata(false, OnStateChanged));
+
+    public bool IsReadOnly
+    {
+        get => (bool)GetValue(IsReadOnlyProperty);
+        set => SetValue(IsReadOnlyProperty, value);
+    }
+
+    public static readonly DependencyProperty AddLineCommandProperty =
+        DependencyProperty.Register(
+            nameof(AddLineCommand),
+            typeof(ICommand),
+            typeof(JournalLinesTableControl),
+            new PropertyMetadata(null));
+
+    public ICommand? AddLineCommand
+    {
+        get => (ICommand?)GetValue(AddLineCommandProperty);
+        set => SetValue(AddLineCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty RemoveLineCommandProperty =
+        DependencyProperty.Register(
+            nameof(RemoveLineCommand),
+            typeof(ICommand),
+            typeof(JournalLinesTableControl),
+            new PropertyMetadata(null));
+
+    public ICommand? RemoveLineCommand
+    {
+        get => (ICommand?)GetValue(RemoveLineCommandProperty);
+        set => SetValue(RemoveLineCommandProperty, value);
     }
 
     #endregion
 
     #region Computed Properties untuk x:Bind
 
-    public string GroupDescription => Group?.Description ?? string.Empty;
+    public bool IsEditable => !IsReadOnly;
 
-    public IReadOnlyList<ClosingJournalLineDisplayItem> DisplayLines =>
-        Group?.Lines?
-            .Select(line => new ClosingJournalLineDisplayItem(line, FormatNumberWithParen))
-            .ToList()
-        ?? [];
+    public bool HasLines => Lines is { Count: > 0 };
 
-    public string FormattedTotalDebit => FormatNumberWithParen(Totals?.TotalDebit ?? 0m);
-
-    public string FormattedTotalCredit => FormatNumberWithParen(Totals?.TotalCredit ?? 0m);
+    public bool IsEmpty => !HasLines;
 
     #endregion
 
-    private static void OnDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    private static void OnStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is ClosingGroupTableControl control)
+        if (d is JournalLinesTableControl control)
         {
-            control.PropertyChanged?.Invoke(control, new PropertyChangedEventArgs(nameof(GroupDescription)));
-            control.PropertyChanged?.Invoke(control, new PropertyChangedEventArgs(nameof(DisplayLines)));
-            control.PropertyChanged?.Invoke(control, new PropertyChangedEventArgs(nameof(FormattedTotalDebit)));
-            control.PropertyChanged?.Invoke(control, new PropertyChangedEventArgs(nameof(FormattedTotalCredit)));
         }
     }
 
-    // Nanti bisa diganti memanggil helper dari lib/format setelah dikonversi
-    private static string FormatNumberWithParen(decimal value)
+    private static void OnLinesPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (value < 0m)
+        if (d is JournalLinesTableControl control)
         {
-            return $"({Math.Abs(value).ToString("N0", IdCulture)})";
-        }
+            if (e.OldValue is ObservableCollection<JournalLineRowItem> oldCollection)
+            {
+                oldCollection.CollectionChanged -= control.Lines_CollectionChanged;
+            }
 
-        return value.ToString("N0", IdCulture);
+            if (e.NewValue is ObservableCollection<JournalLineRowItem> newCollection)
+            {
+                newCollection.CollectionChanged += control.Lines_CollectionChanged;
+                control.RefreshRowNumbers();
+            }
+
+        }
+    }
+
+    private void Lines_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        RefreshRowNumbers();
+    }
+
+    private void RefreshRowNumbers()
+    {
+        if (Lines is null) return;
+
+        for (int i = 0; i < Lines.Count; i++)
+        {
+            Lines[i].RowNumber = i + 1;
+        }
+    }
+
+    private void AddLineButton_Click(object sender, RoutedEventArgs e)
+    {
+        AddLineClicked?.Invoke(this, e);
+        if (AddLineCommand?.CanExecute(null) == true)
+        {
+            AddLineCommand.Execute(null);
+        }
+    }
+
+    private void RemoveLineButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: JournalLineRowItem item } && Lines is not null)
+        {
+            var index = Lines.IndexOf(item);
+            if (index >= 0)
+            {
+                RemoveLineClicked?.Invoke(this, index);
+                if (RemoveLineCommand?.CanExecute(index) == true)
+                {
+                    RemoveLineCommand.Execute(index);
+                }
+            }
+        }
+    }
+
+    private void AccountComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (sender is ComboBox { DataContext: JournalLineRowItem item } && Lines is not null)
+        {
+            var index = Lines.IndexOf(item);
+            if (index >= 0)
+            {
+                LineUpdated?.Invoke(this, new JournalLineUpdatedEventArgs(index, "accountId", item.AccountId));
+            }
+        }
+    }
+
+    private void DebitNumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+    {
+        if (sender.DataContext is JournalLineRowItem item && Lines is not null)
+        {
+            var index = Lines.IndexOf(item);
+            if (index >= 0)
+            {
+                LineUpdated?.Invoke(this, new JournalLineUpdatedEventArgs(index, "debit", item.Debit));
+            }
+        }
+    }
+
+    private void CreditNumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+    {
+        if (sender.DataContext is JournalLineRowItem item && Lines is not null)
+        {
+            var index = Lines.IndexOf(item);
+            if (index >= 0)
+            {
+                LineUpdated?.Invoke(this, new JournalLineUpdatedEventArgs(index, "credit", item.Credit));
+            }
+        }
     }
 }
