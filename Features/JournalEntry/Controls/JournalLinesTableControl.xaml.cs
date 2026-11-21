@@ -70,9 +70,7 @@ public sealed partial class JournalLinesTableControl : UserControl
 {
     public JournalLinesTableControl()
     {
-        Application.LoadComponent(
-            this,
-            new Uri("ms-appx:///Features/JournalEntry/Controls/JournalLinesTableControl.xaml"));
+        InitializeComponent();
         Lines = new ObservableCollection<JournalLineRowItem>();
         Accounts = Array.Empty<AccountOption>();
     }
