@@ -5,13 +5,15 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:AumoDekstop.Features.Reports.GeneralLedgers"
+    xmlns:headers="using:AumoDekstop.Features.Reports.GeneralLedgers.Headers"
+    xmlns:cards="using:AumoDekstop.Features.Reports.GeneralLedgers.Cards"
     mc:Ignorable="d">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Padding="24"
                     Spacing="24">
             <!-- Header Halaman -->
-            <local:GeneralLedgersPageHeader
+            <headers:GeneralLedgersPageHeader
                 x:Name="HeaderControl"
                 Title="Buku Besar - Akun Sementara"
                 Description="Rincian mutasi dan saldo akhir akun Laba Rugi (Pendapatan dan Beban)">
@@ -33,7 +35,7 @@
                             FontWeight="SemiBold"/>
                     </StackPanel>
                 </Button>
-            </local:GeneralLedgersPageHeader>
+            </headers:GeneralLedgersPageHeader>
 
             <!-- 1. State Loading -->
             <Grid
@@ -83,7 +85,7 @@
 
                     <ItemsRepeater.ItemTemplate>
                         <DataTemplate x:DataType="local:LedgerAccountGroup">
-                            <local:GeneralLedgersCard Account="{x:Bind}"/>
+                            <cards:GeneralLedgersCard Account="{x:Bind}"/>
                         </DataTemplate>
                     </ItemsRepeater.ItemTemplate>
                 </ItemsRepeater>
