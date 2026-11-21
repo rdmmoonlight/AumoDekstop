@@ -1,46 +1,46 @@
-<UserControl
-    x:Class="AumoDekstop.Features.Reports.Journals.NoPeriodState"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+namespace AumoDekstop.Features.Reports.Journals;
 
-    <StackPanel
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center"
-        Spacing="8"
-        Padding="0,8">
+using System;
+using System.Windows.Input;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Documents;
 
-        <!-- Ikon EyeOff (pengganti EyeOff dari Lucide) -->
-        <FontIcon
-            Glyph="&#xED1A;"
-            FontSize="28"
-            HorizontalAlignment="Center"
-            Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+public sealed partial class NoPeriodState : UserControl
+{
+    /// <summary>
+    /// Event yang dipicu saat tautan "Periods" diklik (pengganti RouterLink to="/periods").
+    /// </summary>
+    public event EventHandler? NavigateToPeriodsRequested;
 
-        <!-- Judul: No Period Selected -->
-        <TextBlock
-            Text="No Period Selected"
-            FontSize="14"
-            FontWeight="SemiBold"
-            HorizontalAlignment="Center"
-            Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+    /// <summary>
+    /// Opsional: Command MVVM jika ingin di-bind langsung dari ViewModel.
+    /// </summary>
+    public static readonly DependencyProperty NavigateToPeriodsCommandProperty =
+        DependencyProperty.Register(
+            nameof(NavigateToPeriodsCommand),
+            typeof(ICommand),
+            typeof(NoPeriodState),
+            new PropertyMetadata(null));
 
-        <!-- Deskripsi dengan tautan inline: Go to Periods to select a period. -->
-        <TextBlock
-            FontSize="12"
-            HorizontalAlignment="Center"
-            TextWrapping="Wrap"
-            Foreground="{ThemeResource TextFillColorSecondaryBrush}">
-            <Run Text="Go to "/>
-            <Hyperlink
-                UnderlineStyle="Single"
-                Click="OnNavigateToPeriodsClick">
-                <Run Text="Periods"
-                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
-            </Hyperlink>
-            <Run Text=" to select a period."/>
-        </TextBlock>
-    </StackPanel>
-</UserControl>
+    public ICommand? NavigateToPeriodsCommand
+    {
+        get => (ICommand?)GetValue(NavigateToPeriodsCommandProperty);
+        set => SetValue(NavigateToPeriodsCommandProperty, value);
+    }
+
+    public NoPeriodState()
+    {
+        this.InitializeComponent();
+    }
+
+    private void OnNavigateToPeriodsClick(Hyperlink sender, HyperlinkClickEventArgs args)
+    {
+        NavigateToPeriodsRequested?.Invoke(this, EventArgs.Empty);
+
+        if (NavigateToPeriodsCommand?.CanExecute(null) == true)
+        {
+            NavigateToPeriodsCommand.Execute(null);
+        }
+    }
+}
