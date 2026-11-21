@@ -10,14 +10,9 @@ public sealed partial class JournalEntryHeaderControl : UserControl, INotifyProp
 {
     private bool _isUpdatingDateFromProperty;
 
-    private CalendarDatePicker? EntryDatePicker =>
-        FindName("EntryDatePicker") as CalendarDatePicker;
-
     public JournalEntryHeaderControl()
     {
-        Application.LoadComponent(
-            this,
-            new Uri("ms-appx:///Features/JournalEntry/Controls/JournalEntryHeaderControl.xaml"));
+        InitializeComponent();
     }
 
     #region Dependency Properties
