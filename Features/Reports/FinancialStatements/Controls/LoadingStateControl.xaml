@@ -1,0 +1,47 @@
+<UserControl
+    x:Class="AumoDekstop.Features.Reports.FinancialStatements.Controls.LoadingStateControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <!-- Tailwind Emerald-600 (#059669) -->
+        <SolidColorBrush x:Key="Emerald600Brush" Color="#059669"/>
+    </UserControl.Resources>
+
+    <!-- Card Container (min-h-[300px], p-8 = 32px, rounded-lg) -->
+    <Border
+        MinHeight="300"
+        Padding="32"
+        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+        BorderThickness="1"
+        CornerRadius="8">
+
+        <StackPanel
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Spacing="16">
+
+            <!-- Spinner (w-12 h-12 = 48x48, border-t-emerald-600) -->
+            <ProgressRing
+                Width="48"
+                Height="48"
+                HorizontalAlignment="Center"
+                Foreground="{StaticResource Emerald600Brush}"
+                IsActive="{x:Bind IsLoading, Mode=OneWay}"/>
+
+            <!-- Loading Message -->
+            <TextBlock
+                HorizontalAlignment="Center"
+                FontSize="14"
+                FontWeight="Medium"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Text="{x:Bind EffectiveMessage, Mode=OneWay}"
+                TextAlignment="Center"
+                TextWrapping="Wrap"/>
+        </StackPanel>
+    </Border>
+</UserControl>

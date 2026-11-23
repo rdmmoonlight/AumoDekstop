@@ -5,6 +5,7 @@ using System.Net.Http;
 using AumoDekstop.Features.Auth.Services;
 using AumoDekstop.Features.Auth.ViewModels;
 using AumoDekstop.Features.ChartOfAccounts.Services;
+using AumoDekstop.Features.ChartOfAccounts.Views;
 using AumoDekstop.Features.JournalEntry.Services;
 using AumoDekstop.Features.JournalEntry.ViewModels;
 using AumoDekstop.Features.Periods.Services;
@@ -76,6 +77,7 @@ public partial class App : Application
             new PeriodsApiService(sp.GetRequiredService<ApiService>()));
 
         services.AddHttpClient<IChartOfAccountsService, ChartOfAccountsService>();
+        services.AddTransient<ChartOfAccountsPage>();
 
         // 5. Journal Entry Service (menggunakan named HttpClient "AumoApi")
         services.AddSingleton<IJournalEntryService>(sp =>

@@ -1,0 +1,85 @@
+<UserControl
+    x:Class="AumoDekstop.Features.Reports.FinancialStatements.Controls.ErrorAlertControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <!-- Tailwind Red Palette -->
+        <SolidColorBrush x:Key="Red50Brush" Color="#FEF2F2"/>
+        <SolidColorBrush x:Key="Red200Brush" Color="#FECACA"/>
+        <SolidColorBrush x:Key="Red600Brush" Color="#DC2626"/>
+        <SolidColorBrush x:Key="Red700Brush" Color="#B91C1C"/>
+        <SolidColorBrush x:Key="Red800Brush" Color="#991B1B"/>
+    </UserControl.Resources>
+
+    <Border
+        Padding="24"
+        Background="{StaticResource Red50Brush}"
+        BorderBrush="{StaticResource Red200Brush}"
+        BorderThickness="1"
+        CornerRadius="8">
+
+        <Grid ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Error Icon (24x24) -->
+            <FontIcon
+                Grid.Column="0"
+                VerticalAlignment="Top"
+                FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                FontSize="24"
+                Foreground="{StaticResource Red600Brush}"
+                Glyph="&#xE783;"/>
+
+            <!-- Content -->
+            <StackPanel Grid.Column="1">
+                <TextBlock
+                    FontSize="16"
+                    FontWeight="SemiBold"
+                    Foreground="{StaticResource Red800Brush}"
+                    Text="{x:Bind EffectiveTitle, Mode=OneWay}"
+                    TextWrapping="Wrap"/>
+
+                <TextBlock
+                    Margin="0,4,0,0"
+                    FontSize="14"
+                    Foreground="{StaticResource Red700Brush}"
+                    Text="{x:Bind EffectiveMessage, Mode=OneWay}"
+                    TextWrapping="Wrap"/>
+
+                <!-- Retry Button (tampil jika RetryCommand atau RetryClicked terpasang) -->
+                <Button
+                    Margin="0,16,0,0"
+                    Padding="14,8"
+                    HorizontalAlignment="Left"
+                    Background="{StaticResource Red600Brush}"
+                    BorderThickness="0"
+                    Click="RetryButton_Click"
+                    CornerRadius="6"
+                    Foreground="White"
+                    Visibility="{x:Bind HasRetryAction, Mode=OneWay}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon
+                            VerticalAlignment="Center"
+                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                            FontSize="14"
+                            Foreground="White"
+                            Glyph="&#xE72C;"/>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="White"
+                            Text="Coba Lagi"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

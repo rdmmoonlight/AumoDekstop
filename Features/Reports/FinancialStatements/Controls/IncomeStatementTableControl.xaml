@@ -1,0 +1,449 @@
+<UserControl
+    x:Class="AumoDekstop.Features.Reports.FinancialStatements.Controls.IncomeStatementTableControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:AumoDekstop.Features.Reports.FinancialStatements.Models"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <!-- Tailwind Gray & Emerald Palette -->
+        <SolidColorBrush x:Key="Gray50Brush" Color="#F9FAFB"/>
+        <SolidColorBrush x:Key="Gray50HalfBrush" Color="#80F9FAFB"/>
+        <SolidColorBrush x:Key="Gray100Brush" Color="#F3F4F6"/>
+        <SolidColorBrush x:Key="Gray200Brush" Color="#E5E7EB"/>
+        <SolidColorBrush x:Key="Gray500Brush" Color="#6B7280"/>
+        <SolidColorBrush x:Key="Gray800Brush" Color="#1F2937"/>
+        <SolidColorBrush x:Key="Gray900Brush" Color="#111827"/>
+
+        <SolidColorBrush x:Key="Emerald50Alpha40Brush" Color="#66ECFDF5"/>
+        <SolidColorBrush x:Key="Emerald100Brush" Color="#D1FAE5"/>
+        <SolidColorBrush x:Key="Emerald100Alpha60Brush" Color="#99D1FAE5"/>
+        <SolidColorBrush x:Key="Emerald200Brush" Color="#A7F3D0"/>
+        <SolidColorBrush x:Key="Emerald600Brush" Color="#059669"/>
+        <SolidColorBrush x:Key="Emerald800Brush" Color="#065F46"/>
+        <SolidColorBrush x:Key="Emerald900Brush" Color="#064E3B"/>
+        <SolidColorBrush x:Key="Emerald950Brush" Color="#022C22"/>
+
+        <!-- Reusable DataTemplate untuk Item Akun Laba Rugi (pl-10 = 40px) -->
+        <DataTemplate x:Key="IncomeStatementItemTemplate" x:DataType="models:IncomeStatementItem">
+            <Border
+                Padding="40,12,24,12"
+                BorderBrush="{StaticResource Gray100Brush}"
+                BorderThickness="0,0,0,1">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontFamily="Consolas, Cascadia Mono, Segoe UI"
+                            FontSize="12"
+                            Foreground="{StaticResource Gray500Brush}"
+                            Text="{x:Bind AccountCode}"/>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            Foreground="{StaticResource Gray800Brush}"
+                            Text="{x:Bind AccountName}"
+                            TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Consolas, Cascadia Mono, Segoe UI"
+                        FontSize="14"
+                        Foreground="{StaticResource Gray900Brush}"
+                        Text="{x:Bind FormattedAmount}"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <!-- Outer Card (rounded-lg border border-gray-200 bg-white) -->
+    <Border
+        Background="White"
+        BorderBrush="{StaticResource Gray200Brush}"
+        BorderThickness="1"
+        CornerRadius="8">
+
+        <StackPanel>
+            <!-- Header Laporan -->
+            <Border
+                Padding="24,16"
+                Background="{StaticResource Gray50Brush}"
+                BorderBrush="{StaticResource Gray200Brush}"
+                BorderThickness="0,0,0,1"
+                CornerRadius="8,8,0,0">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        FontSize="12"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource Gray500Brush}"
+                        Text="KODE / AKUN"/>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        FontSize="12"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource Gray500Brush}"
+                        Text="JUMLAH (IDR)"/>
+                </Grid>
+            </Border>
+
+            <!-- ========================================================= -->
+            <!-- 1. PENDAPATAN (REVENUE)                                   -->
+            <!-- ========================================================= -->
+            <Border
+                Padding="24,12"
+                Background="{StaticResource Gray50HalfBrush}"
+                BorderBrush="{StaticResource Gray100Brush}"
+                BorderThickness="0,0,0,1">
+                <TextBlock
+                    FontSize="12"
+                    FontWeight="SemiBold"
+                    Foreground="{StaticResource Emerald800Brush}"
+                    Text="{x:Bind SafeData.Revenue.UpperTitle, Mode=OneWay}"/>
+            </Border>
+
+            <ItemsRepeater
+                ItemTemplate="{StaticResource IncomeStatementItemTemplate}"
+                ItemsSource="{x:Bind SafeData.Revenue.Items, Mode=OneWay}"/>
+
+            <Border
+                Padding="24,12"
+                Background="{StaticResource Emerald50Alpha40Brush}"
+                BorderBrush="{StaticResource Emerald100Brush}"
+                BorderThickness="0,1,0,1">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource Emerald900Brush}"
+                        Text="{x:Bind SafeData.Revenue.TotalSectionLabel, Mode=OneWay}"/>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Consolas, Cascadia Mono, Segoe UI"
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource Emerald900Brush}"
+                        Text="{x:Bind SafeData.Revenue.FormattedSubtotal, Mode=OneWay}"/>
+                </Grid>
+            </Border>
+
+            <!-- ========================================================= -->
+            <!-- 2. BEBAN POKOK PENJUALAN (COGS)                           -->
+            <!-- ========================================================= -->
+            <Border
+                Padding="24,12"
+                Background="{StaticResource Gray50HalfBrush}"
+                BorderBrush="{StaticResource Gray100Brush}"
+                BorderThickness="0,0,0,1">
+                <TextBlock
+                    FontSize="12"
+                    FontWeight="SemiBold"
+                    Foreground="{StaticResource Emerald800Brush}"
+                    Text="{x:Bind SafeData.CostOfGoodsSold.UpperTitle, Mode=OneWay}"/>
+            </Border>
+
+            <ItemsRepeater
+                ItemTemplate="{StaticResource IncomeStatementItemTemplate}"
+                ItemsSource="{x:Bind SafeData.CostOfGoodsSold.Items, Mode=OneWay}"/>
+
+            <Border
+                Padding="24,12"
+                Background="{StaticResource Emerald50Alpha40Brush}"
+                BorderBrush="{StaticResource Emerald100Brush}"
+                BorderThickness="0,1,0,1">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource Emerald900Brush}"
+                        Text="{x:Bind SafeData.CostOfGoodsSold.TotalSectionLabel, Mode=OneWay}"/>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Consolas, Cascadia Mono, Segoe UI"
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource Emerald900Brush}"
+                        Text="{x:Bind SafeData.CostOfGoodsSold.FormattedSubtotal, Mode=OneWay}"/>
+                </Grid>
+            </Border>
+
+            <!-- ========================================================= -->
+            <!-- LABA KOTOR (GROSS PROFIT)                                 -->
+            <!-- ========================================================= -->
+            <Border
+                Padding="24,14"
+                Background="{StaticResource Emerald100Alpha60Brush}"
+                BorderBrush="{StaticResource Emerald200Brush}"
+                BorderThickness="0,2,0,2">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Foreground="{StaticResource Emerald950Brush}"
+                        Text="LABA KOTOR"/>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Consolas, Cascadia Mono, Segoe UI"
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Foreground="{StaticResource Emerald950Brush}"
+                        Text="{x:Bind SafeData.FormattedGrossProfit, Mode=OneWay}"/>
+                </Grid>
+            </Border>
+
+            <!-- ========================================================= -->
+            <!-- 3. BEBAN OPERASIONAL (OPERATING EXPENSES)                 -->
+            <!-- ========================================================= -->
+            <Border
+                Padding="24,12"
+                Background="{StaticResource Gray50HalfBrush}"
+                BorderBrush="{StaticResource Gray100Brush}"
+                BorderThickness="0,0,0,1">
+                <TextBlock
+                    FontSize="12"
+                    FontWeight="SemiBold"
+                    Foreground="{StaticResource Emerald800Brush}"
+                    Text="{x:Bind SafeData.OperatingExpenses.UpperTitle, Mode=OneWay}"/>
+            </Border>
+
+            <ItemsRepeater
+                ItemTemplate="{StaticResource IncomeStatementItemTemplate}"
+                ItemsSource="{x:Bind SafeData.OperatingExpenses.Items, Mode=OneWay}"/>
+
+            <Border
+                Padding="24,12"
+                Background="{StaticResource Emerald50Alpha40Brush}"
+                BorderBrush="{StaticResource Emerald100Brush}"
+                BorderThickness="0,1,0,1">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource Emerald900Brush}"
+                        Text="{x:Bind SafeData.OperatingExpenses.TotalSectionLabel, Mode=OneWay}"/>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Consolas, Cascadia Mono, Segoe UI"
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource Emerald900Brush}"
+                        Text="{x:Bind SafeData.OperatingExpenses.FormattedSubtotal, Mode=OneWay}"/>
+                </Grid>
+            </Border>
+
+            <!-- ========================================================= -->
+            <!-- LABA OPERASIONAL                                          -->
+            <!-- ========================================================= -->
+            <Border
+                Padding="24,12"
+                Background="{StaticResource Gray100Brush}"
+                BorderBrush="{StaticResource Gray200Brush}"
+                BorderThickness="0,1,0,1">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource Gray900Brush}"
+                        Text="Laba Operasional"/>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Consolas, Cascadia Mono, Segoe UI"
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource Gray900Brush}"
+                        Text="{x:Bind SafeData.FormattedOperatingIncome, Mode=OneWay}"/>
+                </Grid>
+            </Border>
+
+            <!-- ========================================================= -->
+            <!-- 4. PENDAPATAN & BEBAN LAIN-LAIN                           -->
+            <!-- ========================================================= -->
+            <StackPanel Visibility="{x:Bind SafeData.OtherIncomeExpense.HasItems, Mode=OneWay}">
+                <Border
+                    Padding="24,12"
+                    Background="{StaticResource Gray50HalfBrush}"
+                    BorderBrush="{StaticResource Gray100Brush}"
+                    BorderThickness="0,0,0,1">
+                    <TextBlock
+                        FontSize="12"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource Emerald800Brush}"
+                        Text="{x:Bind SafeData.OtherIncomeExpense.UpperTitle, Mode=OneWay}"/>
+                </Border>
+
+                <ItemsRepeater
+                    ItemTemplate="{StaticResource IncomeStatementItemTemplate}"
+                    ItemsSource="{x:Bind SafeData.OtherIncomeExpense.Items, Mode=OneWay}"/>
+            </StackPanel>
+
+            <!-- ========================================================= -->
+            <!-- LABA SEBELUM PAJAK                                        -->
+            <!-- ========================================================= -->
+            <Border
+                Padding="24,12"
+                Background="{StaticResource Gray100Brush}"
+                BorderBrush="{StaticResource Gray200Brush}"
+                BorderThickness="0,1,0,1">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource Gray900Brush}"
+                        Text="Laba Bersih Sebelum Pajak"/>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Consolas, Cascadia Mono, Segoe UI"
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource Gray900Brush}"
+                        Text="{x:Bind SafeData.FormattedNetIncomeBeforeTax, Mode=OneWay}"/>
+                </Grid>
+            </Border>
+
+            <!-- ========================================================= -->
+            <!-- BEBAN PAJAK PENGHASILAN                                   -->
+            <!-- ========================================================= -->
+            <Border
+                Padding="24,12"
+                BorderBrush="{StaticResource Gray100Brush}"
+                BorderThickness="0,0,0,1">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        Foreground="{StaticResource Gray800Brush}"
+                        Text="Beban Pajak Penghasilan"/>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Consolas, Cascadia Mono, Segoe UI"
+                        FontSize="14"
+                        Foreground="{StaticResource Gray900Brush}"
+                        Text="{x:Bind SafeData.FormattedTaxExpense, Mode=OneWay}"/>
+                </Grid>
+            </Border>
+
+            <!-- ========================================================= -->
+            <!-- LABA BERSIH (NET INCOME)                                  -->
+            <!-- ========================================================= -->
+            <Border
+                Padding="24,16"
+                Background="{StaticResource Emerald600Brush}"
+                CornerRadius="0,0,8,8">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Foreground="White"
+                        Text="LABA BERSIH TEKUN/PERIODE"/>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Consolas, Cascadia Mono, Segoe UI"
+                        FontSize="18"
+                        FontWeight="Bold"
+                        Foreground="White"
+                        Text="{x:Bind SafeData.FormattedNetIncome, Mode=OneWay}"/>
+                </Grid>
+            </Border>
+        </StackPanel>
+    </Border>
+</UserControl>
