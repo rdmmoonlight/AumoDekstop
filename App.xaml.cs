@@ -10,6 +10,9 @@ using AumoDekstop.Features.JournalEntry.Services;
 using AumoDekstop.Features.JournalEntry.ViewModels;
 using AumoDekstop.Features.Periods.Services;
 using AumoDekstop.Features.Periods.ViewModels;
+using AumoDekstop.Features.Reports.FinancialStatements.Services;
+using AumoDekstop.Features.Reports.FinancialStatements.ViewModels;
+using AumoDekstop.Features.Reports.FinancialStatements.Views;
 using AumoDekstop.Features.Reports.TrialBalances.Services;
 using AumoDekstop.Features.Reports.TrialBalances.ViewModels;
 using AumoDekstop.Features.Reports.TrialBalances.Views;
@@ -100,7 +103,11 @@ public partial class App : Application
         });
 
         // Service
-        services.AddTransient<ITrialBalancesApiService, TrialBalancesApiService>();
+        services.AddTransient<ITrialBalancesApiService>(sp =>
+{
+    var factory = sp.GetRequiredService<IHttpClientFactory>();
+    return new TrialBalancesApiService(factory.CreateClient("AumoApi"));
+});
 
         // ViewModels
         services.AddTransient<UnadjustedTrialBalanceViewModel>();
@@ -111,6 +118,26 @@ public partial class App : Application
         services.AddTransient<UnadjustedTrialBalancePage>();
         services.AddTransient<AdjustedTrialBalancePage>();
         services.AddTransient<PostClosingTrialBalancePage>();
+
+        //Financial Statements
+        // Service
+        services.AddTransient<IFinancialStatementsApiService>(sp =>
+{
+    var factory = sp.GetRequiredService<IHttpClientFactory>();
+    return new FinancialStatementsApiService(factory.CreateClient("AumoApi"));
+});
+
+        // ViewModels
+        services.AddTransient<IncomeStatementViewModel>();
+        services.AddTransient<RetainedEarningsViewModel>();
+        services.AddTransient<StatementOfCashFlowViewModel>();
+        services.AddTransient<StatementOfFinancialPositionViewModel>();
+
+        // Pages
+        services.AddTransient<IncomeStatementPage>();
+        services.AddTransient<RetainedEarningsPage>();
+        services.AddTransient<StatementOfCashFlowPage>();
+        services.AddTransient<StatementOfFinancialPositionPage>();
 
         return services.BuildServiceProvider();
     }

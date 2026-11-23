@@ -130,6 +130,11 @@ public sealed class RetainedEarningsData
     public string FormattedDividendsPaid => FinancialStatementFormatter.FormatCurrency(DividendsPaid);
     public string FormattedOtherAdjustments => FinancialStatementFormatter.FormatCurrency(OtherAdjustments);
     public string FormattedEndingBalance => FinancialStatementFormatter.FormatCurrency(EndingBalance);
+
+    public string FormattedDividendsPaidParenthesized =>
+        $"({FinancialStatementFormatter.FormatCurrency(System.Math.Abs(DividendsPaid))})";
+
+    public bool HasOtherAdjustments => OtherAdjustments != 0m;
 }
 
 // --- Statement of Cash Flow (Laporan Arus Kas) ---

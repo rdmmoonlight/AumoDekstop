@@ -1,7 +1,11 @@
 namespace AumoDekstop;
 
+using System;
+using System.Threading.Tasks;
 using AumoDekstop.Features.Periods.Dialogs;
 using AumoDekstop.Features.Periods.Views;
+using AumoDekstop.Features.Reports.FinancialStatements.Views;
+using AumoDekstop.Features.Reports.TrialBalances.Views;
 using AumoDekstop.Services;
 using AumoDekstop.Shell.Ribbon;
 
@@ -42,6 +46,46 @@ public sealed partial class MainWindow
             case RibbonCommand.DeleteCoa:
                 SetStatus("● Menghapus akun (COA) terpilih...");
                 break;
+
+            // Trial Balances (Neraca Saldo)
+            case "UnadjustedTrialBalance":
+                await ShowReportPageAsync<UnadjustedTrialBalancePage>(
+                    "Unadjusted Trial Balance",
+                    p => p.ViewModel.LoadAsync());
+                break;
+            case "AdjustedTrialBalance":
+                await ShowReportPageAsync<AdjustedTrialBalancePage>(
+                    "Adjusted Trial Balance",
+                    p => p.ViewModel.LoadAsync());
+                break;
+            case "PostClosingTrialBalance":
+                await ShowReportPageAsync<PostClosingTrialBalancePage>(
+                    "Post-Closing Trial Balance",
+                    p => p.ViewModel.LoadAsync());
+                break;
+
+            // Financial Statements (Laporan Keuangan)
+            case "IncomeStatement":
+                await ShowReportPageAsync<IncomeStatementPage>(
+                    "Laporan Laba Rugi",
+                    p => p.ViewModel.LoadAsync());
+                break;
+            case "RetainedEarnings":
+                await ShowReportPageAsync<RetainedEarningsPage>(
+                    "Laporan Laba Ditahan",
+                    p => p.ViewModel.LoadAsync());
+                break;
+            case "CashFlow":
+                await ShowReportPageAsync<StatementOfCashFlowPage>(
+                    "Laporan Arus Kas",
+                    p => p.ViewModel.LoadAsync());
+                break;
+            case "FinancialPosition":
+                await ShowReportPageAsync<StatementOfFinancialPositionPage>(
+                    "Laporan Posisi Keuangan (Neraca)",
+                    p => p.ViewModel.LoadAsync());
+                break;
+
             case RibbonCommand.Logout:
                 await LogoutAsync();
                 break;

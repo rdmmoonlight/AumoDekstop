@@ -1,11 +1,11 @@
 namespace AumoDekstop;
 
-using AumoDekstop.Features.Auth.Views;
 using AumoDekstop.Features.Periods.ViewModels;
 using AumoDekstop.Features.Periods.Views;
 using AumoDekstop.Services;
 using AumoDekstop.Shell.Ribbon;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Xaml.Controls;
 
 public sealed partial class MainWindow
 {
@@ -25,6 +25,16 @@ public sealed partial class MainWindow
         {
             RootFrame.Content = _periodsPage;
         }
+    }
+
+    private async Task ShowReportPageAsync<TPage>(string statusTitle, Func<TPage, Task> loadAction)
+        where TPage : Page
+    {
+        var page = App.Current.Services.GetRequiredService<TPage>();
+        RootFrame.Content = page;
+        SetStatus($"● Membuka {statusTitle}...");
+        await loadAction(page);
+        SetStatus($"● {statusTitle} dimuat.");
     }
 
     private void OnRibbonTabChanged(object? sender, RibbonTabChangedEventArgs e)

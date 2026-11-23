@@ -1,0 +1,223 @@
+<UserControl
+    x:Class="AumoDekstop.Features.Reports.FinancialStatements.Controls.RetainedEarningsTableControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <!-- Tailwind Gray, Emerald & Red Palette -->
+        <SolidColorBrush x:Key="Gray50Brush" Color="#F9FAFB"/>
+        <SolidColorBrush x:Key="Gray100Brush" Color="#F3F4F6"/>
+        <SolidColorBrush x:Key="Gray200Brush" Color="#E5E7EB"/>
+        <SolidColorBrush x:Key="Gray500Brush" Color="#6B7280"/>
+        <SolidColorBrush x:Key="Gray900Brush" Color="#111827"/>
+
+        <SolidColorBrush x:Key="Emerald600Brush" Color="#059669"/>
+        <SolidColorBrush x:Key="Emerald700Brush" Color="#047857"/>
+        <SolidColorBrush x:Key="Red600Brush" Color="#DC2626"/>
+    </UserControl.Resources>
+
+    <!-- Outer Card (rounded-lg border border-gray-200 bg-white) -->
+    <Border
+        Background="White"
+        BorderBrush="{StaticResource Gray200Brush}"
+        BorderThickness="1"
+        CornerRadius="8">
+
+        <StackPanel>
+            <!-- Header Laporan -->
+            <Border
+                Padding="24,16"
+                Background="{StaticResource Gray50Brush}"
+                BorderBrush="{StaticResource Gray200Brush}"
+                BorderThickness="0,0,0,1"
+                CornerRadius="8,8,0,0">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        FontSize="12"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource Gray500Brush}"
+                        Text="KETERANGAN"/>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        FontSize="12"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource Gray500Brush}"
+                        Text="JUMLAH (IDR)"/>
+                </Grid>
+            </Border>
+
+            <!-- ========================================================= -->
+            <!-- 1. SALDO AWAL                                             -->
+            <!-- ========================================================= -->
+            <Border
+                Padding="24,14"
+                BorderBrush="{StaticResource Gray100Brush}"
+                BorderThickness="0,0,0,1">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        FontWeight="Medium"
+                        Foreground="{StaticResource Gray900Brush}"
+                        Text="Saldo Laba Ditahan (Awal Periode)"/>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Consolas, Cascadia Mono, Segoe UI"
+                        FontSize="14"
+                        Foreground="{StaticResource Gray900Brush}"
+                        Text="{x:Bind SafeData.FormattedBeginningBalance, Mode=OneWay}"/>
+                </Grid>
+            </Border>
+
+            <!-- ========================================================= -->
+            <!-- 2. LABA BERSIH PERIODE BERJALAN (pl-8 = 32px)              -->
+            <!-- ========================================================= -->
+            <Border
+                Padding="32,14,24,14"
+                BorderBrush="{StaticResource Gray100Brush}"
+                BorderThickness="0,0,0,1">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        FontWeight="Medium"
+                        Foreground="{StaticResource Gray900Brush}"
+                        Text="(+) Laba Bersih Periode Berjalan"/>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Consolas, Cascadia Mono, Segoe UI"
+                        FontSize="14"
+                        Foreground="{StaticResource Emerald700Brush}"
+                        Text="{x:Bind SafeData.FormattedNetIncome, Mode=OneWay}"/>
+                </Grid>
+            </Border>
+
+            <!-- ========================================================= -->
+            <!-- 3. PEMBAGIAN DIVIDEN (pl-8 = 32px)                        -->
+            <!-- ========================================================= -->
+            <Border
+                Padding="32,14,24,14"
+                BorderBrush="{StaticResource Gray100Brush}"
+                BorderThickness="0,0,0,1">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        FontWeight="Medium"
+                        Foreground="{StaticResource Gray900Brush}"
+                        Text="(-) Pembagian Dividen"/>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Consolas, Cascadia Mono, Segoe UI"
+                        FontSize="14"
+                        Foreground="{StaticResource Red600Brush}"
+                        Text="{x:Bind SafeData.FormattedDividendsPaidParenthesized, Mode=OneWay}"/>
+                </Grid>
+            </Border>
+
+            <!-- ========================================================= -->
+            <!-- 4. PENYESUAIAN LAIN-LAIN (v-if="otherAdjustments !== 0")  -->
+            <!-- ========================================================= -->
+            <Border
+                Padding="32,14,24,14"
+                BorderBrush="{StaticResource Gray100Brush}"
+                BorderThickness="0,0,0,1"
+                Visibility="{x:Bind SafeData.HasOtherAdjustments, Mode=OneWay}">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        FontWeight="Medium"
+                        Foreground="{StaticResource Gray900Brush}"
+                        Text="(+/-) Penyesuaian Lain-lain"/>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Consolas, Cascadia Mono, Segoe UI"
+                        FontSize="14"
+                        Foreground="{StaticResource Gray900Brush}"
+                        Text="{x:Bind SafeData.FormattedOtherAdjustments, Mode=OneWay}"/>
+                </Grid>
+            </Border>
+
+            <!-- ========================================================= -->
+            <!-- 5. SALDO AKHIR (bg-emerald-600 text-white)                -->
+            <!-- ========================================================= -->
+            <Border
+                Padding="24,16"
+                Background="{StaticResource Emerald600Brush}"
+                CornerRadius="0,0,8,8">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Foreground="White"
+                        Text="Saldo Laba Ditahan (Akhir Periode)"/>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Consolas, Cascadia Mono, Segoe UI"
+                        FontSize="18"
+                        FontWeight="Bold"
+                        Foreground="White"
+                        Text="{x:Bind SafeData.FormattedEndingBalance, Mode=OneWay}"/>
+                </Grid>
+            </Border>
+        </StackPanel>
+    </Border>
+</UserControl>
