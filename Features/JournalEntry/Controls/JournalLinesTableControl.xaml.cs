@@ -9,8 +9,25 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-public record AccountOption(string Id, string Code, string Name)
+public sealed class AccountOption
 {
+    public AccountOption()
+    {
+    }
+
+    public AccountOption(string id, string code, string name)
+    {
+        Id = id;
+        Code = code;
+        Name = name;
+    }
+
+    public string Id { get; set; } = string.Empty;
+
+    public string Code { get; set; } = string.Empty;
+
+    public string Name { get; set; } = string.Empty;
+
     public string DisplayLabel => $"{Code} - {Name}";
 }
 

@@ -15,3 +15,5 @@ AumoDekstop/
 command:
 build+log: dotnet build -c Debug -r win-x64 -p:Platform=x64 -v normal
 
+cek kompilasi scrimpt dan source:
+dotnet build AumoDekstop.csproj -c Debug -p:Platform=x64 -p:WindowsPackageType=None --no-self-contained

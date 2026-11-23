@@ -13,10 +13,10 @@ using System.Threading.Tasks;
 /// </summary>
 public sealed class ApiResponse<T>
 {
-    public bool IsSuccess { get; init; }
-    public int StatusCode { get; init; }
-    public T? Data { get; init; }
-    public string? ErrorMessage { get; init; }
+    public bool IsSuccess { get; set; }
+    public int StatusCode { get; set; }
+    public T? Data { get; set; }
+    public string? ErrorMessage { get; set; }
 }
 
 public class ApiService
