@@ -34,10 +34,10 @@ public sealed class AccountOption
 public partial class JournalLineRowItem : ObservableObject
 {
     [ObservableProperty]
-    private int _rowNumber;
+    public partial int RowNumber { get; set; }
 
     [ObservableProperty]
-    private string _accountId = string.Empty;
+    public partial string AccountId { get; set; } = string.Empty;
 
     [ObservableProperty]
     private string? _description;

@@ -13,11 +13,11 @@ public partial class GoogleSignInViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasError))]
-    private string _errorMessage = string.Empty;
+    public partial string ErrorMessage { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SignInWithGoogleCommand))]
-    private bool _isLoading;
+    public partial bool IsLoading { get; set; }
 
     public bool HasClientId => !string.IsNullOrWhiteSpace(AuthHelpers.GoogleClientId);
     public bool HasNoClientId => !HasClientId;

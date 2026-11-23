@@ -2,6 +2,7 @@ namespace AumoDekstop;
 
 using System;
 using System.Threading.Tasks;
+using AumoDekstop.Features.ChartOfAccounts.Views;
 using AumoDekstop.Features.Periods.Dialogs;
 using AumoDekstop.Features.Periods.Views;
 using AumoDekstop.Features.Reports.FinancialStatements.Views;
@@ -32,19 +33,35 @@ public sealed partial class MainWindow
                 await RefreshPeriodsAsync();
                 break;
             case RibbonCommand.RefreshCoa:
-                SetStatus("● Memuat ulang daftar akun (COA)...");
+                await RunCoaCommandAsync("● Memuat ulang daftar akun (COA)...", async page =>
+                {
+                    await page.RefreshAsync();
+                    SetStatus("● Daftar akun (COA) diperbarui.");
+                });
                 break;
             case RibbonCommand.ImportCoa:
-                SetStatus("● Membuka impor daftar akun (COA)...");
+                SetStatus("● Impor COA belum tersedia.");
                 break;
             case RibbonCommand.AddCoa:
-                SetStatus("● Membuka form tambah akun (COA)...");
+                await RunCoaCommandAsync("● Membuka form tambah akun (COA)...", page => page.AddAccountAsync());
                 break;
             case RibbonCommand.EditCoa:
-                SetStatus("● Membuka form ubah akun (COA)...");
+                await RunCoaCommandAsync("● Membuka form ubah akun (COA)...", async page =>
+                {
+                    if (!await page.EditSelectedAsync())
+                    {
+                        SetStatus("● Pilih satu akun pada tabel terlebih dahulu.");
+                    }
+                });
                 break;
             case RibbonCommand.DeleteCoa:
-                SetStatus("● Menghapus akun (COA) terpilih...");
+                await RunCoaCommandAsync("● Menghapus akun (COA) terpilih...", async page =>
+                {
+                    if (!await page.DeleteSelectedAsync())
+                    {
+                        SetStatus("● Pilih satu akun pada tabel terlebih dahulu.");
+                    }
+                });
                 break;
 
             // Trial Balances (Neraca Saldo)
@@ -93,6 +110,18 @@ public sealed partial class MainWindow
                 SetStatus("● Fitur ini belum tersedia.");
                 break;
         }
+    }
+
+    // Perintah COA hanya berlaku saat halaman Chart Of Accounts sedang tampil
+    private async Task RunCoaCommandAsync(string statusText, Func<ChartOfAccountsPage, Task> action)
+    {
+        if (RootFrame.Content is not ChartOfAccountsPage page)
+        {
+            return;
+        }
+
+        SetStatus(statusText);
+        await action(page);
     }
 
     private async Task RefreshPeriodsAsync()

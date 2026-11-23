@@ -39,10 +39,10 @@ public partial class JournalEntryFormViewModel : ObservableObject
     public ObservableCollection<AccountOption> Accounts { get; } = [];
 
     [ObservableProperty]
-    private bool _isLoadingAccounts;
+    public partial bool IsLoadingAccounts { get; set; }
 
     [ObservableProperty]
-    private string? _accountsError;
+    public partial string? AccountsError { get; set; }
 
     [RelayCommand]
     public async Task FetchAccountsAsync(CancellationToken cancellationToken = default)
@@ -85,13 +85,13 @@ public partial class JournalEntryFormViewModel : ObservableObject
     #region 2. Journal Entry Detail (dari useJournalEntryDetail.ts)
 
     [ObservableProperty]
-    private JournalEntryDetailDto? _entry;
+    public partial JournalEntryDetailDto? Entry { get; set; }
 
     [ObservableProperty]
-    private bool _isLoadingDetail;
+    public partial bool IsLoadingDetail { get; set; }
 
     [ObservableProperty]
-    private string? _detailError;
+    public partial string? DetailError { get; set; }
 
     [RelayCommand]
     public async Task FetchDetailAsync(string? entryId, CancellationToken cancellationToken = default)
@@ -146,23 +146,22 @@ public partial class JournalEntryFormViewModel : ObservableObject
     #region 3. Form State & Calculations (dari useJournalForm.ts)
 
     [ObservableProperty]
-    private string _transactionDate = DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+    public partial string TransactionDate { get; set; } = DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
     [ObservableProperty]
-    private string _referenceNumber = string.Empty;
+    public partial string ReferenceNumber { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _description = string.Empty;
-
+    public partial string Description { get; set; } = string.Empty;
     public ObservableCollection<JournalLineRowItem> Lines { get; } = [];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsBalanced))]
-    private decimal _totalDebit;
+    public partial decimal TotalDebit { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsBalanced))]
-    private decimal _totalCredit;
+    public partial decimal TotalCredit { get; set; }
 
     public bool IsBalanced => TotalDebit > 0m && TotalDebit == TotalCredit;
 

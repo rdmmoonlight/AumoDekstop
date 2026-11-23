@@ -41,6 +41,9 @@ public sealed partial class AccountsTableControl : UserControl
         set => SetValue(IsLoadingProperty, value);
     }
 
+    /// <summary>Akun pada baris yang sedang dipilih (null jika belum ada).</summary>
+    public Account? SelectedAccount => AccountsListView.SelectedItem as Account;
+
     public AccountsTableControl()
     {
         // Daftarkan resource converters sebelum InitializeComponent

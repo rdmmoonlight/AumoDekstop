@@ -11,35 +11,35 @@ public partial class PeriodsPageViewModel : ObservableObject
     private readonly IPeriodsApiService _periodsApiService;
 
     [ObservableProperty]
-    private ObservableCollection<PeriodItem> _periods = new();
+    public partial ObservableCollection<PeriodItem> Periods { get; set; } = new();
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasActivePeriod))]
-    private PeriodItem? _activePeriod = null;
+    public partial PeriodItem? ActivePeriod { get; set; } = null;
 
     public bool HasActivePeriod => ActivePeriod is not null;
 
     [ObservableProperty]
-    private bool _isLoading = false;
+    public partial bool IsLoading { get; set; } = false;
 
     [ObservableProperty]
-    private bool _isCreating = false;
+    public partial bool IsCreating { get; set; } = false;
 
     [ObservableProperty]
-    private bool _isClosing = false;
+    public partial bool IsClosing { get; set; } = false;
 
     [ObservableProperty]
-    private bool _isSelecting = false;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ErrorMessage))]
-    [NotifyPropertyChangedFor(nameof(HasError))]
-    private string? _actionError = null;
+    public partial bool IsSelecting { get; set; } = false;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ErrorMessage))]
     [NotifyPropertyChangedFor(nameof(HasError))]
-    private string? _queryError = null;
+    public partial string? ActionError { get; set; } = null;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ErrorMessage))]
+    [NotifyPropertyChangedFor(nameof(HasError))]
+    public partial string? QueryError { get; set; } = null;
 
     // Gabungkan error dari aksi mutasi terakhir maupun error dari query daftar periode
     public string? ErrorMessage => !string.IsNullOrWhiteSpace(ActionError) ? ActionError : QueryError;

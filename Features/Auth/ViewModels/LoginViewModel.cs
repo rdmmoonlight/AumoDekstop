@@ -11,26 +11,25 @@ public partial class LoginViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SubmitCommand))]
-    private string _email = string.Empty;
+    public partial string Email { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SubmitCommand))]
-    private string _password = string.Empty;
+    public partial string Password { get; set; } = string.Empty;
 
     // Properti yang sebelumnya hilang dan menyebabkan XAML Compiler crash
     [ObservableProperty]
-    private bool _rememberMe;
+    public partial bool RememberMe { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasError))]
-    private string _errorMessage = string.Empty;
+    public partial string ErrorMessage { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotPending))]
     [NotifyPropertyChangedFor(nameof(SubmitButtonText))]
     [NotifyCanExecuteChangedFor(nameof(SubmitCommand))]
-    private bool _isPending;
-
+    public partial bool IsPending { get; set; }
     public string InitialMode { get; set; } = "login";
 
     public bool IsNotPending => !IsPending;

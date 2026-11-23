@@ -91,6 +91,15 @@ public sealed partial class ChartOfAccountsPage : Page
 
     private async void CreateAccountButton_Click(object sender, RoutedEventArgs e)
     {
+        await AddAccountAsync();
+    }
+
+    /// <summary>Memuat ulang daftar akun (dipakai tombol ribbon).</summary>
+    public Task RefreshAsync() => LoadAccountsAsync();
+
+    /// <summary>Membuka form tambah akun (dipakai tombol ribbon).</summary>
+    public async Task AddAccountAsync()
+    {
         if (_isSubmitting) return;
         ClearError();
 
@@ -105,6 +114,31 @@ public sealed partial class ChartOfAccountsPage : Page
 
     private async void AccountsTable_EditAccountRequested(object? sender, Account account)
     {
+        await EditAccountAsync(account);
+    }
+
+    /// <summary>Mengubah akun yang dipilih di tabel. False jika belum ada baris terpilih.</summary>
+    public async Task<bool> EditSelectedAsync()
+    {
+        var account = AccountsTable.SelectedAccount;
+        if (account is null) return false;
+
+        await EditAccountAsync(account);
+        return true;
+    }
+
+    /// <summary>Menghapus akun yang dipilih di tabel. False jika belum ada baris terpilih.</summary>
+    public async Task<bool> DeleteSelectedAsync()
+    {
+        var account = AccountsTable.SelectedAccount;
+        if (account is null) return false;
+
+        await DeleteAccountAsync(account);
+        return true;
+    }
+
+    private async Task EditAccountAsync(Account account)
+    {
         if (_isSubmitting) return;
         ClearError();
 
@@ -118,6 +152,11 @@ public sealed partial class ChartOfAccountsPage : Page
     }
 
     private async void AccountsTable_DeleteAccountRequested(object? sender, Account account)
+    {
+        await DeleteAccountAsync(account);
+    }
+
+    private async Task DeleteAccountAsync(Account account)
     {
         if (_isSubmitting) return;
         ClearError();

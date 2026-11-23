@@ -79,7 +79,12 @@ public partial class App : Application
         services.AddSingleton<IPeriodsApiService>(sp =>
             new PeriodsApiService(sp.GetRequiredService<ApiService>()));
 
-        services.AddHttpClient<IChartOfAccountsService, ChartOfAccountsService>();
+        // Chart Of Accounts — wajib memakai named HttpClient "AumoApi" (BaseAddress + cookie sesi login)
+        services.AddSingleton<IChartOfAccountsService>(sp =>
+        {
+            var factory = sp.GetRequiredService<IHttpClientFactory>();
+            return new ChartOfAccountsService(factory.CreateClient("AumoApi"));
+        });
         services.AddTransient<ChartOfAccountsPage>();
 
         // 5. Journal Entry Service (menggunakan named HttpClient "AumoApi")

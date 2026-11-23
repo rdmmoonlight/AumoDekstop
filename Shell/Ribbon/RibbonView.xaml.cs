@@ -31,7 +31,7 @@ public sealed partial class RibbonView : UserControl
     {
         RibbonHome.Visibility = tag == "home" ? Visibility.Visible : Visibility.Collapsed;
         RibbonPeriods.Visibility = tag == "periods" ? Visibility.Visible : Visibility.Collapsed;
-        RibbonPeriods.Visibility = tag == "coa" ? Visibility.Visible : Visibility.Collapsed;
+        RibbonCoa.Visibility = tag == "coa" ? Visibility.Visible : Visibility.Collapsed;
         RibbonData.Visibility = tag == "data" ? Visibility.Visible : Visibility.Collapsed;
         RibbonReport.Visibility = tag == "report" ? Visibility.Visible : Visibility.Collapsed;
         RibbonSettings.Visibility = tag == "settings" ? Visibility.Visible : Visibility.Collapsed;

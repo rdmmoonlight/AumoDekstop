@@ -9,11 +9,11 @@ public partial class PeriodFormState : ObservableObject
 {
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StartDateString))]
-    private DateTimeOffset? _startDate;
+    public partial DateTimeOffset? StartDate { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(EndDateString))]
-    private DateTimeOffset? _endDate;
+    public partial DateTimeOffset? EndDate { get; set; }
 
     public string StartDateString => StartDate?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? string.Empty;
 

@@ -1,5 +1,6 @@
 namespace AumoDekstop;
 
+using AumoDekstop.Features.ChartOfAccounts.Views;
 using AumoDekstop.Features.Periods.ViewModels;
 using AumoDekstop.Features.Periods.Views;
 using AumoDekstop.Services;
@@ -27,6 +28,12 @@ public sealed partial class MainWindow
         }
     }
 
+    private void ShowCoa()
+    {
+        // Halaman dibuat baru setiap tab dibuka agar data selalu dimuat ulang (dan tidak tersisa antar akun)
+        RootFrame.Content = App.Current.Services.GetRequiredService<ChartOfAccountsPage>();
+    }
+
     private async Task ShowReportPageAsync<TPage>(string statusTitle, Func<TPage, Task> loadAction)
         where TPage : Page
     {
@@ -48,6 +55,9 @@ public sealed partial class MainWindow
         {
             case "periods":
                 ShowPeriods();
+                break;
+            case "coa":
+                ShowCoa();
                 break;
             default:
                 // "home", "data", "report", "settings": sementara menampilkan Beranda

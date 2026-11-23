@@ -109,7 +109,7 @@
                 x:Name="AccountsListView"
                 Grid.Row="1"
                 ItemsSource="{x:Bind Accounts, Mode=OneWay}"
-                SelectionMode="None"
+                SelectionMode="Single"
                 IsItemClickEnabled="False">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">

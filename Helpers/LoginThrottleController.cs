@@ -9,10 +9,10 @@ public partial class LoginThrottleController : ObservableObject, IDisposable
     private readonly DispatcherQueueTimer _timer;
 
     [ObservableProperty]
-    private bool _isThrottled;
+    public partial bool IsThrottled { get; set; }
 
     [ObservableProperty]
-    private int _remainingTime;
+    public partial int RemainingTime { get; set; }
 
     public LoginThrottleController(int cooldownSeconds = 60, DispatcherQueue? dispatcherQueue = null)
     {
