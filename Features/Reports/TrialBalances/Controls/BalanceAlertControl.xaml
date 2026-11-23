@@ -1,0 +1,41 @@
+<UserControl
+    x:Class="AumoDekstop.Features.Reports.TrialBalances.Controls.BalanceAlertControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Border
+        Padding="16,12"
+        Background="{x:Bind AlertBackground, Mode=OneWay}"
+        BorderBrush="{x:Bind AlertBorderBrush, Mode=OneWay}"
+        BorderThickness="1"
+        CornerRadius="8">
+
+        <Grid ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Pengganti CheckCircle2 (size=16) -->
+            <FontIcon
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                FontSize="16"
+                Foreground="{x:Bind IconForeground, Mode=OneWay}"
+                Glyph="&#xE73E;"/>
+
+            <!-- Pengganti AlertDescription -->
+            <TextBlock
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                FontSize="12"
+                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                Text="{x:Bind DisplayText, Mode=OneWay}"
+                TextWrapping="Wrap"/>
+        </Grid>
+    </Border>
+</UserControl>

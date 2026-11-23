@@ -1,0 +1,97 @@
+<Page
+    x:Class="AumoDekstop.Features.Reports.TrialBalances.Views.UnadjustedTrialBalancePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:AumoDekstop.Features.Reports.TrialBalances.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <!-- text-sky-500 (#0EA5E9) -->
+        <SolidColorBrush x:Key="SkyHeaderBrush" Color="#0EA5E9"/>
+    </Page.Resources>
+
+    <ScrollViewer>
+        <Grid Padding="24">
+            <!-- Loading State -->
+            <StackPanel
+                Padding="0,64"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Orientation="Horizontal"
+                Spacing="8"
+                Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}">
+                <ProgressRing
+                    Width="16"
+                    Height="16"
+                    IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}"/>
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Text="Loading unadjusted trial balance..."/>
+            </StackPanel>
+
+            <!-- Main Content -->
+            <StackPanel
+                Spacing="24"
+                Visibility="{x:Bind ViewModel.IsContentVisible, Mode=OneWay}">
+
+                <!-- Page Header -->
+                <StackPanel Spacing="4">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <!-- List Icon (size=22, sky-500) -->
+                        <FontIcon
+                            VerticalAlignment="Center"
+                            FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                            FontSize="22"
+                            Foreground="{StaticResource SkyHeaderBrush}"
+                            Glyph="&#xEA37;"/>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="22"
+                            FontWeight="Bold"
+                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                            Text="Unadjusted Trial Balance"/>
+                    </StackPanel>
+
+                    <TextBlock
+                        FontSize="13"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Text="Before adjustments • IDR"/>
+                </StackPanel>
+
+                <!-- Error Alert (variant="destructive") -->
+                <InfoBar
+                    Title="Error"
+                    IsClosable="False"
+                    IsOpen="{x:Bind ViewModel.ShowErrorAlert, Mode=OneWay}"
+                    Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}"
+                    Severity="Error"
+                    Visibility="{x:Bind ViewModel.ShowErrorAlert, Mode=OneWay}"/>
+
+                <!-- No Period Selected Card -->
+                <controls:NoPeriodCardControl
+                    NavigateToPeriodsClicked="NoPeriodCard_NavigateToPeriodsClicked"
+                    Visibility="{x:Bind ViewModel.NoPeriod, Mode=OneWay}"/>
+
+                <!-- Report Table & Balance Alert -->
+                <StackPanel
+                    Spacing="24"
+                    Visibility="{x:Bind ViewModel.ShowReportContent, Mode=OneWay}">
+
+                    <controls:TrialBalancesTableControl
+                        Rows="{x:Bind ViewModel.Rows, Mode=OneWay}"
+                        TotalCredit="{x:Bind ViewModel.TotalCredit, Mode=OneWay}"
+                        TotalDebit="{x:Bind ViewModel.TotalDebit, Mode=OneWay}"/>
+
+                    <controls:BalanceAlertControl
+                        BalancedText="Balanced: Debit = Credit"
+                        IsBalanced="{x:Bind ViewModel.IsBalanced, Mode=OneWay}"
+                        UnbalancedText="Unbalanced - check journal entries"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>

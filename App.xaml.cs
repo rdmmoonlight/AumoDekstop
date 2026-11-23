@@ -9,6 +9,9 @@ using AumoDekstop.Features.JournalEntry.Services;
 using AumoDekstop.Features.JournalEntry.ViewModels;
 using AumoDekstop.Features.Periods.Services;
 using AumoDekstop.Features.Periods.ViewModels;
+using AumoDekstop.Features.Reports.TrialBalances.Services;
+using AumoDekstop.Features.Reports.TrialBalances.ViewModels;
+using AumoDekstop.Features.Reports.TrialBalances.Views;
 using AumoDekstop.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -93,6 +96,19 @@ public partial class App : Application
                 factory.CreateClient("AumoApi"),
                 sp.GetRequiredService<IJournalEntryService>());
         });
+
+        // Service
+        services.AddTransient<ITrialBalancesApiService, TrialBalancesApiService>();
+
+        // ViewModels
+        services.AddTransient<UnadjustedTrialBalanceViewModel>();
+        services.AddTransient<AdjustedTrialBalanceViewModel>();
+        services.AddTransient<PostClosingTrialBalanceViewModel>();
+
+        // Pages
+        services.AddTransient<UnadjustedTrialBalancePage>();
+        services.AddTransient<AdjustedTrialBalancePage>();
+        services.AddTransient<PostClosingTrialBalancePage>();
 
         return services.BuildServiceProvider();
     }
