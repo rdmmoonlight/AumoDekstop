@@ -46,11 +46,17 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
 
-          Write-Host "Menjalankan auto-fix whitespace & code style..."
-          dotnet format whitespace $env:Project_Path --verbosity minimal
+          Write-Host "Menjalankan auto-fix whitespace..."
+          dotnet format whitespace $env:Project_Path `
+            --exclude obj bin `
+            --verbosity minimal
           if ($LASTEXITCODE -ne 0) { exit 1 }
 
-          dotnet format style $env:Project_Path --severity info --verbosity minimal
+          Write-Host "Menjalankan auto-fix code style (aman untuk WinUI 3)..."
+          dotnet format style $env:Project_Path `
+            --exclude obj bin `
+            --severity warning `
+            --verbosity minimal
           if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: Auto-Commit & Push Fixes
