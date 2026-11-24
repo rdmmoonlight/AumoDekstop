@@ -20,7 +20,7 @@ public sealed partial class MainWindow : Window
 
     private void MenuButton_Click(object sender, RoutedEventArgs e)
     {
-    MainNavigation.IsPaneOpen = !MainNavigation.IsPaneOpen;
+        MainNavigation.IsPaneOpen = !MainNavigation.IsPaneOpen;
     }
 
     // Halaman Periods dibuat lewat DI (konstruktor membutuhkan ViewModel), lalu disimpan agar tidak dimuat ulang.
