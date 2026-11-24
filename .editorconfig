@@ -1,0 +1,5 @@
+root = true
+
+[*.cs]
+# Nonaktifkan CA1822 agar dotnet format tidak mengubah event handler XAML & properti {x:Bind} menjadi static
+dotnet_diagnostic.CA1822.severity = none
