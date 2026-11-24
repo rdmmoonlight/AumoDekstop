@@ -70,5 +70,5 @@ public partial class GoogleSignInViewModel : ObservableObject
         }
     }
 
-    public bool HasClientId => ...;
+    public bool HasClientId => !string.IsNullOrWhiteSpace(ClientId);
 }
