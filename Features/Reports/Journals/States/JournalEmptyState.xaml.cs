@@ -1,8 +1,8 @@
-namespace AumoDekstop.Features.Reports.Journals.States;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+namespace AumoDekstop.Features.Reports.Journals.States;
 public sealed partial class JournalEmptyState : UserControl
 {
     public static readonly DependencyProperty SelectedPeriodNameProperty =

@@ -14,7 +14,9 @@ public sealed class DesktopGoogleAuthProvider : IGoogleAuthProvider
     public async Task<string?> SignInAndGetIdTokenAsync(string clientId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(clientId))
+        {
             throw new InvalidOperationException("GOOGLE_CLIENT_ID belum dikonfigurasi.");
+        }
 
         // 1. Cari port localhost kosong untuk loopback redirect URI
         int port = GetRandomUnusedPort();
@@ -51,7 +53,9 @@ public sealed class DesktopGoogleAuthProvider : IGoogleAuthProvider
             var contextTask = listener.GetContextAsync();
             var completed = await Task.WhenAny(contextTask, Task.Delay(Timeout.Infinite, timeoutCts.Token));
             if (completed != contextTask)
+            {
                 return null;
+            }
 
             var context = await contextTask;
             var query = context.Request.QueryString;
@@ -71,7 +75,9 @@ public sealed class DesktopGoogleAuthProvider : IGoogleAuthProvider
             context.Response.OutputStream.Close();
 
             if (!string.IsNullOrEmpty(error) || string.IsNullOrEmpty(code) || returnedState != state)
+            {
                 return null;
+            }
 
             // 5. Tukar authorization code dengan id_token dari Google Token Endpoint
             var tokenRequest = new FormUrlEncodedContent(new Dictionary<string, string>
@@ -87,7 +93,9 @@ public sealed class DesktopGoogleAuthProvider : IGoogleAuthProvider
             string tokenJson = await tokenRes.Content.ReadAsStringAsync(cancellationToken);
 
             if (!tokenRes.IsSuccessStatusCode)
+            {
                 throw new InvalidOperationException("Gagal menukar kode otorisasi Google.");
+            }
 
             using var doc = JsonDocument.Parse(tokenJson);
             return doc.RootElement.TryGetProperty("id_token", out var idTokenProp)

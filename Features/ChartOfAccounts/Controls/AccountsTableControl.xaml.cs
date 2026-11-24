@@ -86,7 +86,9 @@ public sealed partial class AccountsTableControl : UserControl
     private void UpdateVisualStates()
     {
         if (LoadingPanel == null || EmptyStateText == null || AccountsListView == null)
+        {
             return;
+        }
 
         if (IsLoading)
         {

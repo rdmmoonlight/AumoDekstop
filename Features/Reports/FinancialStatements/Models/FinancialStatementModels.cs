@@ -1,9 +1,9 @@
-namespace AumoDekstop.Features.Reports.FinancialStatements.Models;
 
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using AumoDekstop.Features.Reports.FinancialStatements.Helpers;
 
+namespace AumoDekstop.Features.Reports.FinancialStatements.Models;
 // --- Common / Shared Types ---
 
 public sealed class FinancialPeriod

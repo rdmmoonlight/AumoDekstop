@@ -1,8 +1,8 @@
-namespace AumoDekstop.Shell.Ribbon;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+namespace AumoDekstop.Shell.Ribbon;
 public sealed partial class RibbonCoaPanel : UserControl
 {
     public event EventHandler<string>? CommandInvoked;

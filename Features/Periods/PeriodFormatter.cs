@@ -13,7 +13,9 @@ public static class PeriodFormatter
     public static string FormatPeriodDate(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
+        {
             return "-";
+        }
 
         if (!DateTimeOffset.TryParse(
                 value,

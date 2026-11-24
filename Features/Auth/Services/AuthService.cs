@@ -1,8 +1,8 @@
-namespace AumoDekstop.Features.Auth.Services;
 
 using AumoDekstop.Features.Auth.Models;
 using AumoDekstop.Services;
 
+namespace AumoDekstop.Features.Auth.Services;
 public class AuthService : IAuthService
 {
     private readonly ApiService _apiService;

@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.JournalEntry.Views;
 
 using System;
 using System.Collections.Specialized;
@@ -16,6 +15,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
+namespace AumoDekstop.Features.JournalEntry.Views;
 public sealed partial class JournalEntryPage : Page, INotifyPropertyChanged
 {
     private readonly IJournalEntryService _journalEntryService;
@@ -234,7 +234,10 @@ public sealed partial class JournalEntryPage : Page, INotifyPropertyChanged
 
     public async Task HandlePostAsync()
     {
-        if (!ViewModel.IsBalanced) return;
+        if (!ViewModel.IsBalanced)
+        {
+            return;
+        }
 
         IsSubmitting = true;
         ErrorMessage = null;
@@ -269,7 +272,11 @@ public sealed partial class JournalEntryPage : Page, INotifyPropertyChanged
 
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
-        if (Equals(field, value)) return false;
+        if (Equals(field, value))
+        {
+            return false;
+        }
+
         field = value;
         OnPropertyChanged(propertyName);
         return true;

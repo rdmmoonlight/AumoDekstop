@@ -1,4 +1,3 @@
-namespace AumoDekstop;
 
 using System;
 using System.Threading.Tasks;
@@ -11,6 +10,7 @@ using AumoDekstop.Features.Reports.Worksheet;
 using AumoDekstop.Services;
 using AumoDekstop.Shell.Ribbon;
 
+namespace AumoDekstop;
 public sealed partial class MainWindow
 {
     // Satu pintu untuk semua tombol ribbon (lihat RibbonCommand)

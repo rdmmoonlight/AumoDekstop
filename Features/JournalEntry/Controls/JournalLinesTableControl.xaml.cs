@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.JournalEntry.Controls;
 
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+namespace AumoDekstop.Features.JournalEntry.Controls;
 public sealed class AccountOption
 {
     public AccountOption()
@@ -211,7 +211,10 @@ public sealed partial class JournalLinesTableControl : UserControl
 
     private void RefreshRowNumbers()
     {
-        if (Lines is null) return;
+        if (Lines is null)
+        {
+            return;
+        }
 
         for (int i = 0; i < Lines.Count; i++)
         {

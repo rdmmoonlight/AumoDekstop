@@ -1,10 +1,10 @@
-namespace AumoDekstop.Features.Reports.GeneralLedgers;
 
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+namespace AumoDekstop.Features.Reports.GeneralLedgers;
 public sealed partial class GeneralLedgersTable : UserControl
 {
     public static readonly DependencyProperty EntriesProperty =

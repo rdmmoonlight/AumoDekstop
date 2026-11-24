@@ -1,4 +1,3 @@
-namespace AumoDekstop;
 
 using System.Net;
 using System.Net.Http;
@@ -21,6 +20,7 @@ using AumoDekstop.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 
+namespace AumoDekstop;
 public partial class App : Application
 {
     private const string ThemeSettingKey = "AppRequestedTheme";

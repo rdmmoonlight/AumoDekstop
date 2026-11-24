@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.Reports.FinancialStatements.ViewModels;
 
 using System;
 using System.Threading;
@@ -8,6 +7,7 @@ using AumoDekstop.Features.Reports.FinancialStatements.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+namespace AumoDekstop.Features.Reports.FinancialStatements.ViewModels;
 public sealed partial class IncomeStatementViewModel : ObservableObject
 {
     private readonly IFinancialStatementsApiService _apiService;

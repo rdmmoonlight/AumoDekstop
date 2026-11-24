@@ -1,8 +1,8 @@
-namespace AumoDekstop.Features.Reports.TrialBalances.Models;
 
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
+namespace AumoDekstop.Features.Reports.TrialBalances.Models;
 public enum TrialBalanceType
 {
     Unadjusted,

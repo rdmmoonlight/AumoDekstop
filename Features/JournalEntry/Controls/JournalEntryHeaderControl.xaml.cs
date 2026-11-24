@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.JournalEntry.Controls;
 
 using System;
 using System.ComponentModel;
@@ -6,6 +5,7 @@ using System.Globalization;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+namespace AumoDekstop.Features.JournalEntry.Controls;
 public sealed partial class JournalEntryHeaderControl : UserControl, INotifyPropertyChanged
 {
     private bool _isUpdatingDateFromProperty;
@@ -134,10 +134,16 @@ public sealed partial class JournalEntryHeaderControl : UserControl, INotifyProp
 
     private void SyncDatePickerFromString(string? dateStr)
     {
-        if (_isUpdatingDateFromProperty) return;
+        if (_isUpdatingDateFromProperty)
+        {
+            return;
+        }
 
         var datePicker = EntryDatePicker;
-        if (datePicker is null || !OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763)) return;
+        if (datePicker is null || !OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763))
+        {
+            return;
+        }
 
         _isUpdatingDateFromProperty = true;
         try
@@ -165,7 +171,10 @@ public sealed partial class JournalEntryHeaderControl : UserControl, INotifyProp
 
     private void EntryDatePicker_DateChanged(CalendarDatePicker sender, CalendarDatePickerDateChangedEventArgs args)
     {
-        if (_isUpdatingDateFromProperty || !OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763)) return;
+        if (_isUpdatingDateFromProperty || !OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763))
+        {
+            return;
+        }
 
         _isUpdatingDateFromProperty = true;
         try

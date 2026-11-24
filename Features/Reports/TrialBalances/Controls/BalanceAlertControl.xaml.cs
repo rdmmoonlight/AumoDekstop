@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.Reports.TrialBalances.Controls;
 
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -7,6 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 
+namespace AumoDekstop.Features.Reports.TrialBalances.Controls;
 public sealed partial class BalanceAlertControl : UserControl, INotifyPropertyChanged
 {
     // Emerald-500 (#10B981) -> 10% alpha = 0x1A, 20% alpha = 0x33

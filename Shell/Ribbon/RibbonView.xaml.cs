@@ -1,8 +1,8 @@
-namespace AumoDekstop.Shell.Ribbon;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+namespace AumoDekstop.Shell.Ribbon;
 /// <summary>Ribbon utama: baris tab + panel tombol per tab.</summary>
 public sealed partial class RibbonView : UserControl
 {
@@ -40,8 +40,15 @@ public sealed partial class RibbonView : UserControl
     private void RibbonTabs_SelectionChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
     {
         // Event ini dapat terpicu saat InitializeComponent, sebelum panel terisi
-        if (!_isReady) return;
-        if (sender.SelectedItem is not SelectorBarItem selected) return;
+        if (!_isReady)
+        {
+            return;
+        }
+
+        if (sender.SelectedItem is not SelectorBarItem selected)
+        {
+            return;
+        }
 
         string? tag = selected.Tag?.ToString();
         ShowPanel(tag);

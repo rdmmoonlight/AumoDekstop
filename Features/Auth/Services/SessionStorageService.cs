@@ -1,10 +1,10 @@
-namespace AumoDekstop.Features.Auth.Services;
 
 using System;
 using System.Linq;
 using AumoDekstop.Services;
 using Windows.Security.Credentials;
 
+namespace AumoDekstop.Features.Auth.Services;
 public static class SessionStorageService
 {
     private const string VaultResourceName = "AumoDekstopAuthToken";
@@ -35,7 +35,9 @@ public static class SessionStorageService
         bool isRemembered = AppLocalSettings.GetBool(RememberMeKey, false);
 
         if (!isRemembered)
+        {
             return (null, null);
+        }
 
         try
         {

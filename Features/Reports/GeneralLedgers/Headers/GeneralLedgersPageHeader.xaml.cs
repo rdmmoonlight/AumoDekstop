@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.Reports.GeneralLedgers.Headers;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -6,6 +5,7 @@ using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 
+namespace AumoDekstop.Features.Reports.GeneralLedgers.Headers;
 [ContentProperty(Name = nameof(ActionsContent))]
 public sealed partial class GeneralLedgersPageHeader : UserControl
 {

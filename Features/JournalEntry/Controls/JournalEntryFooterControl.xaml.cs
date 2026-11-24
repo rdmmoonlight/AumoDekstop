@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.JournalEntry.Controls;
 
 using System;
 using System.ComponentModel;
@@ -6,6 +5,7 @@ using System.Globalization;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+namespace AumoDekstop.Features.JournalEntry.Controls;
 public sealed partial class JournalEntryFooterControl : UserControl, INotifyPropertyChanged
 {
     private static readonly CultureInfo IdCulture = new("id-ID");

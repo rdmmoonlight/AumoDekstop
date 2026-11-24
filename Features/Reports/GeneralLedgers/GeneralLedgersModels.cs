@@ -1,10 +1,10 @@
-namespace AumoDekstop.Features.Reports.GeneralLedgers;
 
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.Json.Serialization;
 
+namespace AumoDekstop.Features.Reports.GeneralLedgers;
 #region Formatter Helpers (Konversi dari format_2.ts)
 
 public static class GeneralLedgerFormatter

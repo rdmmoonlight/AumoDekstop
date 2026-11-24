@@ -1,4 +1,3 @@
-namespace AumoDekstop;
 
 using AumoDekstop.Features.ChartOfAccounts.Views;
 using AumoDekstop.Features.Periods.ViewModels;
@@ -8,6 +7,7 @@ using AumoDekstop.Shell.Ribbon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 
+namespace AumoDekstop;
 public sealed partial class MainWindow
 {
     private void ShowHome()
@@ -47,7 +47,10 @@ public sealed partial class MainWindow
     private void OnRibbonTabChanged(object? sender, RibbonTabChangedEventArgs e)
     {
         // Event ini dapat terpicu saat InitializeComponent, sebelum RootFrame/AppStatusBar terisi
-        if (RootFrame is null || AppStatusBar is null) return;
+        if (RootFrame is null || AppStatusBar is null)
+        {
+            return;
+        }
 
         SetStatus($"● Tab aktif: {e.Text} | Versi: v{GitHubUpdateService.GetCurrentVersionString()} | Server: {ApiService.BaseServerUrl}");
 

@@ -1,10 +1,10 @@
-namespace AumoDekstop.Features.ChartOfAccounts.Services;
 
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AumoDekstop.Features.ChartOfAccounts.Models;
 
+namespace AumoDekstop.Features.ChartOfAccounts.Services;
 public record GetChartOfAccountsParams(
     string? Search = null,
     string? Category = null

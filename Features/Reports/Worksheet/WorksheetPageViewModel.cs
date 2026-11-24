@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.Reports.Worksheet;
 
 using System;
 using System.Collections.Generic;
@@ -8,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 
+namespace AumoDekstop.Features.Reports.Worksheet;
 public partial class WorksheetPageViewModel : INotifyPropertyChanged
 {
     private readonly IWorksheetService _worksheetService;

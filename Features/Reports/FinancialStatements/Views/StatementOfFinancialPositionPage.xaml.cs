@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.Reports.FinancialStatements.Views;
 
 using AumoDekstop.Features.Periods.Views;
 using AumoDekstop.Features.Reports.FinancialStatements.ViewModels;
@@ -6,6 +5,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
+namespace AumoDekstop.Features.Reports.FinancialStatements.Views;
 public sealed partial class StatementOfFinancialPositionPage : Page
 {
     public StatementOfFinancialPositionViewModel ViewModel { get; }

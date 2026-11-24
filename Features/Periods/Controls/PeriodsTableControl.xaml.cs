@@ -50,7 +50,10 @@ public sealed partial class PeriodsTableControl : UserControl
 
     private static void OnPeriodsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is not PeriodsTableControl control) return;
+        if (d is not PeriodsTableControl control)
+        {
+            return;
+        }
 
         if (e.OldValue is INotifyCollectionChanged oldCollection)
         {

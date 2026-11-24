@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.Reports.Journals;
 
 using System;
 using System.Globalization;
@@ -9,6 +8,7 @@ using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 using Windows.UI.Text;
 
+namespace AumoDekstop.Features.Reports.Journals;
 public class FlatJournalRowItem
 {
     public Guid EntryId { get; set; }

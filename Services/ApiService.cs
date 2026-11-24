@@ -1,4 +1,3 @@
-namespace AumoDekstop.Services;
 
 using System;
 using System.Net.Http;
@@ -8,6 +7,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
+namespace AumoDekstop.Services;
 /// <summary>
 /// Pembungkus standar untuk semua respons dari backend Aumo.
 /// </summary>

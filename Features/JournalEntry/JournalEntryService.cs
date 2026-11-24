@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.JournalEntry.Services;
 
 using System;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ using AumoDekstop.Features.JournalEntry.Messages;
 using AumoDekstop.Features.JournalEntry.Models;
 using CommunityToolkit.Mvvm.Messaging;
 
+namespace AumoDekstop.Features.JournalEntry.Services;
 public interface IJournalEntryService
 {
     Task<JournalEntryDetailDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
@@ -97,9 +97,14 @@ public class JournalEntryService : IJournalEntryService
     {
         var queryParams = new List<string>();
         if (!string.IsNullOrWhiteSpace(parameters?.JournalType))
+        {
             queryParams.Add($"JournalType={Uri.EscapeDataString(parameters.JournalType)}");
+        }
+
         if (!string.IsNullOrWhiteSpace(parameters?.EntryDate))
+        {
             queryParams.Add($"EntryDate={Uri.EscapeDataString(parameters.EntryDate)}");
+        }
 
         var queryString = queryParams.Count > 0 ? "?" + string.Join("&", queryParams) : string.Empty;
 

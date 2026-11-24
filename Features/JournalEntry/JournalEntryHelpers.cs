@@ -1,9 +1,9 @@
-namespace AumoDekstop.Features.JournalEntries.Helpers;
 
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 
+namespace AumoDekstop.Features.JournalEntries.Helpers;
 public interface IJournalAmountLine
 {
     decimal Debit { get; }

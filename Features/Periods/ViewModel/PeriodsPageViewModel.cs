@@ -97,7 +97,10 @@ public partial class PeriodsPageViewModel : ObservableObject
     [RelayCommand]
     public async Task CreatePeriodAsync(CreatePeriodPayload? payload, CancellationToken cancellationToken = default)
     {
-        if (payload is null) return;
+        if (payload is null)
+        {
+            return;
+        }
 
         ActionError = null;
         IsCreating = true;

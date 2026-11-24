@@ -15,10 +15,14 @@ public static class AuthHelpers
         if (response.Data is not null)
         {
             if (response.Data.Errors is { Count: > 0 })
+            {
                 return response.Data.Errors[0];
+            }
 
             if (!string.IsNullOrWhiteSpace(response.Data.Message))
+            {
                 return response.Data.Message;
+            }
         }
 
         // 2. Jika HTTP error (400/401/429/500), ErrorMessage dari ApiService bisa berupa JSON string dari backend
@@ -32,10 +36,14 @@ public static class AuthHelpers
                 });
 
                 if (parsed?.Errors is { Count: > 0 })
+                {
                     return parsed.Errors[0];
+                }
 
                 if (!string.IsNullOrWhiteSpace(parsed?.Message))
+                {
                     return parsed.Message;
+                }
             }
             catch
             {

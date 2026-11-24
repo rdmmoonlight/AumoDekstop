@@ -1,8 +1,8 @@
-namespace AumoDekstop.Features.Reports.TrialBalances.Models;
 
 using System.Text.Json.Serialization;
 using AumoDekstop.Features.Reports.TrialBalances.Helpers;
 
+namespace AumoDekstop.Features.Reports.TrialBalances.Models;
 public sealed class RawTrialRow
 {
     [JsonPropertyName("accountId")]

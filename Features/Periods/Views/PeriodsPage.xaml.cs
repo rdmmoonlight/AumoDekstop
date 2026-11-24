@@ -1,13 +1,13 @@
-namespace AumoDekstop.Features.Periods.Views;
 
 using System;
 using System.ComponentModel;
+using AumoDekstop.Features.Periods.Dialogs;
+using AumoDekstop.Features.Periods.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using AumoDekstop.Features.Periods.Dialogs;
-using AumoDekstop.Features.Periods.ViewModels;
 
+namespace AumoDekstop.Features.Periods.Views;
 public sealed partial class PeriodsPage : Page
 {
     public PeriodsPageViewModel ViewModel { get; }

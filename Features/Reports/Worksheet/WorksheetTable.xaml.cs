@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.Reports.Worksheet;
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,6 +6,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+namespace AumoDekstop.Features.Reports.Worksheet;
 public sealed partial class WorksheetTable : UserControl, INotifyPropertyChanged
 {
     public static readonly DependencyProperty TotalsProperty =

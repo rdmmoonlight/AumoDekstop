@@ -1,10 +1,10 @@
-namespace AumoDekstop.Services;
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 
+namespace AumoDekstop.Services;
 /// <summary>
 /// Penyimpanan pengaturan lokal berbasis file JSON di %LOCALAPPDATA%\AumoDekstop\settings.json.
 /// Pengganti ApplicationData.Current.LocalSettings, yang melempar exception pada aplikasi
@@ -61,7 +61,10 @@ public static class AppLocalSettings
 
     private static Dictionary<string, string> Load()
     {
-        if (_cache is not null) return _cache;
+        if (_cache is not null)
+        {
+            return _cache;
+        }
 
         try
         {

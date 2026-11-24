@@ -1,4 +1,3 @@
-namespace AumoDekstop.Services;
 
 using System;
 using System.ComponentModel;
@@ -11,6 +10,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
+namespace AumoDekstop.Services;
 public sealed class UpdateInfo
 {
     public string VersionTag { get; set; } = string.Empty;
@@ -86,7 +86,9 @@ public class GitHubUpdateService
             var releases = JsonSerializer.Deserialize<GitHubRelease[]>(json);
 
             if (releases == null || releases.Length == 0)
+            {
                 return null;
+            }
 
             // Cari rilis pertama (terbaru) yang bukan draft/prerelease dan berakhiran .PC
             var latestPcRelease = releases.FirstOrDefault(r =>
@@ -95,7 +97,9 @@ public class GitHubUpdateService
                 r.TagName.EndsWith(".PC", StringComparison.OrdinalIgnoreCase));
 
             if (latestPcRelease == null)
+            {
                 return null;
+            }
 
             Version currentVersion = ParseCalVer(GetCurrentVersionString());
             Version latestVersion = ParseCalVer(latestPcRelease.TagName);
@@ -196,7 +200,9 @@ public class GitHubUpdateService
         // Ubah "v26.11.2.PC" -> "26.11.2" agar bisa dibandingkan dengan class Version C#
         string clean = tag.TrimStart('v', 'V');
         if (clean.EndsWith(".PC", StringComparison.OrdinalIgnoreCase))
+        {
             clean = clean[..^3];
+        }
 
         return Version.TryParse(clean, out var parsed) ? parsed : new Version(0, 0, 0);
     }

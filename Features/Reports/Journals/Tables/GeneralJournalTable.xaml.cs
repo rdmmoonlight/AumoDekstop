@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.Reports.Journals;
 
 using System;
 using System.Collections.Generic;
@@ -6,6 +5,8 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+
+namespace AumoDekstop.Features.Reports.Journals;
 public sealed partial class GeneralJournalTable : UserControl, INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;

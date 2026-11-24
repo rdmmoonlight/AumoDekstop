@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.Reports.GeneralLedgers;
 
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,7 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
+namespace AumoDekstop.Features.Reports.GeneralLedgers;
 #region DTO / Response Models
 
 public class GetGeneralLedgerPermanentResponse

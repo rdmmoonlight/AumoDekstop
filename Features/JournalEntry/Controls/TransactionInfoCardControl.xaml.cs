@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.JournalEntry.Controls;
 
 using System;
 using System.Globalization;
@@ -6,6 +5,7 @@ using System.Runtime.Versioning;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+namespace AumoDekstop.Features.JournalEntry.Controls;
 [SupportedOSPlatform("windows10.0.17763")]
 public sealed partial class TransactionInfoCardControl : UserControl
 {
@@ -90,7 +90,10 @@ public sealed partial class TransactionInfoCardControl : UserControl
 
     private void SyncDatePickerFromString(string? dateStr)
     {
-        if (_isUpdatingDateFromProperty) return;
+        if (_isUpdatingDateFromProperty)
+        {
+            return;
+        }
 
         _isUpdatingDateFromProperty = true;
         try
@@ -123,7 +126,10 @@ public sealed partial class TransactionInfoCardControl : UserControl
 
     private void TransactionDatePicker_DateChanged(CalendarDatePicker sender, CalendarDatePickerDateChangedEventArgs args)
     {
-        if (_isUpdatingDateFromProperty) return;
+        if (_isUpdatingDateFromProperty)
+        {
+            return;
+        }
 
         _isUpdatingDateFromProperty = true;
         try

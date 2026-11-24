@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.Reports.Journals;
 
 using System;
 using System.Windows.Input;
@@ -6,6 +5,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
 
+namespace AumoDekstop.Features.Reports.Journals;
 public sealed partial class NoPeriodState : UserControl
 {
     /// <summary>

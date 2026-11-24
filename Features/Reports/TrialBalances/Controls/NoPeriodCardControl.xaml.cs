@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.Reports.TrialBalances.Controls;
 
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -6,6 +5,7 @@ using System.Windows.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+namespace AumoDekstop.Features.Reports.TrialBalances.Controls;
 public sealed partial class NoPeriodCardControl : UserControl, INotifyPropertyChanged
 {
     private const string DefaultMessage = "Select a period to view trial balance.";

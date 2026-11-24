@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.Reports.TrialBalances.Controls;
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,6 +9,7 @@ using AumoDekstop.Features.Reports.TrialBalances.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+namespace AumoDekstop.Features.Reports.TrialBalances.Controls;
 public sealed partial class TrialBalancesTableControl : UserControl, INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;

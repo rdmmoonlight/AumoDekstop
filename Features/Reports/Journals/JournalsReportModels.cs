@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.Reports.Journals;
 
 using System;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 using Windows.UI.Text;
 
+namespace AumoDekstop.Features.Reports.Journals;
 #region Formatter Helpers (Konversi dari format.ts)
 
 public static class JournalFormatter
@@ -39,7 +39,9 @@ public static class JournalFormatter
     public static string FormatDateDisplay(string? s)
     {
         if (string.IsNullOrWhiteSpace(s) || !DateTime.TryParse(s, out var dt))
+        {
             return "-";
+        }
 
         return dt.ToString("dd MMM yyyy", IdCulture);
     }
@@ -55,7 +57,9 @@ public static class JournalFormatter
     public static string? FormatDateTimeDisplay(string? s)
     {
         if (string.IsNullOrWhiteSpace(s) || !DateTime.TryParse(s, out var dt))
+        {
             return null;
+        }
 
         return $"{dt.ToString("dd MMM yyyy", IdCulture)}, {dt:HH:mm}";
     }
@@ -63,7 +67,9 @@ public static class JournalFormatter
     public static string? FormatDateTimeDisplay(DateTime? dt)
     {
         if (!dt.HasValue)
+        {
             return null;
+        }
 
         return $"{dt.Value.ToString("dd MMM yyyy", IdCulture)}, {dt.Value:HH:mm}";
     }

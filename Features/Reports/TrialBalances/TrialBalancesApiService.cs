@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.Reports.TrialBalances.Services;
 
 using System;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ using System.Threading.Tasks;
 using AumoDekstop.Features.Reports.TrialBalances.Helpers;
 using AumoDekstop.Features.Reports.TrialBalances.Models;
 
+namespace AumoDekstop.Features.Reports.TrialBalances.Services;
 public sealed class TrialBalanceFetchResult
 {
     public bool HasPeriodSelected { get; set; } = true;
@@ -147,7 +147,10 @@ public sealed class TrialBalancesApiService : ITrialBalancesApiService
 
     private static string? ExtractErrorMessage(string json)
     {
-        if (string.IsNullOrWhiteSpace(json)) return null;
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return null;
+        }
 
         try
         {
@@ -157,13 +160,17 @@ public sealed class TrialBalancesApiService : ITrialBalancesApiService
             if (root.ValueKind == JsonValueKind.Object)
             {
                 if (root.TryGetProperty("message", out var msg) && msg.ValueKind == JsonValueKind.String)
+                {
                     return msg.GetString();
+                }
 
                 if (root.TryGetProperty("data", out var data) &&
                     data.ValueKind == JsonValueKind.Object &&
                     data.TryGetProperty("message", out var nestedMsg) &&
                     nestedMsg.ValueKind == JsonValueKind.String)
+                {
                     return nestedMsg.GetString();
+                }
             }
         }
         catch

@@ -1,9 +1,9 @@
-namespace AumoDekstop;
 
 using AumoDekstop.Features.Auth.Views;
 using AumoDekstop.Services;
 using Microsoft.UI.Xaml;
 
+namespace AumoDekstop;
 public sealed partial class MainWindow
 {
     private void ShowLogin()

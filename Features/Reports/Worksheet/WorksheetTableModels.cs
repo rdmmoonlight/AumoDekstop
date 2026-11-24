@@ -1,10 +1,10 @@
-namespace AumoDekstop.Features.Reports.Worksheet;
 
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.Json.Serialization;
 
+namespace AumoDekstop.Features.Reports.Worksheet;
 public static class WorksheetFormatter
 {
     private static readonly CultureInfo IndonesianCulture = new("id-ID");

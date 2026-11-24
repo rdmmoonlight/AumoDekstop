@@ -1,9 +1,9 @@
-namespace AumoDekstop.Shell.Updates;
 
 using AumoDekstop.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+namespace AumoDekstop.Shell.Updates;
 /// <summary>Pengecekan, dialog, dan pemasangan pembaruan aplikasi.</summary>
 public sealed class UpdateCoordinator
 {
@@ -18,7 +18,9 @@ public sealed class UpdateCoordinator
     public async Task CheckAndPromptAsync(XamlRoot? xamlRoot, bool isManualCheck)
     {
         if (xamlRoot == null)
+        {
             return;
+        }
 
         string currentVer = GitHubUpdateService.GetCurrentVersionString();
 

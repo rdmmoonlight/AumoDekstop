@@ -1,10 +1,10 @@
-namespace AumoDekstop.Features.Reports.FinancialStatements.Controls;
 
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+namespace AumoDekstop.Features.Reports.FinancialStatements.Controls;
 public sealed partial class LoadingStateControl : UserControl, INotifyPropertyChanged
 {
     private const string DefaultMessage = "Memuat data laporan keuangan...";

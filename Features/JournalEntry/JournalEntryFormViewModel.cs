@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.JournalEntry.ViewModels;
 
 using System;
 using System.Collections.Generic;
@@ -17,6 +16,7 @@ using AumoDekstop.Features.JournalEntry.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+namespace AumoDekstop.Features.JournalEntry.ViewModels;
 public partial class JournalEntryFormViewModel : ObservableObject
 {
     private readonly HttpClient _httpClient;
@@ -189,7 +189,10 @@ public partial class JournalEntryFormViewModel : ObservableObject
 
     public void UpdateLine(int index, string field, object? value)
     {
-        if (index < 0 || index >= Lines.Count) return;
+        if (index < 0 || index >= Lines.Count)
+        {
+            return;
+        }
 
         var line = Lines[index];
         switch (field.ToLowerInvariant())

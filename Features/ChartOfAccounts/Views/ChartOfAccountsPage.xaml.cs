@@ -54,7 +54,9 @@ public sealed partial class ChartOfAccountsPage : Page
             var result = await _chartOfAccountsService.GetChartOfAccountsAsync(cancellationToken: token);
 
             if (token.IsCancellationRequested)
+            {
                 return;
+            }
 
             _accounts.Clear();
             foreach (var account in result.Accounts)
@@ -100,14 +102,20 @@ public sealed partial class ChartOfAccountsPage : Page
     /// <summary>Membuka form tambah akun (dipakai tombol ribbon).</summary>
     public async Task AddAccountAsync()
     {
-        if (_isSubmitting) return;
+        if (_isSubmitting)
+        {
+            return;
+        }
+
         ClearError();
 
         var dialog = new AccountFormDialog(this.XamlRoot, editingAccount: null);
         var dialogResult = await dialog.ShowAsync();
 
         if (dialogResult != ContentDialogResult.Primary || dialog.Result == null)
+        {
             return;
+        }
 
         await SubmitCreateAsync(dialog.Result);
     }
@@ -121,7 +129,10 @@ public sealed partial class ChartOfAccountsPage : Page
     public async Task<bool> EditSelectedAsync()
     {
         var account = AccountsTable.SelectedAccount;
-        if (account is null) return false;
+        if (account is null)
+        {
+            return false;
+        }
 
         await EditAccountAsync(account);
         return true;
@@ -131,7 +142,10 @@ public sealed partial class ChartOfAccountsPage : Page
     public async Task<bool> DeleteSelectedAsync()
     {
         var account = AccountsTable.SelectedAccount;
-        if (account is null) return false;
+        if (account is null)
+        {
+            return false;
+        }
 
         await DeleteAccountAsync(account);
         return true;
@@ -139,14 +153,20 @@ public sealed partial class ChartOfAccountsPage : Page
 
     private async Task EditAccountAsync(Account account)
     {
-        if (_isSubmitting) return;
+        if (_isSubmitting)
+        {
+            return;
+        }
+
         ClearError();
 
         var dialog = new AccountFormDialog(this.XamlRoot, editingAccount: account);
         var dialogResult = await dialog.ShowAsync();
 
         if (dialogResult != ContentDialogResult.Primary || dialog.Result == null)
+        {
             return;
+        }
 
         await SubmitUpdateAsync(account.Id, dialog.Result);
     }
@@ -158,12 +178,18 @@ public sealed partial class ChartOfAccountsPage : Page
 
     private async Task DeleteAccountAsync(Account account)
     {
-        if (_isSubmitting) return;
+        if (_isSubmitting)
+        {
+            return;
+        }
+
         ClearError();
 
         bool confirmed = await DeleteAccountDialog.ShowAsync(this.XamlRoot, account);
         if (!confirmed)
+        {
             return;
+        }
 
         await SubmitDeleteAsync(account.Id);
     }

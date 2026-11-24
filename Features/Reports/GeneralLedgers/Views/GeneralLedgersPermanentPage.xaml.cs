@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.Reports.GeneralLedgers.Views;
 
 using System;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
+namespace AumoDekstop.Features.Reports.GeneralLedgers.Views;
 public sealed partial class GeneralLedgersPermanentPage : Page
 {
     private readonly IGeneralLedgersService _generalLedgersService;

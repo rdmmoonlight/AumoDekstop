@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.Reports.Journals.Services;
 
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -6,6 +5,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
+namespace AumoDekstop.Features.Reports.Journals.Services;
 public interface IJournalsReportService
 {
     Task<T?> GetJournalsGeneralAsync<T>(CancellationToken cancellationToken = default);
