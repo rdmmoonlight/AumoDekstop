@@ -1,3 +1,4 @@
 - Gunakan class dengan { get; set; } untuk Semua Model UI (Hindari record & init).
 - Hindari Bindings.Update() secara sembarangan.
 - Setiap <DataTemplate> yang Memakai {x:Bind} Wajib Punya x:DataType.
+- Namespace AumoDekstop.Features. (diatas sendiri sebelum using)
