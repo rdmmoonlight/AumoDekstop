@@ -1,0 +1,90 @@
+name: Code Quality & Auto-Fix (.NET 10 WinUI 3)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  code-quality:
+    name: Format & Auto-Fix (win-x64)
+    runs-on: windows-latest
+
+    env:
+      Project_Path: AumoDekstop.csproj
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Menggunakan token agar bisa push balik jika ada auto-fix
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # Jika PR dari branch yang sama, checkout head ref-nya
+          ref: ${{ github.head_ref || github.ref }}
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet Packages
+        shell: pwsh
+        run: |
+          msbuild $env:Project_Path /t:Restore /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /v:minimal
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: Run dotnet format (Whitespace, Style & Analyzers Auto-Fix)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          Write-Host "Menjalankan auto-fix whitespace, code style, dan analyzers..."
+          # Menjalankan perbaikan otomatis berdasarkan .editorconfig & Roslyn Analyzers
+          dotnet format $env:Project_Path --verbosity minimal
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+          # Opsional: Perbaiki juga warning/info dari third-party atau .NET SDK analyzers secara agresif
+          dotnet format analyzers $env:Project_Path --severity info --verbosity minimal
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: Auto-Commit & Push Fixes
+        shell: pwsh
+        # Hanya auto-commit jika bukan PR dari fork eksternal
+        if: github.event.pull_request.head.repo.fork != true
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          $status = git status --porcelain
+          if (-not [string]::IsNullOrWhiteSpace($status)) {
+            Write-Host "Ditemukan perubahan dari auto-fix. Melakukan commit & push..."
+            git add -A
+            git commit -m "style: auto-fix code quality & formatting [skip ci]"
+            git push
+          } else {
+            Write-Host "Kode sudah bersih dan sesuai standar. Tidak ada yang perlu di-commit."
+          }
+
+      - name: Verify Build & Static Analysis (Release | x64)
+        shell: pwsh
+        run: |
+          # Memastikan hasil auto-fix tidak merusak kompilasi WinUI 3 / XAML
+          msbuild $env:Project_Path `
+            /t:Build `
+            /p:Configuration=Release `
+            /p:Platform=x64 `
+            /p:RuntimeIdentifier=win-x64 `
+            /p:EnforceCodeStyleInBuild=true `
+            /v:minimal
+
+          if ($LASTEXITCODE -ne 0) { exit 1 }
