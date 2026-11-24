@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace AumoDekstop.Features.Auth.ViewModels;
+
 public partial class GoogleSignInViewModel : ObservableObject
 {
     private readonly IAuthService _authService;
