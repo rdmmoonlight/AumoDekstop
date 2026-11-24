@@ -1,6 +1,5 @@
-namespace AumoDekstop.Features.Worksheet;
+namespace AumoDekstop.Features.Reports.Worksheet;
 
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -8,6 +7,72 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+
+public interface IWorksheetService
+{
+    Task<WorksheetApiResponseDto> GetWorksheetAsync(CancellationToken cancellationToken = default);
+}
+
+public class WorksheetService : IWorksheetService
+{
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        NumberHandling = JsonNumberHandling.AllowReadingFromString
+    };
+
+    private readonly HttpClient _httpClient;
+
+    public WorksheetService(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+    }
+
+    public async Task<WorksheetApiResponseDto> GetWorksheetAsync(CancellationToken cancellationToken = default)
+    {
+        using var response = await _httpClient.GetAsync("/api/v1/reports/worksheet", cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync(cancellationToken);
+            var serverMessage = ExtractErrorMessage(errorBody);
+            throw new HttpRequestException(serverMessage ?? $"Request gagal dengan status {(int)response.StatusCode}.");
+        }
+
+        var result = await response.Content.ReadFromJsonAsync<WorksheetApiResponseDto>(JsonOptions, cancellationToken);
+        return result ?? new WorksheetApiResponseDto();
+    }
+
+    private static string? ExtractErrorMessage(string? jsonBody)
+    {
+        if (string.IsNullOrWhiteSpace(jsonBody))
+        {
+            return null;
+        }
+
+        try
+        {
+            using var doc = JsonDocument.Parse(jsonBody);
+            if (doc.RootElement.TryGetProperty("message", out var msgProp) && msgProp.ValueKind == JsonValueKind.String)
+            {
+                return msgProp.GetString();
+            }
+            if (doc.RootElement.TryGetProperty("data", out var dataProp) &&
+                dataProp.ValueKind == JsonValueKind.Object &&
+                dataProp.TryGetProperty("message", out var nestedMsg) &&
+                nestedMsg.ValueKind == JsonValueKind.String)
+            {
+                return nestedMsg.GetString();
+            }
+        }
+        catch
+        {
+            // Abaikan jika body bukan JSON valid
+        }
+
+        return null;
+    }
+}
 
 public class WorksheetApiRowDto
 {
@@ -73,65 +138,4 @@ public class WorksheetApiResponseDto
 
     [JsonPropertyName("hasPeriodSelected")]
     public bool? HasPeriodSelected { get; set; }
-}
-
-public class WorksheetApiService
-{
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        NumberHandling = JsonNumberHandling.AllowReadingFromString
-    };
-
-    private readonly HttpClient _httpClient;
-
-    public WorksheetApiService(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
-    }
-
-    public async Task<WorksheetApiResponseDto> GetWorksheetAsync(CancellationToken cancellationToken = default)
-    {
-        using var response = await _httpClient.GetAsync("/api/v1/reports/worksheet", cancellationToken);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            var errorBody = await response.Content.ReadAsStringAsync(cancellationToken);
-            var serverMessage = ExtractErrorMessage(errorBody);
-            throw new HttpRequestException(serverMessage ?? $"Request gagal dengan status {(int)response.StatusCode}.");
-        }
-
-        var result = await response.Content.ReadFromJsonAsync<WorksheetApiResponseDto>(JsonOptions, cancellationToken);
-        return result ?? new WorksheetApiResponseDto();
-    }
-
-    private static string? ExtractErrorMessage(string? jsonBody)
-    {
-        if (string.IsNullOrWhiteSpace(jsonBody))
-        {
-            return null;
-        }
-
-        try
-        {
-            using var doc = JsonDocument.Parse(jsonBody);
-            if (doc.RootElement.TryGetProperty("message", out var msgProp) && msgProp.ValueKind == JsonValueKind.String)
-            {
-                return msgProp.GetString();
-            }
-            if (doc.RootElement.TryGetProperty("data", out var dataProp) &&
-                dataProp.ValueKind == JsonValueKind.Object &&
-                dataProp.TryGetProperty("message", out var nestedMsg) &&
-                nestedMsg.ValueKind == JsonValueKind.String)
-            {
-                return nestedMsg.GetString();
-            }
-        }
-        catch
-        {
-            // Abaikan jika body bukan JSON valid
-        }
-
-        return null;
-    }
 }

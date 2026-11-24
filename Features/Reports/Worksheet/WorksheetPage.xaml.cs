@@ -1,8 +1,8 @@
-namespace AumoDekstop.Features.Worksheet;
+namespace AumoDekstop.Features.Reports.Worksheet;
 
 using System;
 using System.ComponentModel;
-using System.Net.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -14,7 +14,7 @@ public sealed partial class WorksheetPage : Page
     // Event opsional jika navigasi dikelola oleh Shell/Parent Frame
     public event EventHandler<string>? NavigationRequested;
 
-    public WorksheetPage() : this(CreateDefaultViewModel())
+    public WorksheetPage() : this(((App)Application.Current).Services.GetRequiredService<WorksheetPageViewModel>())
     {
     }
 
@@ -23,14 +23,6 @@ public sealed partial class WorksheetPage : Page
         this.InitializeComponent();
         ViewModel = viewModel;
         ViewModel.PropertyChanged += OnViewModelPropertyChanged;
-    }
-
-    private static WorksheetPageViewModel CreateDefaultViewModel()
-    {
-        // Sesuaikan jika project menggunakan DI container (misal App.Services.GetRequiredService<WorksheetPageViewModel>())
-        var httpClient = new HttpClient();
-        var apiService = new WorksheetApiService(httpClient);
-        return new WorksheetPageViewModel(apiService);
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)

@@ -1,4 +1,4 @@
-namespace AumoDekstop.Features.Worksheet;
+namespace AumoDekstop.Features.Reports.Worksheet;
 
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using Microsoft.UI.Xaml;
 
 public class WorksheetPageViewModel : INotifyPropertyChanged
 {
-    private readonly WorksheetApiService _apiService;
+    private readonly IWorksheetService _worksheetService;
     private CancellationTokenSource? _fetchCts;
 
     private bool _isLoading = true;
@@ -22,9 +22,9 @@ public class WorksheetPageViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public WorksheetPageViewModel(WorksheetApiService apiService)
+    public WorksheetPageViewModel(IWorksheetService worksheetService)
     {
-        _apiService = apiService;
+        _worksheetService = worksheetService;
     }
 
     public bool IsLoading
@@ -112,7 +112,6 @@ public class WorksheetPageViewModel : INotifyPropertyChanged
         }
     }
 
-    // Properti Visibility untuk {x:Bind} langsung di XAML
     public Visibility LoadingVisibility => IsLoading ? Visibility.Visible : Visibility.Collapsed;
     public Visibility ContentVisibility => IsLoading ? Visibility.Collapsed : Visibility.Visible;
     public Visibility NoPeriodVisibility => !HasPeriodSelected ? Visibility.Visible : Visibility.Collapsed;
@@ -129,7 +128,7 @@ public class WorksheetPageViewModel : INotifyPropertyChanged
 
         try
         {
-            var rawData = await _apiService.GetWorksheetAsync(token);
+            var rawData = await _worksheetService.GetWorksheetAsync(token);
 
             var mappedRows = new List<WorksheetRow>();
             var calculatedTotals = new WorksheetTotals();
@@ -199,6 +198,8 @@ public class WorksheetPageViewModel : INotifyPropertyChanged
         }
     }
 
+    public Task LoadAsync() => LoadWorksheetAsync();
+
     public void CancelOngoingRequest()
     {
         if (_fetchCts != null)
@@ -213,4 +214,5 @@ public class WorksheetPageViewModel : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+
 }

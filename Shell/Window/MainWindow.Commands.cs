@@ -7,6 +7,7 @@ using AumoDekstop.Features.Periods.Dialogs;
 using AumoDekstop.Features.Periods.Views;
 using AumoDekstop.Features.Reports.FinancialStatements.Views;
 using AumoDekstop.Features.Reports.TrialBalances.Views;
+using AumoDekstop.Features.Reports.Worksheet;
 using AumoDekstop.Services;
 using AumoDekstop.Shell.Ribbon;
 
@@ -78,6 +79,12 @@ public sealed partial class MainWindow
             case "PostClosingTrialBalance":
                 await ShowReportPageAsync<PostClosingTrialBalancePage>(
                     "Post-Closing Trial Balance",
+                    p => p.ViewModel.LoadAsync());
+                break;
+
+            case "Worksheet":
+                await ShowReportPageAsync<WorksheetPage>(
+                    "Worksheet",
                     p => p.ViewModel.LoadAsync());
                 break;
 

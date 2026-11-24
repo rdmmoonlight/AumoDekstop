@@ -16,6 +16,7 @@ using AumoDekstop.Features.Reports.FinancialStatements.Views;
 using AumoDekstop.Features.Reports.TrialBalances.Services;
 using AumoDekstop.Features.Reports.TrialBalances.ViewModels;
 using AumoDekstop.Features.Reports.TrialBalances.Views;
+using AumoDekstop.Features.Reports.Worksheet;
 using AumoDekstop.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -113,6 +114,16 @@ public partial class App : Application
     var factory = sp.GetRequiredService<IHttpClientFactory>();
     return new TrialBalancesApiService(factory.CreateClient("AumoApi"));
 });
+
+        services.AddSingleton<IWorksheetService>(sp =>
+{
+    var factory = sp.GetRequiredService<IHttpClientFactory>();
+    return new WorksheetService(factory.CreateClient("AumoApi"));
+});
+
+        // ViewModel & Page
+        services.AddTransient<WorksheetPageViewModel>();
+        services.AddTransient<WorksheetPage>();
 
         // ViewModels
         services.AddTransient<UnadjustedTrialBalanceViewModel>();
