@@ -55,7 +55,8 @@ jobs:
           Write-Host "Menjalankan auto-fix code style (aman untuk WinUI 3)..."
           dotnet format style $env:Project_Path `
             --exclude obj bin `
-            --severity warning `
+            --exclude-diagnostics IDE1006 IDE0005 `
+            --severity warn `
             --verbosity minimal
           if ($LASTEXITCODE -ne 0) { exit 1 }
 
