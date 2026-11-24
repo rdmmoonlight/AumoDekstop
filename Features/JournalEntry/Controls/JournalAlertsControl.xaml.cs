@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace AumoDekstop.Features.JournalEntry;
+
 public sealed partial class JournalAlertsControl : UserControl, INotifyPropertyChanged
 {
     private static readonly CultureInfo IdCulture = new("id-ID");

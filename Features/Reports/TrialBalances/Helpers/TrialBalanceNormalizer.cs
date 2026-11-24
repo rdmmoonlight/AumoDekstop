@@ -5,6 +5,7 @@ using System.Linq;
 using AumoDekstop.Features.Reports.TrialBalances.Models;
 
 namespace AumoDekstop.Features.Reports.TrialBalances.Helpers;
+
 public static class TrialBalanceNormalizer
 {
     public static List<TrialRow> NormalizeTrialRows(IEnumerable<RawTrialRow>? raw)

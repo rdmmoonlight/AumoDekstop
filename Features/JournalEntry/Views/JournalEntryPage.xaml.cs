@@ -16,6 +16,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace AumoDekstop.Features.JournalEntry.Views;
+
 public sealed partial class JournalEntryPage : Page, INotifyPropertyChanged
 {
     private readonly IJournalEntryService _journalEntryService;

@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using AumoDekstop.Features.ChartOfAccounts.Models;
 
 namespace AumoDekstop.Features.ChartOfAccounts.Services;
+
 public record GetChartOfAccountsParams(
     string? Search = null,
     string? Category = null

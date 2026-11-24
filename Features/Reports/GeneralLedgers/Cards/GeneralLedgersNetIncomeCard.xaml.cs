@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 
 namespace AumoDekstop.Features.Reports.GeneralLedgers;
+
 public sealed partial class GeneralLedgersNetIncomeCard : UserControl
 {
     public static readonly DependencyProperty TotalRevenueProperty =

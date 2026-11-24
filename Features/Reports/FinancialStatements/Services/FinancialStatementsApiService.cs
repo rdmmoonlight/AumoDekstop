@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using AumoDekstop.Features.Reports.FinancialStatements.Models;
 
 namespace AumoDekstop.Features.Reports.FinancialStatements.Services;
+
 public interface IFinancialStatementsApiService
 {
     Task<IncomeStatementData?> GetIncomeStatementAsync(CancellationToken cancellationToken = default);

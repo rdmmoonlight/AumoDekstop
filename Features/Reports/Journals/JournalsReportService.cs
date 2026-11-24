@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace AumoDekstop.Features.Reports.Journals.Services;
+
 public interface IJournalsReportService
 {
     Task<T?> GetJournalsGeneralAsync<T>(CancellationToken cancellationToken = default);

@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace AumoDekstop.Features.JournalEntry.Controls;
+
 [SupportedOSPlatform("windows10.0.17763")]
 public sealed partial class TransactionInfoCardControl : UserControl
 {

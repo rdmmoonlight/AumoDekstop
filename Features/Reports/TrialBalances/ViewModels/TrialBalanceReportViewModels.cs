@@ -10,6 +10,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace AumoDekstop.Features.Reports.TrialBalances.ViewModels;
+
 public abstract partial class TrialBalanceReportViewModelBase : ObservableObject
 {
     private readonly ITrialBalancesApiService _apiService;

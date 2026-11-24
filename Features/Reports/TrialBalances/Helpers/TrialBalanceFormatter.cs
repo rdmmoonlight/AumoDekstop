@@ -3,6 +3,7 @@ using System;
 using System.Globalization;
 
 namespace AumoDekstop.Features.Reports.TrialBalances.Helpers;
+
 public static class TrialBalanceFormatter
 {
     private static readonly CultureInfo IdCulture = new("id-ID");

@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml.Controls;
 
 namespace AumoDekstop.Shell.Status;
+
 public sealed partial class StatusBarView : UserControl
 {
     public StatusBarView()

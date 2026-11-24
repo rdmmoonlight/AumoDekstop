@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace AumoDekstop.Features.Reports.Worksheet;
+
 public sealed partial class WorksheetPage : Page
 {
     public WorksheetPageViewModel ViewModel { get; }

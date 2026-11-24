@@ -13,6 +13,7 @@ using Microsoft.UI.Xaml.Media;
 using Windows.UI.Text;
 
 namespace AumoDekstop.Features.Reports.Journals.Controls;
+
 public sealed class ClosingJournalLineDisplayItem
 {
     private static readonly CultureInfo IdCulture = new("id-ID");

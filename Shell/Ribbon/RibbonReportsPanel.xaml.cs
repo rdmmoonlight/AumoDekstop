@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace AumoDekstop.Shell.Ribbon;
+
 public sealed partial class RibbonReportPanel : UserControl
 {
     public event EventHandler<string>? CommandInvoked;

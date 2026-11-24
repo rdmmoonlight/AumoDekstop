@@ -17,6 +17,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace AumoDekstop.Features.JournalEntry.ViewModels;
+
 public partial class JournalEntryFormViewModel : ObservableObject
 {
     private readonly HttpClient _httpClient;

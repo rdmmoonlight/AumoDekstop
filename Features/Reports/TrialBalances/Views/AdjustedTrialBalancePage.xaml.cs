@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace AumoDekstop.Features.Reports.TrialBalances.Views;
+
 public sealed partial class AdjustedTrialBalancePage : Page
 {
     public AdjustedTrialBalanceViewModel ViewModel { get; }

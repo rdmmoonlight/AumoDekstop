@@ -10,6 +10,7 @@ using AumoDekstop.Features.JournalEntry.Models;
 using CommunityToolkit.Mvvm.Messaging;
 
 namespace AumoDekstop.Features.JournalEntry.Services;
+
 public interface IJournalEntryService
 {
     Task<JournalEntryDetailDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default);

@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace AumoDekstop.Features.Periods.Views;
+
 public sealed partial class PeriodsPage : Page
 {
     public PeriodsPageViewModel ViewModel { get; }

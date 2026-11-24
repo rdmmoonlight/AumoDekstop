@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace AumoDekstop.Features.Reports.FinancialStatements.Controls;
+
 public sealed partial class CashFlowTableControl : UserControl, INotifyPropertyChanged
 {
     private static readonly CashFlowData EmptyData = new();

@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace AumoDekstop.Features.Reports.FinancialStatements.ViewModels;
+
 public sealed partial class StatementOfCashFlowViewModel : ObservableObject
 {
     private readonly IFinancialStatementsApiService _apiService;

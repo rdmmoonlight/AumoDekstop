@@ -3,6 +3,7 @@ using System;
 using System.Globalization;
 
 namespace AumoDekstop.Features.Reports.FinancialStatements.Helpers;
+
 public static class FinancialStatementFormatter
 {
     private static readonly CultureInfo IdCulture = new("id-ID");

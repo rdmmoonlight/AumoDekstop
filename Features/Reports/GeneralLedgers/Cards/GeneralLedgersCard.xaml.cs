@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace AumoDekstop.Features.Reports.GeneralLedgers.Cards;
+
 public sealed partial class GeneralLedgersCard : UserControl
 {
     public static readonly DependencyProperty AccountProperty =

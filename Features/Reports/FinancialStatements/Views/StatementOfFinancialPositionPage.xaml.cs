@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace AumoDekstop.Features.Reports.FinancialStatements.Views;
+
 public sealed partial class StatementOfFinancialPositionPage : Page
 {
     public StatementOfFinancialPositionViewModel ViewModel { get; }

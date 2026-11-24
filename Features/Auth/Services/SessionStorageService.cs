@@ -5,6 +5,7 @@ using AumoDekstop.Services;
 using Windows.Security.Credentials;
 
 namespace AumoDekstop.Features.Auth.Services;
+
 public static class SessionStorageService
 {
     private const string VaultResourceName = "AumoDekstopAuthToken";

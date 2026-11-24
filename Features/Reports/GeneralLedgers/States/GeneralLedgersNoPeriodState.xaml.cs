@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
 
 namespace AumoDekstop.Features.Reports.GeneralLedgers;
+
 [ContentProperty(Name = nameof(ActionContent))]
 public sealed partial class GeneralLedgersNoPeriodState : UserControl
 {

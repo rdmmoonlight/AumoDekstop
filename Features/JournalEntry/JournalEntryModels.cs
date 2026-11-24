@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace AumoDekstop.Features.JournalEntry.Models;
+
 public record JournalEntryLineDto(
     int AccountId,
     string? Description,

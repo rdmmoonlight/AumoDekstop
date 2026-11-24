@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace AumoDekstop.Features.Reports.FinancialStatements.Controls;
+
 public sealed partial class ErrorAlertControl : UserControl, INotifyPropertyChanged
 {
     private const string DefaultTitle = "Gagal Memuat Data";

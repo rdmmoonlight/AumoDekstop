@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 
 namespace AumoDekstop.Features.Reports.GeneralLedgers.Headers;
+
 [ContentProperty(Name = nameof(ActionsContent))]
 public sealed partial class GeneralLedgersPageHeader : UserControl
 {

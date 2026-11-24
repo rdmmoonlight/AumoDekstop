@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace AumoDekstop.Features.JournalEntry.Controls;
+
 public sealed partial class JournalEntryHeaderControl : UserControl, INotifyPropertyChanged
 {
     private bool _isUpdatingDateFromProperty;

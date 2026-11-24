@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace AumoDekstop.Features.Auth.ViewModels;
+
 public partial class LoginViewModel : ObservableObject
 {
     private readonly IAuthService _authService;

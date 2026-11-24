@@ -9,6 +9,7 @@ using Windows.UI;
 using Windows.UI.Text;
 
 namespace AumoDekstop.Features.Reports.Journals;
+
 public class FlatJournalRowItem
 {
     public Guid EntryId { get; set; }

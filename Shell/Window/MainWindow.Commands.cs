@@ -11,6 +11,7 @@ using AumoDekstop.Services;
 using AumoDekstop.Shell.Ribbon;
 
 namespace AumoDekstop;
+
 public sealed partial class MainWindow
 {
     // Satu pintu untuk semua tombol ribbon (lihat RibbonCommand)

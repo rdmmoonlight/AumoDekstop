@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace AumoDekstop.Features.JournalEntry.Controls;
+
 public sealed class AccountOption
 {
     public AccountOption()

@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace AumoDekstop.Features.Reports.GeneralLedgers.Views;
+
 public sealed partial class GeneralLedgersTemporaryPage : Page
 {
     private readonly IGeneralLedgersService _generalLedgersService;

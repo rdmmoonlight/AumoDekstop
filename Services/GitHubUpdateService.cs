@@ -11,6 +11,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace AumoDekstop.Services;
+
 public sealed class UpdateInfo
 {
     public string VersionTag { get; set; } = string.Empty;

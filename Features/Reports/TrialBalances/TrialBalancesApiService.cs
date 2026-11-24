@@ -10,6 +10,7 @@ using AumoDekstop.Features.Reports.TrialBalances.Helpers;
 using AumoDekstop.Features.Reports.TrialBalances.Models;
 
 namespace AumoDekstop.Features.Reports.TrialBalances.Services;
+
 public sealed class TrialBalanceFetchResult
 {
     public bool HasPeriodSelected { get; set; } = true;
