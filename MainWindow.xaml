@@ -14,29 +14,65 @@
             <RowDefinition Height="28" />
         </Grid.RowDefinitions>
 
-        <!-- Menu Utama (Menu dari segala menu, core fo the core) -->
-        <Button
-            x:Name="MenuButton"
-            Content="Menu"
-            Background="#FF6B35"
-            Foreground="White"
-            FontSize="16"
-            FontWeight="SemiBold"
-            Padding="20,10"
-            CornerRadius="10"
-            BorderThickness="0"
-            Click="MenuButton_Click" />
+        <!-- 1. HEADER: TOMBOL MENU UTAMA + RIBBON -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-        <!-- 1. RIBBON (tersembunyi sebelum login) -->
-        <ribbon:RibbonView
-            x:Name="RibbonHost"
-            Grid.Row="0"
-            Visibility="Collapsed"
-            CommandInvoked="OnRibbonCommand"
-            TabChanged="OnRibbonTabChanged" />
+            <!-- Menu Utama (Menu dari segala menu, core of the core) -->
+            <Button
+                x:Name="MenuButton"
+                Grid.Column="0"
+                Margin="8,6,4,6"
+                Padding="20,10"
+                Background="#FF6B35"
+                BorderThickness="0"
+                Click="MenuButton_Click"
+                Content="Menu"
+                CornerRadius="10"
+                FontSize="16"
+                FontWeight="SemiBold"
+                Foreground="White" />
 
-        <!-- 2. WORKSPACE UTAMA (halaman login atau halaman aplikasi) -->
-        <Frame x:Name="RootFrame" Grid.Row="1" Padding="16" />
+            <!-- RIBBON (tersembunyi sebelum login) -->
+            <ribbon:RibbonView
+                x:Name="RibbonHost"
+                Grid.Column="1"
+                CommandInvoked="OnRibbonCommand"
+                TabChanged="OnRibbonTabChanged"
+                Visibility="Collapsed" />
+        </Grid>
+
+        <!-- 2. WORKSPACE UTAMA + DRAWER MENU UTAMA -->
+        <SplitView
+            x:Name="MainNavigation"
+            Grid.Row="1"
+            DisplayMode="Overlay"
+            IsPaneOpen="False"
+            OpenPaneLength="260">
+            <SplitView.Pane>
+                <Border
+                    Padding="16"
+                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="0,0,1,0">
+                    <StackPanel Spacing="12">
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Text="Menu Utama" />
+                        <MenuFlyoutSeparator />
+                        <!-- Tambahkan tombol/item menu utama di sini -->
+                    </StackPanel>
+                </Border>
+            </SplitView.Pane>
+
+            <SplitView.Content>
+                <Frame x:Name="RootFrame" Padding="16" />
+            </SplitView.Content>
+        </SplitView>
 
         <!-- 3. STATUS BAR -->
         <status:StatusBarView x:Name="AppStatusBar" Grid.Row="2" />
