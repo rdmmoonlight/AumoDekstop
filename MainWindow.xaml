@@ -14,6 +14,19 @@
             <RowDefinition Height="28" />
         </Grid.RowDefinitions>
 
+        <!-- Menu Utama (Menu dari segala menu, core fo the core) -->
+        <Button
+            x:Name="MenuButton"
+            Content="Menu"
+            Background="#FF6B35"
+            Foreground="White"
+            FontSize="16"
+            FontWeight="SemiBold"
+            Padding="20,10"
+            CornerRadius="10"
+            BorderThickness="0"
+            Click="MenuButton_Click" />
+
         <!-- 1. RIBBON (tersembunyi sebelum login) -->
         <ribbon:RibbonView
             x:Name="RibbonHost"
