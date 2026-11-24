@@ -70,5 +70,5 @@ public partial class GoogleSignInViewModel : ObservableObject
         }
     }
 
-    private bool CanSignInWithGoogle() => HasClientId && !IsLoading;
+    public bool HasClientId => ...;
 }
