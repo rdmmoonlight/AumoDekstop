@@ -1,5 +1,25 @@
 root = true
 
+# Abaikan seluruh file hasil generasi XAML & kompilasi WinUI 3
+[**/obj/**]
+generated_code = true
+
+[**/bin/**]
+generated_code = true
+
+[*.{g.cs,g.i.cs}]
+generated_code = true
+
 [*.cs]
-# Nonaktifkan CA1822 agar dotnet format tidak mengubah event handler XAML & properti {x:Bind} menjadi static
+# Nonaktifkan aturan yang merusak {x:Bind} / event handler WinUI 3
 dotnet_diagnostic.CA1822.severity = none
+
+# Nonaktifkan aturan yang memicu crash MSBuildWorkspace / tidak mendukung Fix All
+dotnet_diagnostic.IDE0005.severity = none
+dotnet_diagnostic.IDE1006.severity = none
+
+# Aturan gaya kode aman yang didukung penuh oleh auto-fix dotnet format
+csharp_using_directive_placement = outside_namespace:warning
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_prefer_braces = true:warning
+dotnet_sort_system_directives_first = true
