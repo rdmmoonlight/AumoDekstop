@@ -41,18 +41,16 @@ jobs:
           msbuild $env:Project_Path /t:Restore /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /v:minimal
           if ($LASTEXITCODE -ne 0) { exit 1 }
 
-      - name: Run dotnet format (Whitespace, Style & Analyzers Auto-Fix)
+      - name: Run dotnet format (Whitespace & Safe Style Auto-Fix)
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
 
-          Write-Host "Menjalankan auto-fix whitespace, code style, dan analyzers..."
-          # Menjalankan perbaikan otomatis berdasarkan .editorconfig & Roslyn Analyzers
-          dotnet format $env:Project_Path --verbosity minimal
+          Write-Host "Menjalankan auto-fix whitespace & code style..."
+          dotnet format whitespace $env:Project_Path --verbosity minimal
           if ($LASTEXITCODE -ne 0) { exit 1 }
 
-          # Opsional: Perbaiki juga warning/info dari third-party atau .NET SDK analyzers secara agresif
-          dotnet format analyzers $env:Project_Path --severity info --verbosity minimal
+          dotnet format style $env:Project_Path --severity info --verbosity minimal
           if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: Auto-Commit & Push Fixes
