@@ -18,6 +18,11 @@ public sealed partial class MainWindow : Window
     private readonly UpdateCoordinator _updates;
     private readonly ApiService _api = App.Current.Services.GetRequiredService<ApiService>();
 
+    private void MenuButton_Click(object sender, RoutedEventArgs e)
+    {
+    MainNavigation.IsPaneOpen = !MainNavigation.IsPaneOpen;
+    }
+
     // Halaman Periods dibuat lewat DI (konstruktor membutuhkan ViewModel), lalu disimpan agar tidak dimuat ulang.
     private PeriodsPage? _periodsPage;
     private LoginPage? _loginPage;
