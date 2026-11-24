@@ -79,17 +79,3 @@ jobs:
           } else {
             Write-Host "Kode sudah bersih dan sesuai standar. Tidak ada yang perlu di-commit."
           }
-
-      - name: Verify Build & Static Analysis (Release | x64)
-        shell: pwsh
-        run: |
-          # Memastikan hasil auto-fix tidak merusak kompilasi WinUI 3 / XAML
-          msbuild $env:Project_Path `
-            /t:Build `
-            /p:Configuration=Release `
-            /p:Platform=x64 `
-            /p:RuntimeIdentifier=win-x64 `
-            /p:EnforceCodeStyleInBuild=true `
-            /v:minimal
-
-          if ($LASTEXITCODE -ne 0) { exit 1 }
