@@ -1,4 +1,3 @@
-namespace AumoDekstop.Features.Auth.ViewModels;
 
 using AumoDekstop.Features.Auth.Helpers;
 using AumoDekstop.Features.Auth.Models;
@@ -6,6 +5,7 @@ using AumoDekstop.Features.Auth.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+namespace AumoDekstop.Features.Auth.ViewModels;
 public partial class GoogleSignInViewModel : ObservableObject
 {
     private readonly IAuthService _authService;
