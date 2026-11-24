@@ -1,10 +1,10 @@
+namespace AumoDekstop.Features.Auth.ViewModels;
+
 using AumoDekstop.Features.Auth.Helpers;
 using AumoDekstop.Features.Auth.Models;
 using AumoDekstop.Features.Auth.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-
-namespace AumoDekstop.Features.Auth.ViewModels;
 
 public partial class GoogleSignInViewModel : ObservableObject
 {
@@ -19,9 +19,11 @@ public partial class GoogleSignInViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(SignInWithGoogleCommand))]
     public partial bool IsLoading { get; set; }
 
-    public static bool HasClientId => !string.IsNullOrWhiteSpace(AuthHelpers.GoogleClientId);
+    public bool HasClientId => !string.IsNullOrWhiteSpace(AuthHelpers.GoogleClientId);
     public bool HasNoClientId => !HasClientId;
     public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
+
+    private bool CanSignInWithGoogle() => !IsLoading && HasClientId;
 
     // Pengganti defineEmits<{ (e: 'success'): void }>()
     public event EventHandler? LoginSucceeded;
@@ -69,6 +71,4 @@ public partial class GoogleSignInViewModel : ObservableObject
             IsLoading = false;
         }
     }
-
-    public bool HasClientId => !string.IsNullOrWhiteSpace(ClientId);
 }
