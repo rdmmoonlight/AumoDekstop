@@ -98,7 +98,7 @@ public sealed partial class GeneralJournalTable : UserControl, INotifyPropertyCh
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
 
-public class JournalRowTemplateSelector : DataTemplateSelector
+public partial class JournalRowTemplateSelector : DataTemplateSelector
 {
     public DataTemplate? HeaderTemplate { get; set; }
     public DataTemplate? LineTemplate { get; set; }

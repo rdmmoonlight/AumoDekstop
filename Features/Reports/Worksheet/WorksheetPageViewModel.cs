@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 
-public class WorksheetPageViewModel : INotifyPropertyChanged
+public partial class WorksheetPageViewModel : INotifyPropertyChanged
 {
     private readonly IWorksheetService _worksheetService;
     private CancellationTokenSource? _fetchCts;

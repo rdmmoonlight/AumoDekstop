@@ -137,11 +137,11 @@ public sealed partial class JournalFormActionsControl : UserControl
     {
         if (d is JournalFormActionsControl control)
         {
-            control.UpdateActionState();
+            UpdateActionState();
         }
     }
 
-    private void UpdateActionState()
+    private static void UpdateActionState()
     {
         // Keep this hook available for state changes without depending on generated x:Bind bindings.
     }

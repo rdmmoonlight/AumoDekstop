@@ -122,7 +122,7 @@ public sealed partial class AccountsTableControl : UserControl
 
 #region Value Converters untuk Tampilan Tabel
 
-public class CurrencyIdrConverter : IValueConverter
+public partial class CurrencyIdrConverter : IValueConverter
 {
     private static readonly CultureInfo IdCulture = new("id-ID");
 
@@ -136,7 +136,7 @@ public class CurrencyIdrConverter : IValueConverter
         throw new NotImplementedException();
 }
 
-public class AccountRoleDisplayConverter : IValueConverter
+public partial class AccountRoleDisplayConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -148,7 +148,7 @@ public class AccountRoleDisplayConverter : IValueConverter
         throw new NotImplementedException();
 }
 
-public class BoolToOpacityConverter : IValueConverter
+public partial class BoolToOpacityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language) =>
         value is bool isActive && !isActive ? 0.5 : 1.0;
@@ -157,7 +157,7 @@ public class BoolToOpacityConverter : IValueConverter
         throw new NotImplementedException();
 }
 
-public class StatusToTextConverter : IValueConverter
+public partial class StatusToTextConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language) =>
         value is bool isActive && isActive ? "Aktif" : "Nonaktif";
@@ -166,7 +166,7 @@ public class StatusToTextConverter : IValueConverter
         throw new NotImplementedException();
 }
 
-public class StatusToBackgroundConverter : IValueConverter
+public partial class StatusToBackgroundConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -180,7 +180,7 @@ public class StatusToBackgroundConverter : IValueConverter
         throw new NotImplementedException();
 }
 
-public class AccountTypeToBackgroundConverter : IValueConverter
+public partial class AccountTypeToBackgroundConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -199,7 +199,7 @@ public class AccountTypeToBackgroundConverter : IValueConverter
         throw new NotImplementedException();
 }
 
-public class AccountTypeToForegroundConverter : IValueConverter
+public partial class AccountTypeToForegroundConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {

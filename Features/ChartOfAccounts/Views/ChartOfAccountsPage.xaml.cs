@@ -263,7 +263,7 @@ public sealed partial class ChartOfAccountsPage : Page
         ErrorInfoBar.Message = string.Empty;
     }
 
-    private void ErrorInfoBar_Closed(InfoBar sender, InfoBarClosedEventArgs args)
+    private static void ErrorInfoBar_Closed(InfoBar sender, InfoBarClosedEventArgs args)
     {
         sender.Message = string.Empty;
     }

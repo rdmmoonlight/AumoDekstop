@@ -40,13 +40,13 @@ public partial class JournalLineRowItem : ObservableObject
     public partial string AccountId { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string? _description;
+    public partial string? Description { get; set; }
 
     [ObservableProperty]
-    private decimal _debit;
+    public partial decimal Debit { get; set; }
 
     [ObservableProperty]
-    private decimal _credit;
+    public partial decimal Credit { get; set; }
 
     public double DebitValue
     {

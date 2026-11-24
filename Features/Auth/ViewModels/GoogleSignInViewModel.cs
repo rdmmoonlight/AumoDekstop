@@ -19,7 +19,7 @@ public partial class GoogleSignInViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(SignInWithGoogleCommand))]
     public partial bool IsLoading { get; set; }
 
-    public bool HasClientId => !string.IsNullOrWhiteSpace(AuthHelpers.GoogleClientId);
+    public static bool HasClientId => !string.IsNullOrWhiteSpace(AuthHelpers.GoogleClientId);
     public bool HasNoClientId => !HasClientId;
     public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
 

@@ -27,7 +27,7 @@ public sealed class UpdateCoordinator
             _setStatus($"● Mengecek pembaruan di GitHub (Versi saat ini: v{currentVer})...");
         }
 
-        var update = await _updateService.CheckForUpdateAsync();
+        var update = await GitHubUpdateService.CheckForUpdateAsync();
 
         if (update == null)
         {
@@ -120,7 +120,7 @@ public sealed class UpdateCoordinator
         try
         {
             _setStatus($"● Mengunduh pembaruan {update.VersionTag}...");
-            await _updateService.DownloadAndInstallAsync(update, progressReporter);
+            await GitHubUpdateService.DownloadAndInstallAsync(update, progressReporter);
         }
         catch (Exception ex)
         {

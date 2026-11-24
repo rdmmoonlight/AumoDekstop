@@ -74,7 +74,7 @@ public class GitHubUpdateService
     /// <summary>
     /// Mengecek apakah ada versi .PC (installer) yang lebih baru di GitHub Releases.
     /// </summary>
-    public async Task<UpdateInfo?> CheckForUpdateAsync()
+    public static async Task<UpdateInfo?> CheckForUpdateAsync()
     {
         try
         {
@@ -131,7 +131,7 @@ public class GitHubUpdateService
     /// Mengunduh installer terbaru ke folder sementara, lalu menjalankannya secara silent.
     /// Installer (Inno Setup) menutup aplikasi, memperbarui file, dan membuka ulang aplikasi.
     /// </summary>
-    public async Task DownloadAndInstallAsync(UpdateInfo update, IProgress<double>? progress = null)
+    public static async Task DownloadAndInstallAsync(UpdateInfo update, IProgress<double>? progress = null)
     {
         string installerPath = Path.Combine(Path.GetTempPath(), update.FileName);
 
