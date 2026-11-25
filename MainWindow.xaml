@@ -21,27 +21,12 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Menu Utama (Menu dari segala menu, core of the core) -->
-            <Button
-                x:Name="MenuButton"
-                Grid.Column="0"
-                Margin="8,6,4,6"
-                Padding="20,10"
-                Background="#FF6B35"
-                BorderThickness="0"
-                Click="MenuButton_Click"
-                Content="☰  MENU"
-                CornerRadius="10"
-                FontSize="16"
-                FontWeight="SemiBold"
-                Foreground="White"
-                Visibility="Collapsed"/>
-
-            <!-- RIBBON (tersembunyi sebelum login) -->
-            <ribbon:RibbonView
+           <!-- 1. HEADER: RIBBON (tersembunyi sebelum login) -->
+           <ribbon:RibbonView
                 x:Name="RibbonHost"
-                Grid.Column="1"
+                Grid.Row="0"
                 CommandInvoked="OnRibbonCommand"
+                MenuRequested="OnMenuRequested"
                 TabChanged="OnRibbonTabChanged"
                 Visibility="Collapsed"/>
         </Grid>
