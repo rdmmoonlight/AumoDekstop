@@ -14,22 +14,14 @@
             <RowDefinition Height="28"/>
         </Grid.RowDefinitions>
 
-        <!-- 1. HEADER: TOMBOL MENU UTAMA + RIBBON -->
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-           <!-- 1. HEADER: RIBBON (tersembunyi sebelum login) -->
-           <ribbon:RibbonView
-                x:Name="RibbonHost"
-                Grid.Row="0"
-                CommandInvoked="OnRibbonCommand"
-                MenuRequested="OnMenuRequested"
-                TabChanged="OnRibbonTabChanged"
-                Visibility="Collapsed"/>
-        </Grid>
+        <!-- 1. HEADER: RIBBON (tersembunyi sebelum login) -->
+        <ribbon:RibbonView
+            x:Name="RibbonHost"
+            Grid.Row="0"
+            CommandInvoked="OnRibbonCommand"
+            MenuRequested="OnMenuRequested"
+            TabChanged="OnRibbonTabChanged"
+            Visibility="Collapsed"/>
 
         <!-- 2. WORKSPACE UTAMA + DRAWER MENU UTAMA -->
         <SplitView
