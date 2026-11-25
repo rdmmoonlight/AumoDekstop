@@ -1,3 +1,4 @@
+namespace AumoDekstop;
 
 using System;
 using AumoDekstop.Features.Auth.Services;
@@ -9,7 +10,6 @@ using AumoDekstop.Shell.Updates;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 
-namespace AumoDekstop;
 // Bagian lain dari kelas ini ada di folder Shell/Window:
 //   MainWindow.Auth.cs        -> login, masuk aplikasi, keluar
 //   MainWindow.Navigation.cs  -> perpindahan halaman & tab ribbon
@@ -20,11 +20,6 @@ public sealed partial class MainWindow : Window
     private readonly UpdateCoordinator _updates;
     private readonly ApiService _api = App.Current.Services.GetRequiredService<ApiService>();
     private readonly ITokenStore _tokenStore = App.Current.Services.GetRequiredService<ITokenStore>();
-
-    private void MenuButton_Click(object sender, RoutedEventArgs e)
-    {
-        MainNavigation.IsPaneOpen = !MainNavigation.IsPaneOpen;
-    }
 
     // Halaman Periods dibuat lewat DI (konstruktor membutuhkan ViewModel), lalu disimpan agar tidak dimuat ulang.
     private PeriodsPage? _periodsPage;
@@ -46,6 +41,11 @@ public sealed partial class MainWindow : Window
         {
             rootElement.Loaded += RootElement_Loaded;
         }
+    }
+
+    private void OnMenuRequested(object? sender, EventArgs e)
+    {
+        MainNavigation.IsPaneOpen = !MainNavigation.IsPaneOpen;
     }
 
     private void MainWindow_Closed(object sender, WindowEventArgs args)
