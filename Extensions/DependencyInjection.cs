@@ -1,4 +1,3 @@
-namespace AumoDekstop.Extensions;
 
 using System;
 using AumoDekstop.Features.Auth.Services;
@@ -20,6 +19,7 @@ using AumoDekstop.Features.Shared.Http;
 using AumoDekstop.Services;
 using Microsoft.Extensions.DependencyInjection;
 
+namespace AumoDekstop.Extensions;
 public static class DependencyInjection
 {
     public static IServiceCollection AddAumoServices(this IServiceCollection services)

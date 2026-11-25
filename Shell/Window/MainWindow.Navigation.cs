@@ -1,4 +1,3 @@
-namespace AumoDekstop;
 
 using AumoDekstop.Features.ChartOfAccounts.Views;
 using AumoDekstop.Features.Periods.ViewModels;
@@ -8,6 +7,7 @@ using AumoDekstop.Shell.Ribbon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 
+namespace AumoDekstop;
 public sealed partial class MainWindow
 {
     private void ShowHome()

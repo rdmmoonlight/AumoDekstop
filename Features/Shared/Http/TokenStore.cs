@@ -1,7 +1,7 @@
-namespace AumoDekstop.Features.Shared.Http;
 
 using System;
 
+namespace AumoDekstop.Features.Shared.Http;
 public sealed class TokenStore : ITokenStore
 {
     private static readonly Lazy<TokenStore> _instance = new(() => new TokenStore());
@@ -61,7 +61,9 @@ public sealed class TokenStore : ITokenStore
         lock (_lock)
         {
             if (string.IsNullOrWhiteSpace(_token))
+            {
                 return;
+            }
 
             _token = null;
             handlerToInvoke = SessionExpired;

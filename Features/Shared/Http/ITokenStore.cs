@@ -1,7 +1,7 @@
-namespace AumoDekstop.Features.Shared.Http;
 
 using System;
 
+namespace AumoDekstop.Features.Shared.Http;
 public interface ITokenStore
 {
     string? Token { get; }

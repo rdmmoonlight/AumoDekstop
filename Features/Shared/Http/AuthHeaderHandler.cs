@@ -45,7 +45,9 @@ public sealed class AuthHeaderHandler : DelegatingHandler
     private static bool IsAuthEndpoint(Uri? requestUri)
     {
         if (requestUri is null)
+        {
             return false;
+        }
 
         var path = requestUri.IsAbsoluteUri
             ? requestUri.AbsolutePath

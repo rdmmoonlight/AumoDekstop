@@ -1,7 +1,7 @@
-namespace AumoDekstop.Services;
 
 using System;
 
+namespace AumoDekstop.Services;
 /// <summary>
 /// Konfigurasi endpoint API Aumo dengan urutan prioritas:
 /// 1. Environment Variable: AUMO_API_URL
@@ -20,11 +20,15 @@ public static class ApiConfig
         {
             var envUrl = Environment.GetEnvironmentVariable(EnvVarName);
             if (IsValidHttpUrl(envUrl, out var normalizedEnv))
+            {
                 return normalizedEnv;
+            }
 
             var localUrl = AppLocalSettings.GetString(LocalSettingsKey);
             if (IsValidHttpUrl(localUrl, out var normalizedLocal))
+            {
                 return normalizedLocal;
+            }
 
             return DefaultBaseUrl;
         }
@@ -34,7 +38,9 @@ public static class ApiConfig
     {
         normalizedUrl = string.Empty;
         if (string.IsNullOrWhiteSpace(rawUrl))
+        {
             return false;
+        }
 
         var trimmed = rawUrl.Trim().TrimEnd('/');
         if (Uri.TryCreate(trimmed, UriKind.Absolute, out var uri) &&
