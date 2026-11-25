@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 
 namespace AumoDekstop;
+
 public sealed partial class MainWindow
 {
     private void ShowHome()

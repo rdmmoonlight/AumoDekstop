@@ -20,6 +20,7 @@ using AumoDekstop.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AumoDekstop.Extensions;
+
 public static class DependencyInjection
 {
     public static IServiceCollection AddAumoServices(this IServiceCollection services)

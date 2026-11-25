@@ -4,6 +4,7 @@ using AumoDekstop.Features.Shared.Http;
 using AumoDekstop.Services;
 
 namespace AumoDekstop.Features.Auth.Services;
+
 public class AuthService : IAuthService
 {
     private readonly ApiService _apiService;

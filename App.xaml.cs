@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 
 namespace AumoDekstop;
+
 public partial class App : Application
 {
     private const string ThemeSettingKey = "AppRequestedTheme";

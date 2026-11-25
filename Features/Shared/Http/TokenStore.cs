@@ -2,6 +2,7 @@
 using System;
 
 namespace AumoDekstop.Features.Shared.Http;
+
 public sealed class TokenStore : ITokenStore
 {
     private static readonly Lazy<TokenStore> _instance = new(() => new TokenStore());
