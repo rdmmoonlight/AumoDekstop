@@ -1,4 +1,3 @@
-namespace AumoDekstop;
 
 using System;
 using AumoDekstop.Features.Auth.Services;
@@ -10,6 +9,7 @@ using AumoDekstop.Shell.Updates;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 
+namespace AumoDekstop;
 // Bagian lain dari kelas ini ada di folder Shell/Window:
 //   MainWindow.Auth.cs        -> login, masuk aplikasi, keluar
 //   MainWindow.Navigation.cs  -> perpindahan halaman & tab ribbon
