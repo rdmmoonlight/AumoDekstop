@@ -14,6 +14,13 @@ public sealed partial class RibbonView : UserControl
     /// <summary>Dipicu setelah tab berganti dan panel tombol sudah disesuaikan.</summary>
     public event EventHandler<RibbonTabChangedEventArgs>? TabChanged;
 
+    public event EventHandler? MenuRequested;
+
+    private void OnMenuClick(object sender, RoutedEventArgs e)
+    {
+        MenuRequested?.Invoke(this, EventArgs.Empty);
+    }
+
     public RibbonView()
     {
         InitializeComponent();
