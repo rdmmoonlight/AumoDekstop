@@ -9,16 +9,16 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="28" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="28"/>
         </Grid.RowDefinitions>
 
         <!-- 1. HEADER: TOMBOL MENU UTAMA + RIBBON -->
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!-- Menu Utama (Menu dari segala menu, core of the core) -->
@@ -30,11 +30,12 @@
                 Background="#FF6B35"
                 BorderThickness="0"
                 Click="MenuButton_Click"
-                Content="Menu"
+                Content="☰  MENU"
                 CornerRadius="10"
                 FontSize="16"
                 FontWeight="SemiBold"
-                Foreground="White" />
+                Foreground="White"
+                Visibility="Collapsed"/>
 
             <!-- RIBBON (tersembunyi sebelum login) -->
             <ribbon:RibbonView
@@ -42,7 +43,7 @@
                 Grid.Column="1"
                 CommandInvoked="OnRibbonCommand"
                 TabChanged="OnRibbonTabChanged"
-                Visibility="Collapsed" />
+                Visibility="Collapsed"/>
         </Grid>
 
         <!-- 2. WORKSPACE UTAMA + DRAWER MENU UTAMA -->
@@ -62,19 +63,21 @@
                         <TextBlock
                             FontSize="18"
                             FontWeight="SemiBold"
-                            Text="Menu Utama" />
-                        <MenuFlyoutSeparator />
+                            Text="Menu Utama"/>
+                        <MenuFlyoutSeparator/>
                         <!-- Tambahkan tombol/item menu utama di sini -->
                     </StackPanel>
                 </Border>
             </SplitView.Pane>
 
             <SplitView.Content>
-                <Frame x:Name="RootFrame" Padding="16" />
+                <Frame x:Name="RootFrame"
+                       Padding="16"/>
             </SplitView.Content>
         </SplitView>
 
         <!-- 3. STATUS BAR -->
-        <status:StatusBarView x:Name="AppStatusBar" Grid.Row="2" />
+        <status:StatusBarView x:Name="AppStatusBar"
+                              Grid.Row="2"/>
     </Grid>
 </Window>

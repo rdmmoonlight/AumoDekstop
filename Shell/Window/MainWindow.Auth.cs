@@ -8,6 +8,8 @@ public sealed partial class MainWindow
 {
     private void ShowLogin()
     {
+        MenuButton.Visibility = Visibility.Collapsed;
+        MainNavigation.IsPaneOpen = false;
         RibbonHost.Visibility = Visibility.Collapsed;
         _periodsPage = null;
 
@@ -30,6 +32,7 @@ public sealed partial class MainWindow
 
     private void EnterApp()
     {
+        MenuButton.Visibility = Visibility.Visible;
         RibbonHost.Visibility = Visibility.Visible;
         RibbonHost.SelectHome();
         ShowHome();
