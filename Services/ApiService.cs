@@ -1,3 +1,4 @@
+namespace AumoDekstop.Services;
 
 using System;
 using System.Net.Http;
@@ -6,8 +7,8 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using AumoDekstop.Features.Shared.Http;
 
-namespace AumoDekstop.Services;
 /// <summary>
 /// Pembungkus standar untuk semua respons dari backend Aumo.
 /// </summary>
@@ -21,8 +22,6 @@ public sealed class ApiResponse<T>
 
 public class ApiService
 {
-    public const string BaseServerUrl = "https://aumo.onrender.com/";
-
     // Cold start Render (free tier): nginx sudah aktif, tetapi backend dotnet belum listen -> 502/503.
     // Request diulang otomatis sampai backend siap (maks. 12 x 5 detik = 60 detik).
     private const int MaxColdStartRetries = 12;
@@ -41,7 +40,7 @@ public class ApiService
 
         if (_httpClient.BaseAddress == null)
         {
-            _httpClient.BaseAddress = new Uri(BaseServerUrl);
+            _httpClient.BaseAddress = new Uri(ApiConfig.BaseUrl);
         }
 
         // Timeout 60 detik untuk mengantisipasi cold-start server Render
@@ -66,10 +65,12 @@ public class ApiService
     {
         if (string.IsNullOrWhiteSpace(token))
         {
+            TokenStore.Instance.Clear();
             _httpClient.DefaultRequestHeaders.Authorization = null;
         }
         else
         {
+            TokenStore.Instance.Set(token);
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
     }

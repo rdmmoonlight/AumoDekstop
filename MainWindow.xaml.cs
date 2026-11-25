@@ -1,13 +1,15 @@
+namespace AumoDekstop;
 
+using System;
 using AumoDekstop.Features.Auth.Services;
 using AumoDekstop.Features.Auth.Views;
 using AumoDekstop.Features.Periods.Views;
+using AumoDekstop.Features.Shared.Http;
 using AumoDekstop.Services;
 using AumoDekstop.Shell.Updates;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 
-namespace AumoDekstop;
 // Bagian lain dari kelas ini ada di folder Shell/Window:
 //   MainWindow.Auth.cs        -> login, masuk aplikasi, keluar
 //   MainWindow.Navigation.cs  -> perpindahan halaman & tab ribbon
@@ -17,6 +19,7 @@ public sealed partial class MainWindow : Window
     private bool _hasCheckedUpdate;
     private readonly UpdateCoordinator _updates;
     private readonly ApiService _api = App.Current.Services.GetRequiredService<ApiService>();
+    private readonly ITokenStore _tokenStore = App.Current.Services.GetRequiredService<ITokenStore>();
 
     private void MenuButton_Click(object sender, RoutedEventArgs e)
     {
@@ -35,11 +38,30 @@ public sealed partial class MainWindow : Window
         _updates = new UpdateCoordinator(SetStatus);
         GitHubUpdateService.CleanupOldExecutable();
 
+        _tokenStore.SessionExpired += TokenStore_SessionExpired;
+        Closed += MainWindow_Closed;
+
         // Event Loaded pada Content menjamin XamlRoot sudah siap
         if (Content is FrameworkElement rootElement)
         {
             rootElement.Loaded += RootElement_Loaded;
         }
+    }
+
+    private void MainWindow_Closed(object sender, WindowEventArgs args)
+    {
+        _tokenStore.SessionExpired -= TokenStore_SessionExpired;
+    }
+
+    private void TokenStore_SessionExpired(object? sender, EventArgs e)
+    {
+        // Pemanggilan HTTP sering berjalan di background thread; pastikan manipulasi UI masuk ke UI thread
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            _auth.ClearSession();
+            SetStatus("Sesi telah berakhir. Silakan login kembali.");
+            ShowLogin();
+        });
     }
 
     private async void RootElement_Loaded(object sender, RoutedEventArgs e)

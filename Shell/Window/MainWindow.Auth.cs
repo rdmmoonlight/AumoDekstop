@@ -1,9 +1,8 @@
+namespace AumoDekstop;
 
 using AumoDekstop.Features.Auth.Views;
 using AumoDekstop.Services;
 using Microsoft.UI.Xaml;
-
-namespace AumoDekstop;
 
 public sealed partial class MainWindow
 {
@@ -21,7 +20,7 @@ public sealed partial class MainWindow
         _loginPage.LoginSucceeded += OnLoginSucceeded;
         RootFrame.Content = _loginPage;
 
-        SetStatus($"● Silakan masuk | Server: {ApiService.BaseServerUrl}");
+        SetStatus($"● Silakan masuk | Server: {ApiConfig.BaseUrl}");
     }
 
     private void OnLoginSucceeded(object? sender, EventArgs e)
@@ -34,7 +33,7 @@ public sealed partial class MainWindow
         RibbonHost.Visibility = Visibility.Visible;
         RibbonHost.SelectHome();
         ShowHome();
-        SetStatus($"● Siap | Versi: v{GitHubUpdateService.GetCurrentVersionString()} | Server: {ApiService.BaseServerUrl}");
+        SetStatus($"● Siap | Versi: v{GitHubUpdateService.GetCurrentVersionString()} | Server: {ApiConfig.BaseUrl}");
     }
 
     private async Task LogoutAsync()

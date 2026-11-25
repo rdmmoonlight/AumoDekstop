@@ -1,3 +1,4 @@
+namespace AumoDekstop;
 
 using AumoDekstop.Features.ChartOfAccounts.Views;
 using AumoDekstop.Features.Periods.ViewModels;
@@ -6,8 +7,6 @@ using AumoDekstop.Services;
 using AumoDekstop.Shell.Ribbon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
-
-namespace AumoDekstop;
 
 public sealed partial class MainWindow
 {
@@ -53,7 +52,7 @@ public sealed partial class MainWindow
             return;
         }
 
-        SetStatus($"● Tab aktif: {e.Text} | Versi: v{GitHubUpdateService.GetCurrentVersionString()} | Server: {ApiService.BaseServerUrl}");
+        SetStatus($"● Tab aktif: {e.Text} | Versi: v{GitHubUpdateService.GetCurrentVersionString()} | Server: {ApiConfig.BaseUrl}");
 
         switch (e.Tag)
         {

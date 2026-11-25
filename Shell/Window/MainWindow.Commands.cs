@@ -167,7 +167,7 @@ public sealed partial class MainWindow
 
     private async Task SyncAsync()
     {
-        SetStatus($"● Menghubungi server {ApiService.BaseServerUrl} (mohon tunggu)...");
+        SetStatus($"● Menghubungi server {ApiConfig.BaseUrl} (mohon tunggu)...");
 
         bool isOnline = await _api.CheckServerHealthAsync("");
 
@@ -178,7 +178,7 @@ public sealed partial class MainWindow
                 await periodsPage.ViewModel.FetchPeriodsCommand.ExecuteAsync(null);
             }
 
-            SetStatus($"● Terhubung ke Server ({ApiService.BaseServerUrl}) | Versi: v{GitHubUpdateService.GetCurrentVersionString()}");
+            SetStatus($"● Terhubung ke Server ({ApiConfig.BaseUrl}) | Versi: v{GitHubUpdateService.GetCurrentVersionString()}");
         }
         else
         {

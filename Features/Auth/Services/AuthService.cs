@@ -1,21 +1,21 @@
+namespace AumoDekstop.Features.Auth.Services;
 
 using AumoDekstop.Features.Auth.Models;
+using AumoDekstop.Features.Shared.Http;
 using AumoDekstop.Services;
-
-namespace AumoDekstop.Features.Auth.Services;
 
 public class AuthService : IAuthService
 {
     private readonly ApiService _apiService;
-    private string? _accessToken;
+    private readonly ITokenStore _tokenStore;
 
     public UserProfileData? CachedProfile { get; private set; }
-    public bool IsAuthenticated => !string.IsNullOrWhiteSpace(_accessToken);
+    public bool IsAuthenticated => _tokenStore.HasToken;
 
-    // Default menggunakan ApiService.Instance agar konsisten di seluruh window/page
-    public AuthService(ApiService? apiService = null)
+    public AuthService(ApiService? apiService = null, ITokenStore? tokenStore = null)
     {
         _apiService = apiService ?? ApiService.Instance;
+        _tokenStore = tokenStore ?? TokenStore.Instance;
     }
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request, CancellationToken ct = default)
@@ -65,7 +65,6 @@ public class AuthService : IAuthService
     {
         try
         {
-            // Endpoint logout tanpa body payload
             var response = await _apiService.PostAsync<object, CommonActionResponse>("api/v1/auth/logout", new { }, ct);
             return response.Data ?? new CommonActionResponse(response.IsSuccess, response.ErrorMessage ?? string.Empty);
         }
@@ -77,15 +76,11 @@ public class AuthService : IAuthService
 
     public void ClearSession()
     {
-        _accessToken = null;
         CachedProfile = null;
+        _tokenStore.Clear();
         _apiService.SetAuthToken(null);
     }
 
-    /// <summary>
-    /// Memastikan hasil login tidak pernah null. Jika server tidak mengirim JSON
-    /// (misal 502 saat cold start), kembalikan respons gagal dengan pesan yang jelas.
-    /// </summary>
     private static AuthResponse ToAuthResponse(ApiResponse<AuthResponse> response)
     {
         if (response.Data is not null)
@@ -107,7 +102,7 @@ public class AuthService : IAuthService
     {
         if (!string.IsNullOrWhiteSpace(token))
         {
-            _accessToken = token;
+            _tokenStore.Set(token);
             _apiService.SetAuthToken(token);
         }
     }

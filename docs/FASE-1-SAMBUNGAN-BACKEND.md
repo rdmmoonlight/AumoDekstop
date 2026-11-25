@@ -22,14 +22,14 @@ Folder `Features/Shared` belum ada di repo. Buat sekarang. Isi komponen UI menyu
 
 ### 1.1 Alamat server dari konfigurasi (T9)
 
-- [ ] Buat `ApiConfig.BaseUrl` dengan urutan baca: variabel lingkungan `AUMO_API_URL` → `AppLocalSettings` kunci `ApiBaseUrl` → bawaan `https://aumo.onrender.com/`.
-- [ ] Pastikan hasilnya selalu berakhiran `/`.
-- [ ] Ganti semua pemakaian `ApiService.BaseServerUrl` (`App.xaml.cs`, `MainWindow.Auth.cs`, `MainWindow.Navigation.cs`) dengan `ApiConfig.BaseUrl`.
-- [ ] Hapus konstanta `BaseServerUrl` dari `ApiService`.
+- [x] Buat `ApiConfig.BaseUrl` dengan urutan baca: variabel lingkungan `AUMO_API_URL` → `AppLocalSettings` kunci `ApiBaseUrl` → bawaan `https://aumo.onrender.com`.
+- [x] Pastikan hasilnya selalu berawalan `/`.
+- [x] Ganti semua pemakaian `ApiService.BaseServerUrl` (`App.xaml.cs`, `MainWindow.Auth.cs`, `MainWindow.Navigation.cs`) dengan `ApiConfig.BaseUrl`.
+- [x] Hapus konstanta `BaseServerUrl` dari `ApiService`.
 
 ### 1.2 Penyimpan token (T2)
 
-- [ ] Buat `ITokenStore`:
+- [x] Buat `ITokenStore`:
 
 ```csharp
 namespace AumoDekstop.Features.Shared.Http;
@@ -45,11 +45,11 @@ public interface ITokenStore
 }
 ```
 
-- [ ] Implementasikan `TokenStore` (singleton). `Clear()` mengosongkan token. `RaiseSessionExpired()` memicu event hanya bila `HasToken` bernilai `true`, lalu memanggil `Clear()`. Cegah pemicuan ganda.
+- [x] Implementasikan `TokenStore` (singleton). `Clear()` mengosongkan token. `RaiseSessionExpired()` memicu event hanya bila `HasToken` bernilai `true`, lalu memanggil `Clear()`. Cegah pemicuan ganda.
 
 ### 1.3 Handler Bearer dan 401 (T2, T6)
 
-- [ ] Buat `AuthHeaderHandler : DelegatingHandler`.
+- [x] Buat `AuthHeaderHandler : DelegatingHandler`.
   - Sebelum kirim: bila `HasToken`, isi `Authorization: Bearer {token}`.
   - Sesudah terima: bila status 401, permintaan bukan ke `auth/login` dan `auth/google-login`, panggil `RaiseSessionExpired()`.
   - Handler tidak mengulang permintaan.
@@ -58,11 +58,11 @@ public interface ITokenStore
 
 - [ ] Buat `ColdStartRetryHandler : DelegatingHandler`. Pindahkan aturan dari `ApiService.SendRequestAsync`:
 
-| Kondisi | Diulang untuk |
-| ------- | ------------- |
-| 502, 503 | Semua metode |
-| 504 | GET dan PUT |
-| `HttpRequestException` | GET dan PUT |
+| Kondisi                | Diulang untuk |
+| ---------------------- | ------------- |
+| 502, 503               | Semua metode  |
+| 504                    | GET dan PUT   |
+| `HttpRequestException` | GET dan PUT   |
 
 - [ ] Maksimal 12 kali, jeda 5 detik. Hormati `CancellationToken`.
 - [ ] `HttpRequestMessage` tidak boleh dikirim dua kali. Sebelum pengiriman pertama, baca isi permintaan ke `byte[]` (`ReadAsByteArrayAsync`), lalu buat klon permintaan (metode, URI, header, isi, header isi) untuk setiap percobaan.
@@ -183,14 +183,14 @@ Setelah semua selesai:
 
 - [ ] Tambahkan pemetaan status di `ApiService`:
 
-| Status | Pesan |
-| ------ | ----- |
-| 0 | Server tidak dapat dihubungi |
-| 401 | Sesi berakhir (ditangani handler) |
-| 403 | Akses ditolak |
-| 404 | Data tidak ditemukan |
-| 429 | Terlalu banyak permintaan, tunggu sebentar. Bila ada `lockoutEnd` pada isi, tampilkan waktunya |
-| 5xx | Server bermasalah |
+| Status | Pesan                                                                                          |
+| ------ | ---------------------------------------------------------------------------------------------- |
+| 0      | Server tidak dapat dihubungi                                                                   |
+| 401    | Sesi berakhir (ditangani handler)                                                              |
+| 403    | Akses ditolak                                                                                  |
+| 404    | Data tidak ditemukan                                                                           |
+| 429    | Terlalu banyak permintaan, tunggu sebentar. Bila ada `lockoutEnd` pada isi, tampilkan waktunya |
+| 5xx    | Server bermasalah                                                                              |
 
 Backend memberi batas laju global 100 permintaan per jendela waktu, dan kebijakan lebih ketat pada otentikasi. Jangan memuat banyak laporan sekaligus saat startup.
 
@@ -198,18 +198,18 @@ Backend memberi batas laju global 100 permintaan per jendela waktu, dan kebijaka
 
 Jalankan setelah langkah 1.11. Server Render bisa butuh sampai 60 detik pada permintaan pertama.
 
-| No | Uji | Harapan |
-| -- | --- | ------- |
-| 1 | Login sandi benar | 200, `token` terisi, ribbon tampil |
-| 2 | Login sandi salah | Pesan galat dari backend, tetap di halaman login |
-| 3 | Tutup aplikasi, buka lagi (ingat saya aktif) | Langsung masuk, tanpa login |
-| 4 | Tutup aplikasi, buka lagi (ingat saya mati) | Halaman login |
-| 5 | Hapus token tersimpan atau tunggu kedaluwarsa, buka halaman Periods | Kembali ke login dengan pesan "Sesi berakhir" |
-| 6 | Pilih periode lalu buka Neraca Saldo | Data sesuai periode terpilih |
-| 7 | Tutup periode | Sukses atau pesan validasi dari backend (neraca saldo wajib seimbang) |
-| 8 | Putuskan internet saat membuka COA | Pesan "Server tidak dapat dihubungi", aplikasi tidak macet |
-| 9 | Server tidur, login pertama | Aplikasi menunggu dan mengulang otomatis, berhasil dalam 60 detik |
-| 10 | Keluar | Kembali ke login, token tersimpan terhapus |
+| No  | Uji                                                                 | Harapan                                                               |
+| --- | ------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| 1   | Login sandi benar                                                   | 200, `token` terisi, ribbon tampil                                    |
+| 2   | Login sandi salah                                                   | Pesan galat dari backend, tetap di halaman login                      |
+| 3   | Tutup aplikasi, buka lagi (ingat saya aktif)                        | Langsung masuk, tanpa login                                           |
+| 4   | Tutup aplikasi, buka lagi (ingat saya mati)                         | Halaman login                                                         |
+| 5   | Hapus token tersimpan atau tunggu kedaluwarsa, buka halaman Periods | Kembali ke login dengan pesan "Sesi berakhir"                         |
+| 6   | Pilih periode lalu buka Neraca Saldo                                | Data sesuai periode terpilih                                          |
+| 7   | Tutup periode                                                       | Sukses atau pesan validasi dari backend (neraca saldo wajib seimbang) |
+| 8   | Putuskan internet saat membuka COA                                  | Pesan "Server tidak dapat dihubungi", aplikasi tidak macet            |
+| 9   | Server tidur, login pertama                                         | Aplikasi menunggu dan mengulang otomatis, berhasil dalam 60 detik     |
+| 10  | Keluar                                                              | Kembali ke login, token tersimpan terhapus                            |
 
 ## Selesai Fase 1 Bila
 
