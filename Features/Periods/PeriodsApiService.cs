@@ -108,7 +108,7 @@ public sealed class PeriodsApiService : IPeriodsApiService
     public async Task SelectPeriodAsync(int id, CancellationToken cancellationToken = default)
     {
         var response = await _apiService.PostAsync<object?, JsonElement>(
-            $"api/v1/periods/{id}/select",
+            $"api/v1/periods/select/{id}",
             null,
             cancellationToken);
 
