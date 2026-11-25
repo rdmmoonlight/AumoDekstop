@@ -144,7 +144,7 @@ public sealed class PeriodsApiService : IPeriodsApiService
     public async Task ClosePeriodAsync(int id, CancellationToken cancellationToken = default)
     {
         var response = await _apiService.PostAsync<object?, JsonElement>(
-            $"api/v1/periods/{id}/close",
+            $"api/v1/periods/close/{id}",
             null,
             cancellationToken);
 
