@@ -30,6 +30,7 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        RibbonHost.Visibility = Visibility.Collapsed;
         _updates = new UpdateCoordinator(SetStatus);
         GitHubUpdateService.CleanupOldExecutable();
 
