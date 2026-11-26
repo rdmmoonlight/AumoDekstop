@@ -72,8 +72,8 @@
                 Height="96"
                 Visibility="{x:Bind ShowLoadingState, Mode=OneWay}">
                 <ProgressRing IsActive="{x:Bind IsLoading, Mode=OneWay}"
-                        Width="18"
-                        Height="18"/>
+                              Width="18"
+                              Height="18"/>
                 <TextBlock
                     Text="Memuat data periode..."
                     VerticalAlignment="Center"
@@ -201,13 +201,13 @@
                                     BorderThickness="0"
                                     ToolTipService.ToolTip="Buka menu">
                                     <FontIcon Glyph="&#xE712;"
-                                            FontSize="14"/>
+                                              FontSize="14"/>
                                     <Button.Flyout>
                                         <MenuFlyout Placement="BottomEdgeAlignedRight">
                                             <MenuFlyoutItem
                                                 Text="Tutup Periode"
-                                                Tag="{x:Bind Id}"
-                                                Visibility="{x:Bind IsOpen, Mode=OneWay}"
+                                                Tag="{Binding Id}"
+                                                IsEnabled="{Binding IsOpen}"
                                                 Click="ClosePeriodMenuItem_Click">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xE72E;"/>
@@ -216,8 +216,8 @@
 
                                             <MenuFlyoutItem
                                                 Text="Pilih Periode"
-                                                Tag="{x:Bind Id}"
-                                                Visibility="{x:Bind CanSelect, Mode=OneWay}"
+                                                Tag="{Binding Id}"
+                                                IsEnabled="{Binding CanSelect}"
                                                 Click="SelectPeriodMenuItem_Click">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xE73E;"/>

@@ -1,11 +1,18 @@
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using AumoDekstop.Features.Periods.Helpers;
 
 namespace AumoDekstop.Features.Periods.Models;
 
-public class PeriodItem
+public class PeriodItem : INotifyPropertyChanged
 {
+    private bool _isClosed;
+    private bool _isSelected;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     [JsonPropertyName("id")]
     public int Id { get; set; }
 
@@ -19,61 +26,50 @@ public class PeriodItem
     public string EndDate { get; set; } = string.Empty;
 
     [JsonPropertyName("isClosed")]
-    public bool IsClosed { get; set; }
+    public bool IsClosed
+    {
+        get => _isClosed;
+        set
+        {
+            if (_isClosed != value)
+            {
+                _isClosed = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsOpen));
+                OnPropertyChanged(nameof(CanSelect));
+            }
+        }
+    }
 
     [JsonPropertyName("isSelected")]
-    public bool IsSelected { get; set; }
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set
+        {
+            if (_isSelected != value)
+            {
+                _isSelected = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(CanSelect));
+            }
+        }
+    }
 
-    // Properti bantuan (computed) untuk langsung di-bind di XAML
     [JsonIgnore]
     public string FormattedStartDate => PeriodFormatter.FormatPeriodDate(StartDate);
 
     [JsonIgnore]
     public string FormattedEndDate => PeriodFormatter.FormatPeriodDate(EndDate);
 
-    // Dipakai oleh PeriodsTableControl.xaml (x:Bind IsOpen, x:Bind CanSelect)
     [JsonIgnore]
     public bool IsOpen => !IsClosed;
 
     [JsonIgnore]
     public bool CanSelect => !IsClosed && !IsSelected;
-}
 
-public class GetPeriodsResponse
-{
-    [JsonPropertyName("success")]
-    public bool? Success { get; set; }
-
-    [JsonPropertyName("selectedPeriodId")]
-    public int? SelectedPeriodId { get; set; }
-
-    [JsonPropertyName("periods")]
-    public List<PeriodItem> Periods { get; set; } = new List<PeriodItem>();
-}
-
-public class AccountSummary
-{
-    [JsonPropertyName("id")]
-    public int Id { get; set; }
-
-    [JsonPropertyName("name")]
-    public string Name { get; set; } = string.Empty;
-
-    [JsonPropertyName("code")]
-    public string Code { get; set; } = string.Empty;
-
-    [JsonIgnore]
-    public string DisplayLabel => $"{Code} - {Name}";
-}
-
-public class PeriodsOpenInfo
-{
-    [JsonPropertyName("hasExistingPermanentAccounts")]
-    public bool HasExistingPermanentAccounts { get; set; }
-
-    [JsonPropertyName("availableCashAndBankAccounts")]
-    public List<AccountSummary>? AvailableCashAndBankAccounts { get; set; }
-
-    [JsonPropertyName("availableRetainedEarningsAccounts")]
-    public List<AccountSummary>? AvailableRetainedEarningsAccounts { get; set; }
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 }
