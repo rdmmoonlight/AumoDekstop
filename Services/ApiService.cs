@@ -1,7 +1,5 @@
-
 using System;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading;
@@ -9,6 +7,7 @@ using System.Threading.Tasks;
 using AumoDekstop.Features.Shared.Http;
 
 namespace AumoDekstop.Services;
+
 /// <summary>
 /// Pembungkus standar untuk semua respons dari backend Aumo.
 /// </summary>
@@ -22,34 +21,13 @@ public sealed class ApiResponse<T>
 
 public class ApiService
 {
-    // Cold start Render (free tier): nginx sudah aktif, tetapi backend dotnet belum listen -> 502/503.
-    // Request diulang otomatis sampai backend siap (maks. 12 x 5 detik = 60 detik).
-    private const int MaxColdStartRetries = 12;
-    private static readonly TimeSpan ColdStartRetryDelay = TimeSpan.FromSeconds(5);
-
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
 
-    // Singleton ringan agar bisa diakses dari seluruh halaman/window dengan 1 sesi koneksi
-    private static ApiService? _instance;
-    public static ApiService Instance => _instance ??= new ApiService();
-
-    public ApiService(HttpClient? httpClient = null)
+    public ApiService(HttpClient httpClient)
     {
-        _httpClient = httpClient ?? new HttpClient();
-
-        if (_httpClient.BaseAddress == null)
-        {
-            _httpClient.BaseAddress = new Uri(ApiConfig.BaseUrl);
-        }
-
-        // Timeout 60 detik untuk mengantisipasi cold-start server Render
-        _httpClient.Timeout = TimeSpan.FromSeconds(60);
-
-        _httpClient.DefaultRequestHeaders.Accept.Clear();
-        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd($"AumoDekstop/{GitHubUpdateService.GetCurrentVersionString()}");
-        _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("X-Client-Platform", "Windows-Desktop");
+        ArgumentNullException.ThrowIfNull(httpClient);
+        _httpClient = httpClient;
 
         _jsonOptions = new JsonSerializerOptions
         {
@@ -58,26 +36,18 @@ public class ApiService
         };
     }
 
-    /// <summary>
-    /// Menyimpan JWT / API Token setelah login agar otomatis terbawa di setiap request berikutnya.
-    /// </summary>
     public void SetAuthToken(string? token)
     {
         if (string.IsNullOrWhiteSpace(token))
         {
             TokenStore.Instance.Clear();
-            _httpClient.DefaultRequestHeaders.Authorization = null;
         }
         else
         {
             TokenStore.Instance.Set(token);
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
     }
 
-    /// <summary>
-    /// Mengecek koneksi & membangunkan server Render (ping/health check).
-    /// </summary>
     public async Task<bool> CheckServerHealthAsync(string healthEndpoint = "health", CancellationToken ct = default)
     {
         try
@@ -93,17 +63,17 @@ public class ApiService
 
     public async Task<ApiResponse<T>> GetAsync<T>(string endpoint, CancellationToken ct = default)
     {
-        return await SendRequestAsync<T>(() => _httpClient.GetAsync(endpoint.TrimStart('/'), ct), ct, isIdempotent: true);
+        return await SendRequestAsync<T>(() => _httpClient.GetAsync(endpoint.TrimStart('/'), ct), ct);
     }
 
     public async Task<ApiResponse<TResponse>> PostAsync<TRequest, TResponse>(string endpoint, TRequest payload, CancellationToken ct = default)
     {
-        return await SendRequestAsync<TResponse>(() => _httpClient.PostAsJsonAsync(endpoint.TrimStart('/'), payload, _jsonOptions, ct), ct, isIdempotent: false);
+        return await SendRequestAsync<TResponse>(() => _httpClient.PostAsJsonAsync(endpoint.TrimStart('/'), payload, _jsonOptions, ct), ct);
     }
 
     public async Task<ApiResponse<TResponse>> PutAsync<TRequest, TResponse>(string endpoint, TRequest payload, CancellationToken ct = default)
     {
-        return await SendRequestAsync<TResponse>(() => _httpClient.PutAsJsonAsync(endpoint.TrimStart('/'), payload, _jsonOptions, ct), ct, isIdempotent: true);
+        return await SendRequestAsync<TResponse>(() => _httpClient.PutAsJsonAsync(endpoint.TrimStart('/'), payload, _jsonOptions, ct), ct);
     }
 
     public async Task<ApiResponse<bool>> DeleteAsync(string endpoint, CancellationToken ct = default)
@@ -132,57 +102,18 @@ public class ApiService
 
     private async Task<ApiResponse<T>> SendRequestAsync<T>(
         Func<Task<HttpResponseMessage>> httpCall,
-        CancellationToken ct,
-        bool isIdempotent)
+        CancellationToken ct)
     {
-        for (int attempt = 0; ; attempt++)
+        try
         {
-            bool shouldRetry = false;
-
-            try
-            {
-                using var response = await httpCall();
-
-                if (attempt < MaxColdStartRetries && IsColdStartStatus(response.StatusCode, isIdempotent))
-                {
-                    shouldRetry = true;
-                }
-                else
-                {
-                    return await BuildResponseAsync<T>(response, ct);
-                }
-            }
-            catch (HttpRequestException) when (isIdempotent && attempt < MaxColdStartRetries)
-            {
-                shouldRetry = true;
-            }
-            catch (Exception ex)
-            {
-                return HandleException<T>(ex);
-            }
-
-            if (shouldRetry)
-            {
-                try
-                {
-                    await Task.Delay(ColdStartRetryDelay, ct);
-                }
-                catch (OperationCanceledException ex)
-                {
-                    return HandleException<T>(ex);
-                }
-            }
+            using var response = await httpCall();
+            return await BuildResponseAsync<T>(response, ct);
+        }
+        catch (Exception ex)
+        {
+            return HandleException<T>(ex);
         }
     }
-
-    /// <summary>
-    /// 502/503 berarti request belum sampai ke backend (aman diulang untuk semua method).
-    /// 504 hanya diulang untuk request idempotent (GET/PUT).
-    /// </summary>
-    private static bool IsColdStartStatus(System.Net.HttpStatusCode status, bool isIdempotent) =>
-        status == System.Net.HttpStatusCode.BadGateway ||
-        status == System.Net.HttpStatusCode.ServiceUnavailable ||
-        (isIdempotent && status == System.Net.HttpStatusCode.GatewayTimeout);
 
     private async Task<ApiResponse<T>> BuildResponseAsync<T>(HttpResponseMessage response, CancellationToken ct)
     {
@@ -190,7 +121,6 @@ public class ApiService
 
         if (response.IsSuccessStatusCode)
         {
-            // Jika server mengembalikan 204 No Content
             if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
             {
                 return new ApiResponse<T> { IsSuccess = true, StatusCode = statusCode };
@@ -208,7 +138,6 @@ public class ApiService
         string errorBody = await response.Content.ReadAsStringAsync(ct);
         string trimmed = errorBody.TrimStart();
 
-        // Body error berbentuk JSON (misal {"success":false,"message":"..."}) tetap dipetakan ke model
         T? errorData = default;
         if (trimmed.StartsWith('{'))
         {
@@ -218,11 +147,9 @@ public class ApiService
             }
             catch (JsonException)
             {
-                // Bukan format model yang diharapkan
             }
         }
 
-        // Body HTML (halaman error nginx/Render) tidak ditampilkan mentah
         bool isHtml = trimmed.StartsWith('<');
 
         return new ApiResponse<T>

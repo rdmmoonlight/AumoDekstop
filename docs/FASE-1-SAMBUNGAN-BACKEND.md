@@ -56,7 +56,7 @@ public interface ITokenStore
 
 ### 1.4 Handler retry cold start (T8, T11)
 
-- [ ] Buat `ColdStartRetryHandler : DelegatingHandler`. Pindahkan aturan dari `ApiService.SendRequestAsync`:
+- [x] Buat `ColdStartRetryHandler : DelegatingHandler`. Pindahkan aturan dari `ApiService.SendRequestAsync`:
 
 | Kondisi                | Diulang untuk |
 | ---------------------- | ------------- |
@@ -64,9 +64,9 @@ public interface ITokenStore
 | 504                    | GET dan PUT   |
 | `HttpRequestException` | GET dan PUT   |
 
-- [ ] Maksimal 12 kali, jeda 5 detik. Hormati `CancellationToken`.
-- [ ] `HttpRequestMessage` tidak boleh dikirim dua kali. Sebelum pengiriman pertama, baca isi permintaan ke `byte[]` (`ReadAsByteArrayAsync`), lalu buat klon permintaan (metode, URI, header, isi, header isi) untuk setiap percobaan.
-- [ ] Bebaskan `HttpResponseMessage` dari percobaan yang gagal sebelum mengulang.
+- [x] Maksimal 12 kali, jeda 5 detik. Hormati `CancellationToken`.
+- [x] `HttpRequestMessage` tidak boleh dikirim dua kali. Sebelum pengiriman pertama, baca isi permintaan ke `byte[]` (`ReadAsByteArrayAsync`), lalu buat klon permintaan (metode, URI, header, isi, header isi) untuk setiap percobaan.
+- [x] Bebaskan `HttpResponseMessage` dari percobaan yang gagal sebelum mengulang.
 
 ### 1.5 Daftarkan satu klien di DI (K2)
 
@@ -93,8 +93,8 @@ services.AddHttpClient("AumoApi", client =>
     .AddHttpMessageHandler<AuthHeaderHandler>();      // terdalam
 ```
 
-- [ ] Hapus `CookieContainer` dan `HttpClientHandler` lama.
-- [ ] Pasang `X-Client-Platform` dan `User-Agent` pada `DefaultRequestHeaders` klien ini (pindah dari konstruktor `ApiService`).
+- [x] Hapus `CookieContainer` dan `HttpClientHandler` lama.
+- [x] Pasang `X-Client-Platform` dan `User-Agent` pada `DefaultRequestHeaders` klien ini (pindah dari konstruktor `ApiService`).
 
 ### 1.6 `ApiService` menjadi satu-satunya pintu (T7, K3)
 

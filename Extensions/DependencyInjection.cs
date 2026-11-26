@@ -1,5 +1,5 @@
-
 using System;
+using System.Net.Http;
 using AumoDekstop.Features.Auth.Services;
 using AumoDekstop.Features.Auth.ViewModels;
 using AumoDekstop.Features.ChartOfAccounts.Services;
@@ -25,18 +25,29 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddAumoServices(this IServiceCollection services)
     {
-        // 0. Penyimpanan token terpusat & handler Bearer + 401 otomatis
+        // 0. Penyimpanan token terpusat & handler HTTP
         services.AddSingleton<ITokenStore>(_ => TokenStore.Instance);
         services.AddTransient<AuthHeaderHandler>();
+        services.AddTransient<ColdStartRetryHandler>();
 
-        // 1. Named HttpClient untuk backend Render dengan AuthHeaderHandler
+        // 1. Named HttpClient untuk backend Render (Sesuai K2)
         services.AddHttpClient("AumoApi", client =>
         {
             client.BaseAddress = new Uri(ApiConfig.BaseUrl);
-            client.DefaultRequestHeaders.Add("Accept", "application/json");
-            client.Timeout = TimeSpan.FromSeconds(60);
+            client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd($"AumoDekstop/{GitHubUpdateService.GetCurrentVersionString()}");
+            client.DefaultRequestHeaders.TryAddWithoutValidation("X-Client-Platform", "Windows-Desktop");
+
+            // Harus > total durasi retry (12 x 5 detik = 60 detik + waktu eksekusi request)
+            client.Timeout = TimeSpan.FromSeconds(150);
         })
-        .AddHttpMessageHandler<AuthHeaderHandler>();
+        .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+        {
+            UseCookies = false,
+            PooledConnectionLifetime = TimeSpan.FromMinutes(5)
+        })
+        .AddHttpMessageHandler<ColdStartRetryHandler>()   // terluar
+        .AddHttpMessageHandler<AuthHeaderHandler>();     // Terdalam (mendekati network/SocketsHttpHandler)
 
         // 2. ApiService singleton
         services.AddSingleton<ApiService>(sp =>

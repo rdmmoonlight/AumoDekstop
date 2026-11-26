@@ -15,7 +15,6 @@ public class AuthService : IAuthService
 
     public AuthService(ApiService? apiService = null, ITokenStore? tokenStore = null)
     {
-        _apiService = apiService ?? ApiService.Instance;
         _tokenStore = tokenStore ?? TokenStore.Instance;
     }
 

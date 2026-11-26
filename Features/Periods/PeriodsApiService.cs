@@ -33,10 +33,7 @@ public sealed class PeriodsApiService : IPeriodsApiService
 
     public event EventHandler? PeriodContextChanged;
 
-    public PeriodsApiService(ApiService? apiService = null)
-    {
-        _apiService = apiService ?? ApiService.Instance;
-    }
+    public PeriodsApiService(ApiService? apiService = null) { _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService)); }
 
     private void NotifyPeriodChanged() => PeriodContextChanged?.Invoke(this, EventArgs.Empty);
 
