@@ -26,6 +26,8 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <PublishAot>true</PublishAot>
   </PropertyGroup>
 
   <ItemGroup>
