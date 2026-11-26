@@ -192,6 +192,8 @@
                                 <!-- DropdownMenu Aksi -->
                                 <Button
                                     Grid.Column="4"
+                                    DataContext="{x:Bind}"
+                                    Visibility="{x:Bind HasAnyAction, Mode=OneWay}"
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Center"
                                     Width="32"
@@ -200,24 +202,21 @@
                                     Background="Transparent"
                                     BorderThickness="0"
                                     ToolTipService.ToolTip="Buka menu">
-                                    <FontIcon Glyph="&#xE712;"
-                                              FontSize="14"/>
+                                    <FontIcon Glyph="&#xE712;" FontSize="14"/>
                                     <Button.Flyout>
                                         <MenuFlyout Placement="BottomEdgeAlignedRight">
                                             <MenuFlyoutItem
                                                 Text="Tutup Periode"
-                                                Tag="{Binding Id}"
-                                                IsEnabled="{Binding IsOpen}"
+                                                Visibility="{Binding IsOpen}"
                                                 Click="ClosePeriodMenuItem_Click">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xE72E;"/>
                                                 </MenuFlyoutItem.Icon>
                                             </MenuFlyoutItem>
-
+                                
                                             <MenuFlyoutItem
                                                 Text="Pilih Periode"
-                                                Tag="{Binding Id}"
-                                                IsEnabled="{Binding CanSelect}"
+                                                Visibility="{Binding CanSelect}"
                                                 Click="SelectPeriodMenuItem_Click">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xE73E;"/>
