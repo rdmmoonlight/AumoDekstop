@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using AumoDekstop.Features.Periods.Helpers;
 
 namespace AumoDekstop.Features.Periods.Models;
+
 public class PeriodItem : INotifyPropertyChanged
 {
     private int _id;
