@@ -22,7 +22,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Menghasilkan versi CalVer (yy.M.N.PC) lanjutan dari rilis PC GitHub terakhir
+      # Menghasilkan versi CalVer (yy.M.N.PC) lanjutan dari rilis PC 【entity-GitHub¦canonical_name=GitHub】 terakhir
       - name: Generate CalVer version (.PC)
         id: version
         shell: pwsh
@@ -38,7 +38,7 @@ jobs:
           # Cari tag rilis terakhir khusus yang berakhiran .PC (abaikan rilis Android)
           $latestTag = ""
           try {
-            $tags = gh release list --repo "${{ github.repository }}" --limit 20 --json tagName -q '.[].tagName' 2>$null
+            $tags = gh release list --repo "${{ 【entity-github¦canonical_name=GitHub】.repository }}" --limit 20 --json tagName -q '.[].tagName' 2>$null
             $latestTag = $tags | Where-Object { $_ -like "*.PC" } | Select-Object -First 1
           } catch {
             $latestTag = ""
@@ -79,6 +79,53 @@ jobs:
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
+
+      - name: Inject Google Client ID from 【entity-GitHub¦canonical_name=GitHub】 Env
+        shell: pwsh
+        env:
+          GOOGLE_CLIENT_ID_SECRET: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_ID_VAR: ${{ vars.GOOGLE_CLIENT_ID }}
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          # Ambil dari Secrets dulu, kalau kosong ambil dari Variables
+          $clientId = $env:GOOGLE_CLIENT_ID_SECRET
+          if ([string]::IsNullOrWhiteSpace($clientId)) {
+            $clientId = $env:GOOGLE_CLIENT_ID_VAR
+          }
+          if ([string]::IsNullOrWhiteSpace($clientId)) {
+            throw "GOOGLE_CLIENT_ID belum diisi. Isi di 【entity-GitHub¦canonical_name=GitHub】 > Settings > Secrets and variables > Actions, nama GOOGLE_CLIENT_ID."
+          }
+
+          $projectDir = Split-Path $env:Project_Path -Parent
+          if ([string]::IsNullOrWhiteSpace($projectDir)) {
+            $projectDir = "."
+          }
+          $path = Join-Path $projectDir "appsettings.json"
+
+          if (Test-Path $path) {
+            $raw = Get-Content $path -Raw
+            if ($raw -match "__GOOGLE_CLIENT_ID__") {
+              $raw = $raw -replace "__GOOGLE_CLIENT_ID__", $clientId
+              Set-Content $path $raw -Encoding UTF8
+            } else {
+              $json = $raw | ConvertFrom-Json
+              if (-not $json.Google) {
+                $json | Add-Member -MemberType NoteProperty -Name Google -Value ([pscustomobject]@{})
+              }
+              $json.Google.ClientId = $clientId
+              $json | ConvertTo-Json -Depth 10 | Set-Content $path -Encoding UTF8
+            }
+          } else {
+            $json = [pscustomobject]@{
+              Google = [pscustomobject]@{
+                ClientId = $clientId
+              }
+            }
+            $json | ConvertTo-Json -Depth 10 | Set-Content $path -Encoding UTF8
+          }
+
+          Write-Host "appsettings.json berhasil di-inject Google Client ID."
 
       - name: Build & Publish application
         shell: pwsh
@@ -173,7 +220,7 @@ jobs:
           path: ./OutputInstaller/Setup_*.exe
           retention-days: 7
 
-      - name: Create GitHub Release
+      - name: Create 【entity-GitHub¦canonical_name=GitHub】 Release
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
