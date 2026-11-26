@@ -97,7 +97,7 @@ public class PeriodItem : INotifyPropertyChanged
     public bool IsOpen => !IsClosed;
 
     [JsonIgnore]
-    public bool CanSelect => !IsClosed && !IsSelected;
+    public bool CanSelect => !IsSelected;
 
     protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
