@@ -59,5 +59,4 @@
     <!-- Mode installer: publish sebagai folder biasa (tanpa single-file) lalu dibungkus Inno Setup -->
     <PublishSingleFile>false</PublishSingleFile>
   </PropertyGroup>
-
 </Project>
