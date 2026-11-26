@@ -67,7 +67,7 @@ public class PeriodItem : INotifyPropertyChanged
             if (SetProperty(ref _isClosed, value))
             {
                 OnPropertyChanged(nameof(IsOpen));
-                OnPropertyChanged(nameof(CanSelect));
+                OnPropertyChanged(nameof(HasAnyAction));
             }
         }
     }
@@ -81,6 +81,7 @@ public class PeriodItem : INotifyPropertyChanged
             if (SetProperty(ref _isSelected, value))
             {
                 OnPropertyChanged(nameof(CanSelect));
+                OnPropertyChanged(nameof(HasAnyAction));
             }
         }
     }
@@ -98,6 +99,9 @@ public class PeriodItem : INotifyPropertyChanged
 
     [JsonIgnore]
     public bool CanSelect => !IsSelected;
+
+    [JsonIgnore]
+    public bool HasAnyAction => IsOpen || CanSelect;
 
     protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
