@@ -77,8 +77,10 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
+      - name: Setup MSVC Build Tools (untuk Native AOT)
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
 
       - name: Inject Google Client ID from GitHub Env
         shell: pwsh
@@ -88,7 +90,6 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
 
-          # Ambil dari Secrets dulu, kalau kosong ambil dari Variables
           $clientId = $env:GOOGLE_CLIENT_ID_SECRET
           if ([string]::IsNullOrWhiteSpace($clientId)) {
             $clientId = $env:GOOGLE_CLIENT_ID_VAR
@@ -127,51 +128,60 @@ jobs:
 
           Write-Host "appsettings.json berhasil di-inject Google Client ID."
 
-      - name: Build & Publish application
+      - name: Build & Publish Application (Native AOT)
         shell: pwsh
         env:
           Configuration: ${{ matrix.configuration }}
         run: |
-          msbuild $env:Project_Path `
-            /restore `
-            /t:Publish `
-            /p:Configuration=$env:Configuration `
-            /p:Platform=x64 `
-            /p:RuntimeIdentifier=win-x64 `
-            /p:PublishDir=./publish/ `
-            /p:Version=${{ steps.version.outputs.semver_version }} `
-            /p:InformationalVersion=${{ steps.version.outputs.app_version }} `
-            /p:AssemblyVersion=${{ steps.version.outputs.assembly_version }} `
-            /p:FileVersion=${{ steps.version.outputs.assembly_version }} `
-            /v:minimal
+          $ErrorActionPreference = "Stop"
 
-          if ($LASTEXITCODE -ne 0) {
-            exit 1
+          dotnet publish $env:Project_Path `
+            -c $env:Configuration `
+            -r win-x64 `
+            -p:Platform=x64 `
+            -p:PublishDir=./publish/ `
+            -p:Version=${{ steps.version.outputs.semver_version }} `
+            -p:InformationalVersion=${{ steps.version.outputs.app_version }} `
+            -p:AssemblyVersion=${{ steps.version.outputs.assembly_version }} `
+            -p:FileVersion=${{ steps.version.outputs.assembly_version }}
+
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+          # Pastikan appsettings.json ikut tersalin ke folder publish
+          if (Test-Path "./appsettings.json") {
+            Copy-Item "./appsettings.json" "./publish/appsettings.json" -Force
           }
 
       - name: Sign Application Executable
+        if: ${{ secrets.CERT_BASE64 != '' }}
         shell: pwsh
         env:
           CERT_BASE64: ${{ secrets.CERT_BASE64 }}
           CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }}
         run: |
           $ErrorActionPreference = "Stop"
-
           $pfxPath = "$env:TEMP\codesign.pfx"
-          [IO.File]::WriteAllBytes($pfxPath, [Convert]::FromBase64String($env:CERT_BASE64))
 
-          $signtool = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse |
-                      Where-Object { $_.FullName -like "*\x64\*" } |
-                      Select-Object -First 1 -ExpandProperty FullName
+          try {
+            [IO.File]::WriteAllBytes($pfxPath, [Convert]::FromBase64String($env:CERT_BASE64))
 
-          & $signtool sign /f $pfxPath /p $env:CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "./publish/AumoDekstop.exe"
-          if ($LASTEXITCODE -ne 0) { exit 1 }
+            $signtool = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse |
+                        Where-Object { $_.FullName -like "*\x64\*" } |
+                        Sort-Object FullName -Descending |
+                        Select-Object -First 1 -ExpandProperty FullName
 
-          Remove-Item $pfxPath -Force
+            if (-not $signtool) { throw "signtool.exe tidak ditemukan." }
+
+            & $signtool sign /f $pfxPath /p $env:CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "./publish/AumoDekstop.exe"
+            if ($LASTEXITCODE -ne 0) { exit 1 }
+          } finally {
+            if (Test-Path $pfxPath) { Remove-Item $pfxPath -Force }
+          }
 
       - name: Install Inno Setup
         shell: pwsh
         run: |
+          $ErrorActionPreference = "Stop"
           $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
           if (-not (Test-Path $iscc)) {
             choco install innosetup -y --no-progress
@@ -193,25 +203,31 @@ jobs:
           Get-ChildItem ./OutputInstaller
 
       - name: Sign Installer
+        if: ${{ secrets.CERT_BASE64 != '' }}
         shell: pwsh
         env:
           CERT_BASE64: ${{ secrets.CERT_BASE64 }}
           CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }}
         run: |
           $ErrorActionPreference = "Stop"
-
           $pfxPath = "$env:TEMP\codesign.pfx"
-          [IO.File]::WriteAllBytes($pfxPath, [Convert]::FromBase64String($env:CERT_BASE64))
 
-          $signtool = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse |
-                      Where-Object { $_.FullName -like "*\x64\*" } |
-                      Select-Object -First 1 -ExpandProperty FullName
+          try {
+            [IO.File]::WriteAllBytes($pfxPath, [Convert]::FromBase64String($env:CERT_BASE64))
 
-          $installer = Get-ChildItem ./OutputInstaller -Filter "Setup_*.exe" | Select-Object -First 1
-          & $signtool sign /f $pfxPath /p $env:CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 $installer.FullName
-          if ($LASTEXITCODE -ne 0) { exit 1 }
+            $signtool = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse |
+                        Where-Object { $_.FullName -like "*\x64\*" } |
+                        Sort-Object FullName -Descending |
+                        Select-Object -First 1 -ExpandProperty FullName
 
-          Remove-Item $pfxPath -Force
+            $installer = Get-ChildItem ./OutputInstaller -Filter "Setup_*.exe" | Select-Object -First 1
+            if (-not $installer) { throw "File Setup_*.exe tidak ditemukan di ./OutputInstaller." }
+
+            & $signtool sign /f $pfxPath /p $env:CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 $installer.FullName
+            if ($LASTEXITCODE -ne 0) { exit 1 }
+          } finally {
+            if (Test-Path $pfxPath) { Remove-Item $pfxPath -Force }
+          }
 
       - name: Upload Installer Artifact
         uses: actions/upload-artifact@v4
