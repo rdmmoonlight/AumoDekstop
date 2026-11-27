@@ -1,5 +1,5 @@
-
 using System;
+using System.Threading.Tasks;
 using AumoDekstop.Extensions;
 using AumoDekstop.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,10 +29,39 @@ public partial class App : Application
 
     public App()
     {
+        AppLogger.Init();
+        RegisterGlobalExceptionHandlers();
+
         InitializeComponent();
         Services = new ServiceCollection()
             .AddAumoServices()
             .BuildServiceProvider();
+    }
+
+    private void RegisterGlobalExceptionHandlers()
+    {
+        // 1. Menangkap crash pada UI Thread / XAML Binding / Navigation WinUI 3
+        this.UnhandledException += (_, e) =>
+        {
+            AppLogger.Fatal("WinUI.UnhandledException", e.Message, e.Exception);
+        };
+
+        // 2. Menangkap crash pada background thread / domain level
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+        {
+            var ex = e.ExceptionObject as Exception;
+            AppLogger.Fatal(
+                "AppDomain.UnhandledException",
+                $"IsTerminating={e.IsTerminating}: {e.ExceptionObject}",
+                ex);
+        };
+
+        // 3. Menangkap exception dari Task async yang tidak di-await
+        TaskScheduler.UnobservedTaskException += (_, e) =>
+        {
+            AppLogger.Error("TaskScheduler.Unobserved", "Unobserved task exception", e.Exception);
+            e.SetObserved();
+        };
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
