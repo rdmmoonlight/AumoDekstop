@@ -37,7 +37,9 @@ public static class AppLogger
     public static void Init(string? customDirectory = null)
     {
         if (Interlocked.Exchange(ref _initialized, 1) == 1)
+        {
             return;
+        }
 
         var baseDir = customDirectory
             ?? Path.Combine(
@@ -71,7 +73,9 @@ public static class AppLogger
     {
         // Pembatalan Task/CancellationToken bukan error.
         if (exception is OperationCanceledException)
+        {
             return;
+        }
 
         Debug.WriteLine($"[ERROR/{tag}] {message}\n{exception}");
         Enqueue("ERROR", tag, message, exception);
@@ -94,11 +98,15 @@ public static class AppLogger
             lock (FileLock)
             {
                 if (string.IsNullOrEmpty(_logFilePath) || !File.Exists(_logFilePath))
+                {
                     return EmptyMessage;
+                }
 
                 var info = new FileInfo(_logFilePath);
                 if (info.Length == 0)
+                {
                     return EmptyMessage;
+                }
 
                 return File.ReadAllText(_logFilePath, Encoding.UTF8);
             }
@@ -130,7 +138,9 @@ public static class AppLogger
     private static void Enqueue(string level, string tag, string message, Exception? exception)
     {
         if (string.IsNullOrEmpty(_logFilePath))
+        {
             Init();
+        }
 
         Queue.Writer.TryWrite(new LogEntry(DateTime.Now, level, tag, message, exception));
     }
@@ -155,7 +165,9 @@ public static class AppLogger
             lock (FileLock)
             {
                 if (string.IsNullOrEmpty(_logFilePath))
+                {
                     return;
+                }
 
                 var time = timestamp.ToString("yyyy-MM-dd HH:mm:ss");
                 var trace = exception is not null ? $"\n{FormatException(exception)}" : string.Empty;
@@ -193,11 +205,15 @@ public static class AppLogger
         while (current is not null)
         {
             if (depth > 0)
+            {
                 sb.AppendLine($"--- Inner Exception ({depth}) ---");
+            }
 
             sb.AppendLine($"{current.GetType().FullName}: {current.Message}");
             if (!string.IsNullOrWhiteSpace(current.StackTrace))
+            {
                 sb.AppendLine(current.StackTrace);
+            }
 
             current = current.InnerException;
             depth++;
