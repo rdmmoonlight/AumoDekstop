@@ -1,7 +1,7 @@
 
 using System;
 
-namespace AumoDekstop.Services.Api;
+namespace AumoDekstop.Services;
 /// <summary>
 /// Konfigurasi endpoint API Aumo dengan urutan prioritas:
 /// 1. Environment Variable: AUMO_API_URL

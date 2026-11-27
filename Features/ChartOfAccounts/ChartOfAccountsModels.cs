@@ -1,7 +1,6 @@
-
 using System.Text.Json.Serialization;
 
-namespace AumoDekstop.Features.ChartOfAccounts.Models;
+namespace AumoDekstop.Features.ChartOfAccounts;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum AccountType

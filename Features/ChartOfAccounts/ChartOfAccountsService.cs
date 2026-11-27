@@ -5,7 +5,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using AumoDekstop.Features.ChartOfAccounts.Models;
 using AumoDekstop.Services;
 using AumoDekstop.Services.Api;
 

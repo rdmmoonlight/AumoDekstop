@@ -31,7 +31,7 @@
                     Style="{StaticResource TitleTextBlockStyle}"/>
                 <TextBlock
                     x:Name="SubtitleText"
-                    Text="Kelola daftar akun buku besar untuk pencatatan transaksi keuangan."
+                    Text="{x:Bind ViewModel.SubtitleText, Mode=OneWay}"
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                     TextWrapping="Wrap"/>
             </StackPanel>
@@ -42,7 +42,8 @@
                         VerticalAlignment="Center">
                 <Button
                     x:Name="RefreshButton"
-                    Click="RefreshButton_Click"
+                    Command="{x:Bind ViewModel.LoadAccountsCommand}"
+                    IsEnabled="{x:Bind ViewModel.CanRefresh, Mode=OneWay}"
                     ToolTipService.ToolTip="Muat ulang data">
                     <FontIcon Glyph="&#xE72C;"
                               FontSize="14"/>
@@ -51,6 +52,7 @@
                 <Button
                     x:Name="CreateAccountButton"
                     Style="{StaticResource AccentButtonStyle}"
+                    IsEnabled="{x:Bind ViewModel.CanSubmit, Mode=OneWay}"
                     Click="CreateAccountButton_Click">
                     <StackPanel Orientation="Horizontal"
                                 Spacing="8">
@@ -68,7 +70,8 @@
             Grid.Row="1"
             Severity="Error"
             Title="Gagal"
-            IsOpen="False"
+            Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}"
+            IsOpen="{x:Bind ViewModel.IsErrorOpen, Mode=TwoWay}"
             IsClosable="True"
             Closed="ErrorInfoBar_Closed"/>
 
@@ -76,6 +79,8 @@
         <controls:AccountsTableControl
             x:Name="AccountsTable"
             Grid.Row="2"
+            Accounts="{x:Bind ViewModel.Accounts, Mode=OneWay}"
+            IsLoading="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
             EditAccountRequested="AccountsTable_EditAccountRequested"
             DeleteAccountRequested="AccountsTable_DeleteAccountRequested"/>
     </Grid>

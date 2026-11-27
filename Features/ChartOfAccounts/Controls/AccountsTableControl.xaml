@@ -2,8 +2,8 @@
     x:Class="AumoDekstop.Features.ChartOfAccounts.Controls.AccountsTableControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:models="using:AumoDekstop.Features.ChartOfAccounts.Models"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:models="using:AumoDekstop.Features.ChartOfAccounts"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
