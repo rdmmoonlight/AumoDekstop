@@ -51,7 +51,7 @@ public sealed class NamaFiturService : INamaFiturService
 
 ```
 
-_(Alternatif: jika ingin memakai pembungkus `ApiResponse<T>` dan fitur retry cold-start Render, service baru cukup menerima `ApiService` di constructor seperti `PeriodsApiService`.)_
+_(Alternatif: jika ingin memakai pembungkus `ApiResponse<T>` dan fitur retry cold-start Render, service baru cukup menerima `ApiService` di constructor seperti `PeriodsService`.)_
 
 ### 3. Daftarkan di `Extensions/DependencyInjection.cs`
 

@@ -10,7 +10,7 @@ namespace AumoDekstop.Features.Periods.ViewModels;
 
 public sealed partial class CreatePeriodFormViewModel : ObservableObject
 {
-    private readonly IPeriodsApiService _periodsApiService;
+    private readonly IPeriodsService _PeriodsService;
     private readonly Func<Task>? _onSuccessCallback;
 
     private string? _error;
@@ -37,10 +37,10 @@ public sealed partial class CreatePeriodFormViewModel : ObservableObject
     }
 
     public CreatePeriodFormViewModel(
-        IPeriodsApiService periodsApiService,
+        IPeriodsService PeriodsService,
         Func<Task>? onSuccessCallback = null)
     {
-        _periodsApiService = periodsApiService ?? throw new ArgumentNullException(nameof(periodsApiService));
+        _PeriodsService = PeriodsService ?? throw new ArgumentNullException(nameof(PeriodsService));
         _onSuccessCallback = onSuccessCallback;
     }
 
@@ -58,7 +58,7 @@ public sealed partial class CreatePeriodFormViewModel : ObservableObject
         try
         {
             var request = MapToCreatePeriodRequest(payload);
-            var result = await _periodsApiService.CreatePeriodAsync(request, cancellationToken);
+            var result = await _PeriodsService.CreatePeriodAsync(request, cancellationToken);
 
             if (!result.Success)
             {

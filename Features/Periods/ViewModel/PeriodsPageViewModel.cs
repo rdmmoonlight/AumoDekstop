@@ -12,7 +12,7 @@ namespace AumoDekstop.Features.Periods.ViewModels;
 
 public partial class PeriodsPageViewModel : ObservableObject
 {
-    private readonly IPeriodsApiService _periodsApiService;
+    private readonly IPeriodsService _PeriodsService;
 
     [ObservableProperty]
     public partial ObservableCollection<PeriodItem> Periods { get; set; } = new();
@@ -50,9 +50,9 @@ public partial class PeriodsPageViewModel : ObservableObject
 
     public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
 
-    public PeriodsPageViewModel(IPeriodsApiService periodsApiService)
+    public PeriodsPageViewModel(IPeriodsService PeriodsService)
     {
-        _periodsApiService = periodsApiService;
+        _PeriodsService = PeriodsService;
     }
 
     private void UpdateActivePeriod(int? selectedPeriodId = null)
@@ -75,7 +75,7 @@ public partial class PeriodsPageViewModel : ObservableObject
 
         try
         {
-            var response = await _periodsApiService.GetPeriodsAsync(cancellationToken);
+            var response = await _PeriodsService.GetPeriodsAsync(cancellationToken);
 
             Periods.Clear();
             foreach (var item in response.Periods)
@@ -114,7 +114,7 @@ public partial class PeriodsPageViewModel : ObservableObject
 
         try
         {
-            var result = await _periodsApiService.CreatePeriodAsync(request, cancellationToken);
+            var result = await _PeriodsService.CreatePeriodAsync(request, cancellationToken);
             if (!result.Success)
             {
                 ActionError = !string.IsNullOrWhiteSpace(result.Message)
@@ -149,7 +149,7 @@ public partial class PeriodsPageViewModel : ObservableObject
 
         try
         {
-            await _periodsApiService.ClosePeriodAsync(id, cancellationToken);
+            await _PeriodsService.ClosePeriodAsync(id, cancellationToken);
             await FetchPeriodsAsync(cancellationToken);
         }
         catch (OperationCanceledException)
@@ -176,7 +176,7 @@ public partial class PeriodsPageViewModel : ObservableObject
 
         try
         {
-            await _periodsApiService.SelectPeriodAsync(id, cancellationToken);
+            await _PeriodsService.SelectPeriodAsync(id, cancellationToken);
             await FetchPeriodsAsync(cancellationToken);
         }
         catch (OperationCanceledException)

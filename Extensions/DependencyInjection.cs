@@ -58,7 +58,7 @@ public static class DependencyInjection
         services.AddSingleton<IGoogleAuthProvider, DesktopGoogleAuthProvider>();
 
         // 4. Periods
-        services.AddSingleton<IPeriodsApiService, PeriodsApiService>();
+        services.AddSingleton<IPeriodsService, PeriodsService>();
 
         // 5. Chart Of Accounts
         services.AddSingleton<IChartOfAccountsService, ChartOfAccountsService>();

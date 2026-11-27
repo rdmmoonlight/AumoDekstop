@@ -102,7 +102,7 @@ services.AddHttpClient("AumoApi", client =>
 - [x] Konstruktor menjadi `ApiService(HttpClient httpClient)`. Tetap daftarkan sebagai singleton dari `factory.CreateClient("AumoApi")`.
 - [x] Pertahankan `ApiResponse<T>`, `GetAsync`, `PostAsync`, `PutAsync`, `DeleteAsync`, dan pemetaan galat.
 - [x] Tambahkan `DeleteAsync<T>` dan `PostAsync<T>` tanpa isi (untuk `select`, `close`, `refresh`) bila belum ada.
-- [x] Ubah `AuthService` dan `PeriodsApiService`: hilangkan `?? ApiService.Instance`. Konstruktor wajib menerima `ApiService`.
+- [x] Ubah `AuthService` dan `PeriodsService`: hilangkan `?? ApiService.Instance`. Konstruktor wajib menerima `ApiService`.
 - [x] Perbaiki `CheckServerHealthAsync` agar memanggil `api/v1/health`. Ganti panggilan `CheckServerHealthAsync("")` di `App.OnLaunched`.
 
 ### 1.7 Login meminta token (T1)
