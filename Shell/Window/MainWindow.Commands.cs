@@ -1,4 +1,3 @@
-
 using System;
 using System.Threading.Tasks;
 using AumoDekstop.Features.ChartOfAccounts.Views;
@@ -68,45 +67,45 @@ public sealed partial class MainWindow
                 break;
 
             // Trial Balances (Neraca Saldo)
-            case "UnadjustedTrialBalance":
+            case RibbonCommand.UnadjustedTrialBalance:
                 await ShowReportPageAsync<UnadjustedTrialBalancePage>(
                     "Unadjusted Trial Balance",
                     p => p.ViewModel.LoadAsync());
                 break;
-            case "AdjustedTrialBalance":
+            case RibbonCommand.AdjustedTrialBalance:
                 await ShowReportPageAsync<AdjustedTrialBalancePage>(
                     "Adjusted Trial Balance",
                     p => p.ViewModel.LoadAsync());
                 break;
-            case "PostClosingTrialBalance":
+            case RibbonCommand.PostClosingTrialBalance:
                 await ShowReportPageAsync<PostClosingTrialBalancePage>(
                     "Post-Closing Trial Balance",
                     p => p.ViewModel.LoadAsync());
                 break;
 
-            case "Worksheet":
+            case RibbonCommand.Worksheet:
                 await ShowReportPageAsync<WorksheetPage>(
                     "Worksheet",
                     p => p.ViewModel.LoadAsync());
                 break;
 
             // Financial Statements (Laporan Keuangan)
-            case "IncomeStatement":
+            case RibbonCommand.IncomeStatement:
                 await ShowReportPageAsync<IncomeStatementPage>(
                     "Laporan Laba Rugi",
                     p => p.ViewModel.LoadAsync());
                 break;
-            case "RetainedEarnings":
+            case RibbonCommand.RetainedEarnings:
                 await ShowReportPageAsync<RetainedEarningsPage>(
                     "Laporan Laba Ditahan",
                     p => p.ViewModel.LoadAsync());
                 break;
-            case "CashFlow":
+            case RibbonCommand.CashFlow:
                 await ShowReportPageAsync<StatementOfCashFlowPage>(
                     "Laporan Arus Kas",
                     p => p.ViewModel.LoadAsync());
                 break;
-            case "FinancialPosition":
+            case RibbonCommand.FinancialPosition:
                 await ShowReportPageAsync<StatementOfFinancialPositionPage>(
                     "Laporan Posisi Keuangan (Neraca)",
                     p => p.ViewModel.LoadAsync());
