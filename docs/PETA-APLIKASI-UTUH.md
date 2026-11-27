@@ -86,7 +86,7 @@ Backend menambahkan awalan `api/v1` lewat `ApiVersionPrefixConvention`. Rute pad
 | K7   | Pendaftaran akun disembunyikan sampai backend menyediakan endpoint.                                                                               |
 | K8   | Impor COA tetap "belum tersedia". Backend belum punya endpoint impor.                                                                             |
 
-## Pekerjaan di Backend (di luar repo ini)
+## Pekerjaan di Backend (di luar repo ini). Note: sudah tidak diperlukan, karena fitur ubah dan hapus ditiadakan.
 
 | Kode | Tugas                                                       | Diperlukan oleh   |
 | ---- | ----------------------------------------------------------- | ----------------- |
