@@ -107,7 +107,7 @@ services.AddHttpClient("AumoApi", client =>
 
 ### 1.7 Login meminta token (T1)
 
-- [ ] Ubah `LoginRequest` menjadi `class` (aturan migrasi):
+- [x] Ubah `LoginRequest` menjadi `class` (aturan migrasi):
 
 ```csharp
 namespace AumoDekstop.Features.Auth.Models;
@@ -124,11 +124,11 @@ public class LoginRequest
 }
 ```
 
-- [ ] Lakukan hal yang sama untuk `GoogleLoginRequest`: tambahkan `IsMobileClient = true`.
-- [ ] Perbarui pemanggil `new LoginRequest(Email.Trim(), Password)` di `LoginViewModel` menjadi inisialisasi objek, termasuk `RememberMe`.
-- [ ] `AuthService.ApplyToken` memanggil `ITokenStore.Set(token)`, bukan `ApiService.SetAuthToken`.
-- [ ] `AuthService.IsAuthenticated` membaca `ITokenStore.HasToken`.
-- [ ] Bila login berhasil tetapi `Token` kosong, kembalikan galat "Server tidak mengirim token". Jangan masuk ke aplikasi.
+- [x] Lakukan hal yang sama untuk `GoogleLoginRequest`: tambahkan `IsMobileClient = true`.
+- [x] Perbarui pemanggil `new LoginRequest(Email.Trim(), Password)` di `LoginViewModel` menjadi inisialisasi objek, termasuk `RememberMe`.
+- [x] `AuthService.ApplyToken` memanggil `ITokenStore.Set(token)`, bukan `ApiService.SetAuthToken`.
+- [x] `AuthService.IsAuthenticated` membaca `ITokenStore.HasToken`.
+- [x] Bila login berhasil tetapi `Token` kosong, kembalikan galat "Server tidak mengirim token". Jangan masuk ke aplikasi.
 
 ### 1.8 Ingat saya dan pemulihan sesi (T5)
 
