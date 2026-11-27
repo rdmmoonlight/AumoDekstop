@@ -132,15 +132,15 @@ public class LoginRequest
 
 ### 1.8 Ingat saya dan pemulihan sesi (T5)
 
-- [ ] Setelah login sukses, panggil `SessionStorageService.SaveSession(email, token, rememberMe)`.
-- [ ] Tambahkan `IAuthService.RestoreSessionAsync()`:
+- [x] Setelah login sukses, panggil `SessionStorageService.SaveSession(email, token, rememberMe)`.
+- [x] Tambahkan `IAuthService.RestoreSessionAsync()`:
   1. `GetSavedSession()`. Bila kosong → kembalikan `false`.
   2. `ITokenStore.Set(token)`.
   3. `GET api/v1/auth/me`. Bila 200 → isi `CachedProfile`, kembalikan `true`.
   4. Bila 401 → `ClearSession()` dan `SessionStorageService.ClearSession()`, kembalikan `false`.
   5. Bila galat jaringan (status 0) → pertahankan token, kembalikan `false`, tampilkan login dengan pesan "Server belum dapat dihubungi".
-- [ ] Ubah `MainWindow.RootElement_Loaded`: tampilkan status "Memulihkan sesi...", panggil `RestoreSessionAsync()`, lalu `EnterApp()` atau `ShowLogin()`. Jangan lagi memakai `_auth.IsAuthenticated` sebagai gerbang awal.
-- [ ] `LogoutAsync`: panggil endpoint, lalu `ITokenStore.Clear()`, `SessionStorageService.ClearSession()`, dan `ShowLogin()`.
+- [x] Ubah `MainWindow.RootElement_Loaded`: tampilkan status "Memulihkan sesi...", panggil `RestoreSessionAsync()`, lalu `EnterApp()` atau `ShowLogin()`. Jangan lagi memakai `_auth.IsAuthenticated` sebagai gerbang awal.
+- [x] `LogoutAsync`: panggil endpoint, lalu `ITokenStore.Clear()`, `SessionStorageService.ClearSession()`, dan `ShowLogin()`.
 
 ### 1.9 Sesi berakhir terpusat (T6)
 
