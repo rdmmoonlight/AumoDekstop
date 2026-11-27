@@ -24,14 +24,10 @@
             Visibility="{x:Bind HasActivePeriod, Mode=OneWay}">
             <InfoBar.Content>
                 <TextBlock
+                    Text="{x:Bind ActivePeriodDescription, Mode=OneWay}"
                     TextWrapping="Wrap"
                     Margin="0,0,0,12"
-                    Style="{ThemeResource BodyTextBlockStyle}">
-                    <Run Text="Saat ini periode "/>
-                    <Run Text="{x:Bind ActivePeriodName, Mode=OneWay}"
-                            FontWeight="SemiBold"/>
-                    <Run Text=" sedang berjalan. Semua transaksi baru akan dicatat ke dalam periode ini."/>
-                </TextBlock>
+                    Style="{ThemeResource BodyTextBlockStyle}"/>
             </InfoBar.Content>
         </InfoBar>
 

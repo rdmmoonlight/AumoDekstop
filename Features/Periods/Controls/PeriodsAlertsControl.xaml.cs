@@ -38,6 +38,9 @@ public sealed partial class PeriodsAlertsControl : UserControl
         set => SetValue(ActivePeriodNameProperty, value ?? string.Empty);
     }
 
+    public string ActivePeriodDescription =>
+    $"Saat ini periode {ActivePeriodName} sedang berjalan. Semua transaksi baru akan dicatat ke dalam periode ini.";
+
     public string WarningMessage
     {
         get => (string)(GetValue(WarningMessageProperty) ?? string.Empty);
