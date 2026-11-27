@@ -153,11 +153,11 @@ jobs:
           }
 
       - name: Sign Application Executable
-        if: ${{ secrets.CERT_BASE64 != '' }}
-        shell: pwsh
         env:
           CERT_BASE64: ${{ secrets.CERT_BASE64 }}
           CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }}
+        if: env.CERT_BASE64 != ''
+        shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
           $pfxPath = "$env:TEMP\codesign.pfx"
@@ -203,11 +203,11 @@ jobs:
           Get-ChildItem ./OutputInstaller
 
       - name: Sign Installer
-        if: ${{ secrets.CERT_BASE64 != '' }}
-        shell: pwsh
         env:
           CERT_BASE64: ${{ secrets.CERT_BASE64 }}
           CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }}
+        if: env.CERT_BASE64 != ''
+        shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
           $pfxPath = "$env:TEMP\codesign.pfx"
