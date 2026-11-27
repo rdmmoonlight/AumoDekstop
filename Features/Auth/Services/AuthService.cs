@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AumoDekstop.Features.Auth.Models;
 using AumoDekstop.Features.Shared.Http;
 using AumoDekstop.Services;
+using AumoDekstop.Services.Api;
 
 namespace AumoDekstop.Features.Auth.Services;
 

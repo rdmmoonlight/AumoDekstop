@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AumoDekstop.Features.Auth.Services;
 using AumoDekstop.Features.Auth.Views;
 using AumoDekstop.Services;
+using AumoDekstop.Services.Api;
 using Microsoft.UI.Xaml;
 
 namespace AumoDekstop;

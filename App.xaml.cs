@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using AumoDekstop.Extensions;
 using AumoDekstop.Services;
+using AumoDekstop.Services.Api;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 

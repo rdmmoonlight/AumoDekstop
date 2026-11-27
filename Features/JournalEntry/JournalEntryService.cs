@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AumoDekstop.Features.JournalEntry.Messages;
 using AumoDekstop.Features.JournalEntry.Models;
 using AumoDekstop.Services;
+using AumoDekstop.Services.Api;
 using CommunityToolkit.Mvvm.Messaging;
 
 namespace AumoDekstop.Features.JournalEntry.Services;

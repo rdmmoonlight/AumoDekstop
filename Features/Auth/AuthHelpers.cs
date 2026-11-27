@@ -1,6 +1,7 @@
 using System.Text.Json;
 using AumoDekstop.Features.Auth.Models;
 using AumoDekstop.Services;
+using AumoDekstop.Services.Api;
 
 namespace AumoDekstop.Features.Auth.Helpers;
 
