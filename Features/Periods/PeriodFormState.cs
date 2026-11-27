@@ -3,8 +3,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace AumoDekstop.Features.Periods.ViewModels;
 
-public sealed record CreatePeriodPayload(string StartDate, string EndDate);
-
 public partial class PeriodFormState : ObservableObject
 {
     [ObservableProperty]
@@ -24,25 +22,4 @@ public partial class PeriodFormState : ObservableObject
         StartDate = null;
         EndDate = null;
     }
-
-    public void SetFormData(CreatePeriodPayload data)
-    {
-        StartDate = DateTimeOffset.TryParse(
-            data.StartDate,
-            CultureInfo.InvariantCulture,
-            DateTimeStyles.AssumeUniversal,
-            out var parsedStart)
-            ? parsedStart
-            : null;
-
-        EndDate = DateTimeOffset.TryParse(
-            data.EndDate,
-            CultureInfo.InvariantCulture,
-            DateTimeStyles.AssumeUniversal,
-            out var parsedEnd)
-            ? parsedEnd
-            : null;
-    }
-
-    public CreatePeriodPayload ToPayload() => new(StartDateString, EndDateString);
 }

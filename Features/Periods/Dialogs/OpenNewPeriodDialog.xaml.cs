@@ -1,3 +1,5 @@
+using System;
+using System.Threading.Tasks;
 using AumoDekstop.Features.Periods.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -12,9 +14,9 @@ public sealed partial class OpenNewPeriodDialog : ContentDialog
     /// Opsional: Handler async saat tombol "Simpan & Buka Periode" ditekan.
     /// Jika diisi, dialog akan menunggu task selesai sebelum menutup.
     /// </summary>
-    public Func<CreatePeriodPayload, Task>? OnSubmitAsync { get; set; }
+    public Func<(string StartDate, string EndDate), Task>? OnSubmitAsync { get; set; }
 
-    public CreatePeriodPayload? SubmittedPayload { get; private set; }
+    public (string StartDate, string EndDate)? SubmittedPayload { get; private set; }
 
     private bool _isLoading;
     public bool IsLoading
@@ -61,14 +63,13 @@ public sealed partial class OpenNewPeriodDialog : ContentDialog
 
     private async void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
-        // Validasi setara Zod schema (min 1)
         if (!ValidateForm())
         {
             args.Cancel = true;
             return;
         }
 
-        var payload = FormState.ToPayload();
+        var payload = (FormState.StartDateString, FormState.EndDateString);
         SubmittedPayload = payload;
 
         if (OnSubmitAsync is not null)

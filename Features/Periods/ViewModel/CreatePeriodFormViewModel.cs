@@ -10,7 +10,7 @@ namespace AumoDekstop.Features.Periods.ViewModels;
 
 public sealed partial class CreatePeriodFormViewModel : ObservableObject
 {
-    private readonly IPeriodsService _PeriodsService;
+    private readonly IPeriodsService _periodsService;
     private readonly Func<Task>? _onSuccessCallback;
 
     private string? _error;
@@ -37,17 +37,17 @@ public sealed partial class CreatePeriodFormViewModel : ObservableObject
     }
 
     public CreatePeriodFormViewModel(
-        IPeriodsService PeriodsService,
+        IPeriodsService periodsService,
         Func<Task>? onSuccessCallback = null)
     {
-        _PeriodsService = PeriodsService ?? throw new ArgumentNullException(nameof(PeriodsService));
+        _periodsService = periodsService ?? throw new ArgumentNullException(nameof(periodsService));
         _onSuccessCallback = onSuccessCallback;
     }
 
     [RelayCommand]
-    public async Task SubmitFormAsync(CreatePeriodPayload payload, CancellationToken cancellationToken = default)
+    public async Task SubmitFormAsync(CreatePeriodRequest? request, CancellationToken cancellationToken = default)
     {
-        if (payload is null || IsSubmitting)
+        if (request is null || IsSubmitting)
         {
             return;
         }
@@ -57,8 +57,7 @@ public sealed partial class CreatePeriodFormViewModel : ObservableObject
 
         try
         {
-            var request = MapToCreatePeriodRequest(payload);
-            var result = await _PeriodsService.CreatePeriodAsync(request, cancellationToken);
+            var result = await _periodsService.CreatePeriodAsync(request, cancellationToken);
 
             if (!result.Success)
             {
@@ -81,47 +80,11 @@ public sealed partial class CreatePeriodFormViewModel : ObservableObject
         {
             Error = !string.IsNullOrWhiteSpace(ex.Message)
                 ? ex.Message
-                : "Terjadi kesalahan saat membuat periode";
+                : "Terjadi kesalahan saat membuat periode.";
         }
         finally
         {
             IsSubmitting = false;
         }
-    }
-
-    private static CreatePeriodRequest MapToCreatePeriodRequest(CreatePeriodPayload payload)
-    {
-        var isLoadExisting = string.Equals(
-            payload.SetupMode,
-            CreatePeriodRequest.ModeLoadExisting,
-            StringComparison.OrdinalIgnoreCase);
-
-        if (isLoadExisting)
-        {
-            return new CreatePeriodRequest
-            {
-                Month = payload.Month,
-                Year = payload.Year,
-                SetupMode = CreatePeriodRequest.ModeLoadExisting,
-                CashAccountId = payload.CashAccountId,
-                BankAccountId = payload.BankAccountId,
-                RetainedEarningsAccountId = payload.RetainedEarningsAccountId
-            };
-        }
-
-        return new CreatePeriodRequest
-        {
-            Month = payload.Month,
-            Year = payload.Year,
-            SetupMode = CreatePeriodRequest.ModeCreateNew,
-            CashAccountCode = payload.CashAccountCode,
-            CashAccountName = payload.CashAccountName,
-            CashBalance = payload.CashBalance,
-            BankAccountCode = payload.BankAccountCode,
-            BankAccountName = payload.BankAccountName,
-            BankBalance = payload.BankBalance,
-            RetainedEarningsAccountCode = payload.RetainedEarningsAccountCode,
-            RetainedEarningsAccountName = payload.RetainedEarningsAccountName
-        };
     }
 }
