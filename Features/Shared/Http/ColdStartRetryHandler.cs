@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace AumoDekstop.Features.Shared.Http;
+
 public sealed class ColdStartRetryHandler : DelegatingHandler
 {
     private const int MaxRetries = 12;
