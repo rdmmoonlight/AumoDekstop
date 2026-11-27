@@ -1,4 +1,3 @@
-
 using AumoDekstop.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -7,7 +6,6 @@ namespace AumoDekstop.Shell.Updates;
 /// <summary>Pengecekan, dialog, dan pemasangan pembaruan aplikasi.</summary>
 public sealed class UpdateCoordinator
 {
-    private readonly GitHubUpdateService _updateService = new();
     private readonly Action<string> _setStatus;
 
     public UpdateCoordinator(Action<string> setStatus)
