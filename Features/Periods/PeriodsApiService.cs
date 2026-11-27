@@ -16,7 +16,7 @@ public interface IPeriodsApiService
 
     Task<GetPeriodsResponse> GetPeriodsAsync(CancellationToken cancellationToken = default);
     Task<PeriodsOpenInfo> GetPeriodsOpenInfoAsync(CancellationToken cancellationToken = default);
-    Task CreatePeriodAsync(object createPeriodRequest, CancellationToken cancellationToken = default);
+    Task<CreatePeriodResult> CreatePeriodAsync(CreatePeriodRequest createPeriodRequest, CancellationToken cancellationToken = default);
     Task SelectPeriodAsync(int id, CancellationToken cancellationToken = default);
     Task ClearPeriodSelectionAsync(CancellationToken cancellationToken = default);
     Task ClosePeriodAsync(int id, CancellationToken cancellationToken = default);
@@ -33,7 +33,10 @@ public sealed class PeriodsApiService : IPeriodsApiService
 
     public event EventHandler? PeriodContextChanged;
 
-    public PeriodsApiService(ApiService? apiService = null) { _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService)); }
+    public PeriodsApiService(ApiService? apiService = null)
+    {
+        _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
+    }
 
     private void NotifyPeriodChanged() => PeriodContextChanged?.Invoke(this, EventArgs.Empty);
 
@@ -84,9 +87,11 @@ public sealed class PeriodsApiService : IPeriodsApiService
         return response.Data ?? new PeriodsOpenInfo();
     }
 
-    public async Task CreatePeriodAsync(object createPeriodRequest, CancellationToken cancellationToken = default)
+    public async Task<CreatePeriodResult> CreatePeriodAsync(CreatePeriodRequest createPeriodRequest, CancellationToken cancellationToken = default)
     {
-        var response = await _apiService.PostAsync<object, JsonElement>(
+        ArgumentNullException.ThrowIfNull(createPeriodRequest);
+
+        var response = await _apiService.PostAsync<CreatePeriodRequest, CreatePeriodResult>(
             "api/v1/periods",
             createPeriodRequest,
             cancellationToken);
@@ -94,12 +99,13 @@ public sealed class PeriodsApiService : IPeriodsApiService
         if (!response.IsSuccess)
         {
             throw new HttpRequestException(
-                response.ErrorMessage ?? "Gagal membuat periode baru.",
+                response.ErrorMessage ?? response.Data?.Message ?? "Gagal membuat periode baru.",
                 null,
                 (HttpStatusCode)response.StatusCode);
         }
 
         NotifyPeriodChanged();
+        return response.Data ?? new CreatePeriodResult { Success = true };
     }
 
     public async Task SelectPeriodAsync(int id, CancellationToken cancellationToken = default)

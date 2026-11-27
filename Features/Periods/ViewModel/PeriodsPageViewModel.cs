@@ -1,4 +1,8 @@
+using System;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AumoDekstop.Features.Periods.Models;
 using AumoDekstop.Features.Periods.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -51,10 +55,13 @@ public partial class PeriodsPageViewModel : ObservableObject
         _periodsApiService = periodsApiService;
     }
 
-    private void UpdateActivePeriod()
+    private void UpdateActivePeriod(int? selectedPeriodId = null)
     {
-        // Periode aktif: periode terbuka yang sedang dipilih, atau periode terbuka pertama
+        // Periode aktif: cocokkan dengan SelectedPeriodId dari server, lalu flag IsSelected, atau periode terbuka pertama
         ActivePeriod =
+            (selectedPeriodId.HasValue
+                ? Periods.FirstOrDefault(p => p.Id == selectedPeriodId.Value && !p.IsClosed)
+                : null) ??
             Periods.FirstOrDefault(p => p.IsSelected && !p.IsClosed) ??
             Periods.FirstOrDefault(p => !p.IsClosed);
     }
@@ -76,7 +83,7 @@ public partial class PeriodsPageViewModel : ObservableObject
                 Periods.Add(item);
             }
 
-            UpdateActivePeriod();
+            UpdateActivePeriod(response.SelectedPeriodId);
         }
         catch (OperationCanceledException)
         {
@@ -95,9 +102,9 @@ public partial class PeriodsPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public async Task CreatePeriodAsync(CreatePeriodPayload? payload, CancellationToken cancellationToken = default)
+    public async Task CreatePeriodAsync(CreatePeriodRequest? request, CancellationToken cancellationToken = default)
     {
-        if (payload is null)
+        if (request is null)
         {
             return;
         }
@@ -107,7 +114,15 @@ public partial class PeriodsPageViewModel : ObservableObject
 
         try
         {
-            await _periodsApiService.CreatePeriodAsync(payload, cancellationToken);
+            var result = await _periodsApiService.CreatePeriodAsync(request, cancellationToken);
+            if (!result.Success)
+            {
+                ActionError = !string.IsNullOrWhiteSpace(result.Message)
+                    ? result.Message
+                    : "Gagal membuat periode baru";
+                return;
+            }
+
             await FetchPeriodsAsync(cancellationToken);
         }
         catch (OperationCanceledException)

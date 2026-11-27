@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -138,24 +137,116 @@ public class AccountSummary
     [JsonPropertyName("id")]
     public int Id { get; set; }
 
-    [JsonPropertyName("name")]
-    public string Name { get; set; } = string.Empty;
+    [JsonPropertyName("referenceNumber")]
+    public int ReferenceNumber { get; set; }
 
-    [JsonPropertyName("code")]
-    public string Code { get; set; } = string.Empty;
+    [JsonPropertyName("accountName")]
+    public string AccountName { get; set; } = string.Empty;
+
+    [JsonPropertyName("type")]
+    public string Type { get; set; } = string.Empty;
+
+    [JsonPropertyName("displayLabel")]
+    public string DisplayLabel { get; set; } = string.Empty;
+
+    // Properti alias agar binding XAML lama (Name, Code) tetap berjalan tanpa error
+    [JsonIgnore]
+    public string Name => AccountName;
 
     [JsonIgnore]
-    public string DisplayLabel => $"{Code} - {Name}";
+    public string Code => ReferenceNumber.ToString();
 }
 
 public class PeriodsOpenInfo
 {
+    [JsonPropertyName("success")]
+    public bool Success { get; set; }
+
     [JsonPropertyName("hasExistingPermanentAccounts")]
     public bool HasExistingPermanentAccounts { get; set; }
 
     [JsonPropertyName("availableCashAndBankAccounts")]
-    public List<AccountSummary>? AvailableCashAndBankAccounts { get; set; }
+    public List<AccountSummary> AvailableCashAndBankAccounts { get; set; } = new();
 
     [JsonPropertyName("availableRetainedEarningsAccounts")]
-    public List<AccountSummary>? AvailableRetainedEarningsAccounts { get; set; }
+    public List<AccountSummary> AvailableRetainedEarningsAccounts { get; set; } = new();
+
+    [JsonPropertyName("permanentAccounts")]
+    public List<AccountSummary> PermanentAccounts { get; set; } = new();
+}
+
+public class CreatePeriodRequest
+{
+    public const string ModeLoadExisting = "LoadExisting";
+    public const string ModeCreateNew = "CreateNew";
+
+    [JsonPropertyName("month")]
+    public int Month { get; set; }
+
+    [JsonPropertyName("year")]
+    public int Year { get; set; }
+
+    [JsonPropertyName("setupMode")]
+    public string SetupMode { get; set; } = string.Empty;
+
+    // Properties for ModeLoadExisting
+    [JsonPropertyName("cashAccountId")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? CashAccountId { get; set; }
+
+    [JsonPropertyName("bankAccountId")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? BankAccountId { get; set; }
+
+    [JsonPropertyName("retainedEarningsAccountId")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? RetainedEarningsAccountId { get; set; }
+
+    // Properties for ModeCreateNew
+    [JsonPropertyName("cashAccountCode")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? CashAccountCode { get; set; }
+
+    [JsonPropertyName("cashAccountName")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? CashAccountName { get; set; }
+
+    [JsonPropertyName("cashBalance")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public decimal? CashBalance { get; set; }
+
+    [JsonPropertyName("bankAccountCode")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? BankAccountCode { get; set; }
+
+    [JsonPropertyName("bankAccountName")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? BankAccountName { get; set; }
+
+    [JsonPropertyName("bankBalance")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public decimal? BankBalance { get; set; }
+
+    [JsonPropertyName("retainedEarningsAccountCode")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? RetainedEarningsAccountCode { get; set; }
+
+    [JsonPropertyName("retainedEarningsAccountName")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? RetainedEarningsAccountName { get; set; }
+}
+
+public class CreatePeriodResult
+{
+    [JsonPropertyName("success")]
+    public bool Success { get; set; }
+
+    [JsonPropertyName("message")]
+    public string Message { get; set; } = string.Empty;
+
+    [JsonPropertyName("periodId")]
+    public int? PeriodId { get; set; }
+
+    [JsonPropertyName("isServerError")]
+    public bool IsServerError { get; set; }
 }
