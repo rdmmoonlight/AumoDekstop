@@ -51,8 +51,12 @@ public partial class GoogleSignInViewModel : ObservableObject
                 return;
             }
 
-            var res = await ((AuthService)_authService).GoogleLoginAsync(
-                new GoogleLoginRequest(idToken), CancellationToken.None);
+            var res = await _authService.GoogleLoginAsync(
+            new GoogleLoginRequest
+            {
+                IdToken = idToken
+            },
+            CancellationToken.None);
 
             if (res is not { Success: true })
             {
