@@ -1,14 +1,13 @@
-
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace AumoDekstop.Shell.Ribbon;
 
-public sealed partial class RibbonReportPanel : UserControl
+public sealed partial class RibbonReportsPanel : UserControl
 {
     public event EventHandler<string>? CommandInvoked;
 
-    public RibbonReportPanel()
+    public RibbonReportsPanel()
     {
         InitializeComponent();
     }
