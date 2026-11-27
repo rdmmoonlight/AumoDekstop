@@ -2,6 +2,8 @@
 # .//
 Aumo Dekstop
 
+Pola arsitektur MVVM
+
 ```text
 AumoDekstop/
 ├── Models/          # DTO (Data Transfer Object) sesuai JSON dari backend
