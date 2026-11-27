@@ -1,4 +1,3 @@
-
 using System;
 using System.Linq;
 using AumoDekstop.Services;
@@ -19,11 +18,13 @@ public static class SessionStorageService
         // Hapus kredensial lama jika ada
         ClearVault();
 
-        if (rememberMe && !string.IsNullOrEmpty(authToken))
+        if (rememberMe && !string.IsNullOrWhiteSpace(authToken))
         {
-            AppLocalSettings.SetString(SavedEmailKey, email);
+            string safeUserName = string.IsNullOrWhiteSpace(email) ? "user" : email;
+            AppLocalSettings.SetString(SavedEmailKey, safeUserName);
+
             var vault = new PasswordVault();
-            vault.Add(new PasswordCredential(VaultResourceName, email, authToken));
+            vault.Add(new PasswordCredential(VaultResourceName, safeUserName, authToken));
         }
         else
         {

@@ -169,7 +169,7 @@ public sealed partial class MainWindow
     {
         SetStatus($"● Menghubungi server {ApiConfig.BaseUrl} (mohon tunggu)...");
 
-        bool isOnline = await _api.CheckServerHealthAsync("");
+        bool isOnline = await _api.CheckServerHealthAsync("api/v1/health");
 
         if (isOnline)
         {

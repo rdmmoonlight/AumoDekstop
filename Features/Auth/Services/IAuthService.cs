@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using AumoDekstop.Features.Auth.Models;
 
 namespace AumoDekstop.Features.Auth.Services;
@@ -10,6 +12,7 @@ public interface IAuthService
     Task<AuthResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default);
     Task<AuthResponse> GoogleLoginAsync(GoogleLoginRequest request, CancellationToken cancellationToken = default);
     Task<ProfileResponse> GetProfileAsync(bool forceRefresh = false, CancellationToken cancellationToken = default);
+    Task<(bool IsRestored, string? ErrorMessage)> RestoreSessionAsync(CancellationToken cancellationToken = default);
     Task<CommonActionResponse> LogoutAsync(CancellationToken cancellationToken = default);
     void ClearSession();
 }

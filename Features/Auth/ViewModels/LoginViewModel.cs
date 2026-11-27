@@ -1,4 +1,3 @@
-
 using AumoDekstop.Features.Auth.Models;
 using AumoDekstop.Features.Auth.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -18,7 +17,6 @@ public partial class LoginViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(SubmitCommand))]
     public partial string Password { get; set; } = string.Empty;
 
-    // Properti yang sebelumnya hilang dan menyebabkan XAML Compiler crash
     [ObservableProperty]
     public partial bool RememberMe { get; set; }
 
@@ -31,6 +29,7 @@ public partial class LoginViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(SubmitButtonText))]
     [NotifyCanExecuteChangedFor(nameof(SubmitCommand))]
     public partial bool IsPending { get; set; }
+
     public string InitialMode { get; set; } = "login";
 
     public bool IsNotPending => !IsPending;
@@ -57,11 +56,14 @@ public partial class LoginViewModel : ObservableObject
 
         try
         {
-            // Panggil langsung melalui interface IAuthService tanpa casting ke AuthService
-            // (Sesuaikan parameter LoginRequest jika mendukung RememberMe)
-            var res = await _authService.LoginAsync(
-                new LoginRequest(Email.Trim(), Password),
-                cancellationToken);
+            var request = new LoginRequest
+            {
+                Email = Email.Trim(),
+                Password = Password,
+                RememberMe = RememberMe
+            };
+
+            var res = await _authService.LoginAsync(request, cancellationToken);
 
             if (!res.Success)
             {

@@ -25,12 +25,11 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddAumoServices(this IServiceCollection services)
     {
-        // 0. Penyimpanan token terpusat & handler HTTP
+        // 0. Penyimpanan token terpusat & handler autentikasi HTTP
         services.AddSingleton<ITokenStore>(_ => TokenStore.Instance);
         services.AddTransient<AuthHeaderHandler>();
-        services.AddTransient<ColdStartRetryHandler>();
 
-        // 1. Named HttpClient untuk backend Render (Sesuai K2)
+        // 1. Named HttpClient untuk backend Render (tanpa ColdStartRetryHandler, retry dikelola ApiService)
         services.AddHttpClient("AumoApi", client =>
         {
             client.BaseAddress = new Uri(ApiConfig.BaseUrl);
@@ -38,56 +37,36 @@ public static class DependencyInjection
             client.DefaultRequestHeaders.UserAgent.ParseAdd($"AumoDekstop/{GitHubUpdateService.GetCurrentVersionString()}");
             client.DefaultRequestHeaders.TryAddWithoutValidation("X-Client-Platform", "Windows-Desktop");
 
-            // Harus > total durasi retry (12 x 5 detik = 60 detik + waktu eksekusi request)
-            client.Timeout = TimeSpan.FromSeconds(150);
+            // Timeout per-request cukup 30-45 detik karena retry loop dikelola di level ApiService
+            client.Timeout = TimeSpan.FromSeconds(45);
         })
         .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
         {
             UseCookies = false,
             PooledConnectionLifetime = TimeSpan.FromMinutes(5)
         })
-        .AddHttpMessageHandler<ColdStartRetryHandler>()   // terluar
-        .AddHttpMessageHandler<AuthHeaderHandler>();     // Terdalam (mendekati network/SocketsHttpHandler)
+        .AddHttpMessageHandler<AuthHeaderHandler>();
 
-        // 2. ApiService singleton
-        services.AddSingleton<ApiService>(sp =>
-        {
-            var factory = sp.GetRequiredService<IHttpClientFactory>();
-            return new ApiService(factory.CreateClient("AumoApi"));
-        });
+        // 2. Satu-satunya pintu akses HTTP (IApiService & ApiService)
+        services.AddHttpClient<IApiService, ApiService>("AumoApi");
+
+        // Opsional: forward sementara jika masih ada kelas lama yang meminta concrete ApiService
+        services.AddTransient<ApiService>(sp => (ApiService)sp.GetRequiredService<IApiService>());
 
         // 3. Autentikasi & Google OAuth
-        services.AddSingleton<IAuthService>(sp =>
-            new AuthService(
-                sp.GetRequiredService<ApiService>(),
-                sp.GetRequiredService<ITokenStore>()));
+        services.AddSingleton<IAuthService, AuthService>();
         services.AddSingleton<IGoogleAuthProvider, DesktopGoogleAuthProvider>();
 
-        // 4. Periods — WAJIB mengambil ApiService yang SAMA dari DI container (bukan ApiService.Instance)
-        services.AddSingleton<IPeriodsApiService>(sp =>
-            new PeriodsApiService(sp.GetRequiredService<ApiService>()));
+        // 4. Periods
+        services.AddSingleton<IPeriodsApiService, PeriodsApiService>();
 
         // 5. Chart Of Accounts
-        services.AddSingleton<IChartOfAccountsService>(sp =>
-        {
-            var factory = sp.GetRequiredService<IHttpClientFactory>();
-            return new ChartOfAccountsService(factory.CreateClient("AumoApi"));
-        });
+        services.AddSingleton<IChartOfAccountsService, ChartOfAccountsService>();
         services.AddTransient<ChartOfAccountsPage>();
 
         // 6. Journal Entry
-        services.AddSingleton<IJournalEntryService>(sp =>
-        {
-            var factory = sp.GetRequiredService<IHttpClientFactory>();
-            return new JournalEntryService(factory.CreateClient("AumoApi"));
-        });
-        services.AddTransient<JournalEntryFormViewModel>(sp =>
-        {
-            var factory = sp.GetRequiredService<IHttpClientFactory>();
-            return new JournalEntryFormViewModel(
-                factory.CreateClient("AumoApi"),
-                sp.GetRequiredService<IJournalEntryService>());
-        });
+        services.AddSingleton<IJournalEntryService, JournalEntryService>();
+        services.AddTransient<JournalEntryFormViewModel>();
 
         // 7. Auth & Periods ViewModels
         services.AddTransient<GoogleSignInViewModel>();
@@ -96,16 +75,8 @@ public static class DependencyInjection
         services.AddTransient<PeriodsPageViewModel>();
 
         // 8. Trial Balances & Worksheet
-        services.AddTransient<ITrialBalancesApiService>(sp =>
-        {
-            var factory = sp.GetRequiredService<IHttpClientFactory>();
-            return new TrialBalancesApiService(factory.CreateClient("AumoApi"));
-        });
-        services.AddSingleton<IWorksheetService>(sp =>
-        {
-            var factory = sp.GetRequiredService<IHttpClientFactory>();
-            return new WorksheetService(factory.CreateClient("AumoApi"));
-        });
+        services.AddTransient<ITrialBalancesApiService, TrialBalancesApiService>();
+        services.AddSingleton<IWorksheetService, WorksheetService>();
         services.AddTransient<WorksheetPageViewModel>();
         services.AddTransient<WorksheetPage>();
         services.AddTransient<UnadjustedTrialBalanceViewModel>();
@@ -116,11 +87,7 @@ public static class DependencyInjection
         services.AddTransient<PostClosingTrialBalancePage>();
 
         // 9. Financial Statements
-        services.AddTransient<IFinancialStatementsApiService>(sp =>
-        {
-            var factory = sp.GetRequiredService<IHttpClientFactory>();
-            return new FinancialStatementsApiService(factory.CreateClient("AumoApi"));
-        });
+        services.AddTransient<IFinancialStatementsApiService, FinancialStatementsApiService>();
         services.AddTransient<IncomeStatementViewModel>();
         services.AddTransient<RetainedEarningsViewModel>();
         services.AddTransient<StatementOfCashFlowViewModel>();

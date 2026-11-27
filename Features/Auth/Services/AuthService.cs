@@ -1,4 +1,6 @@
-
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using AumoDekstop.Features.Auth.Models;
 using AumoDekstop.Features.Shared.Http;
 using AumoDekstop.Services;
@@ -7,14 +9,16 @@ namespace AumoDekstop.Features.Auth.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly ApiService _apiService;
+    private readonly IApiService _apiService;
     private readonly ITokenStore _tokenStore;
 
     public UserProfileData? CachedProfile { get; private set; }
     public bool IsAuthenticated => _tokenStore.HasToken;
 
-    public AuthService(ApiService? apiService = null, ITokenStore? tokenStore = null)
+    public AuthService(IApiService apiService, ITokenStore? tokenStore = null)
     {
+        ArgumentNullException.ThrowIfNull(apiService);
+        _apiService = apiService;
         _tokenStore = tokenStore ?? TokenStore.Instance;
     }
 
@@ -24,8 +28,14 @@ public class AuthService : IAuthService
 
         if (response.IsSuccess && response.Data is { Success: true } authData)
         {
+            if (string.IsNullOrWhiteSpace(authData.Token))
+            {
+                return new AuthResponse(false, "Server tidak mengirim token");
+            }
+
             ApplyToken(authData.Token);
-            CachedProfile = null; // Invalidate cache profil
+            SessionStorageService.SaveSession(request.Email, authData.Token, request.RememberMe);
+            CachedProfile = null;
         }
 
         return ToAuthResponse(response);
@@ -37,11 +47,56 @@ public class AuthService : IAuthService
 
         if (response.IsSuccess && response.Data is { Success: true } authData)
         {
+            if (string.IsNullOrWhiteSpace(authData.Token))
+            {
+                return new AuthResponse(false, "Server tidak mengirim token");
+            }
+
             ApplyToken(authData.Token);
+            SessionStorageService.SaveSession(authData.UserId ?? "google-user", authData.Token, true);
             CachedProfile = null;
         }
 
         return ToAuthResponse(response);
+    }
+
+    public async Task<(bool IsRestored, string? ErrorMessage)> RestoreSessionAsync(CancellationToken ct = default)
+    {
+        // 1. GetSavedSession(). Bila kosong -> kembalikan false
+        var (_, savedToken) = SessionStorageService.GetSavedSession();
+        if (string.IsNullOrWhiteSpace(savedToken))
+        {
+            return (false, null);
+        }
+
+        // 2. ITokenStore.Set(token)
+        ApplyToken(savedToken);
+
+        // 3. GET api/v1/auth/me
+        var response = await _apiService.GetAsync<ProfileResponse>("api/v1/auth/me", ct);
+
+        // Bila 200 -> isi CachedProfile, kembalikan true
+        if (response.IsSuccess && response.Data is { Success: true, Data: not null } profileRes)
+        {
+            CachedProfile = profileRes.Data;
+            return (true, null);
+        }
+
+        // 4. Bila 401 -> ClearSession() dan SessionStorageService.ClearSession(), kembalikan false
+        if (response.StatusCode == 401)
+        {
+            ClearSession();
+            SessionStorageService.ClearSession();
+            return (false, null);
+        }
+
+        // 5. Bila galat jaringan (status 0) -> pertahankan token, kembalikan false + pesan
+        if (response.StatusCode == 0)
+        {
+            return (false, "Server belum dapat dihubungi");
+        }
+
+        return (false, response.ErrorMessage);
     }
 
     public async Task<ProfileResponse> GetProfileAsync(bool forceRefresh = false, CancellationToken ct = default)
@@ -65,12 +120,13 @@ public class AuthService : IAuthService
     {
         try
         {
-            var response = await _apiService.PostAsync<object, CommonActionResponse>("api/v1/auth/logout", new { }, ct);
+            var response = await _apiService.PostEmptyAsync<CommonActionResponse>("api/v1/auth/logout", ct);
             return response.Data ?? new CommonActionResponse(response.IsSuccess, response.ErrorMessage ?? string.Empty);
         }
         finally
         {
             ClearSession();
+            SessionStorageService.ClearSession();
         }
     }
 
@@ -78,7 +134,6 @@ public class AuthService : IAuthService
     {
         CachedProfile = null;
         _tokenStore.Clear();
-        _apiService.SetAuthToken(null);
     }
 
     private static AuthResponse ToAuthResponse(ApiResponse<AuthResponse> response)
@@ -91,19 +146,15 @@ public class AuthService : IAuthService
         string message = response.StatusCode switch
         {
             400 or 401 => "Email atau kata sandi salah.",
-            0 or >= 500 => "Server belum siap atau tidak merespons. Silakan coba lagi.",
-            _ => "Permintaan ditolak oleh server."
+            0 or >= 500 => response.ErrorMessage ?? "Server belum siap atau tidak merespons. Silakan coba lagi.",
+            _ => response.ErrorMessage ?? "Permintaan ditolak oleh server."
         };
 
         return new AuthResponse(false, message);
     }
 
-    private void ApplyToken(string? token)
+    private void ApplyToken(string token)
     {
-        if (!string.IsNullOrWhiteSpace(token))
-        {
-            _tokenStore.Set(token);
-            _apiService.SetAuthToken(token);
-        }
+        _tokenStore.Set(token);
     }
 }

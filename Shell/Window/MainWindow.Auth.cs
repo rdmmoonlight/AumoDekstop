@@ -1,4 +1,6 @@
-
+using System;
+using System.Threading.Tasks;
+using AumoDekstop.Features.Auth.Services;
 using AumoDekstop.Features.Auth.Views;
 using AumoDekstop.Services;
 using Microsoft.UI.Xaml;
@@ -7,7 +9,7 @@ namespace AumoDekstop;
 
 public sealed partial class MainWindow
 {
-    private void ShowLogin()
+    private void ShowLogin(string? errorMessage = null)
     {
         MainNavigation.IsPaneOpen = false;
         RibbonHost.Visibility = Visibility.Collapsed;
@@ -20,9 +22,18 @@ public sealed partial class MainWindow
 
         _loginPage = new LoginPage();
         _loginPage.LoginSucceeded += OnLoginSucceeded;
+
+        if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            _loginPage.ViewModel.ErrorMessage = errorMessage;
+        }
+
         RootFrame.Content = _loginPage;
 
-        SetStatus($"● Silakan masuk | Server: {ApiConfig.BaseUrl}");
+        string statusText = string.IsNullOrWhiteSpace(errorMessage)
+            ? $"● Silakan masuk | Server: {ApiConfig.BaseUrl}"
+            : $"● {errorMessage} | Server: {ApiConfig.BaseUrl}";
+        SetStatus(statusText);
     }
 
     private void OnLoginSucceeded(object? sender, EventArgs e)
@@ -50,6 +61,7 @@ public sealed partial class MainWindow
         {
             // Sesi lokal tetap dibersihkan walau server tidak merespons
             _auth.ClearSession();
+            SessionStorageService.ClearSession();
         }
 
         ShowLogin();

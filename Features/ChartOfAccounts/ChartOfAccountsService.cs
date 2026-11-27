@@ -1,8 +1,12 @@
-
-using System.Net.Http.Json;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 using AumoDekstop.Features.ChartOfAccounts.Models;
+using AumoDekstop.Services;
 
 namespace AumoDekstop.Features.ChartOfAccounts.Services;
 
@@ -57,13 +61,13 @@ public interface IChartOfAccountsService
 
 public class ChartOfAccountsService : IChartOfAccountsService
 {
-    private readonly HttpClient _httpClient;
+    private readonly IApiService _apiService;
     private readonly JsonSerializerOptions _jsonOptions;
     private const string BaseEndpoint = "api/v1/chart-of-accounts";
 
-    public ChartOfAccountsService(HttpClient httpClient)
+    public ChartOfAccountsService(IApiService apiService)
     {
-        _httpClient = httpClient;
+        _apiService = apiService;
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
@@ -77,32 +81,27 @@ public class ChartOfAccountsService : IChartOfAccountsService
         var queryParts = new List<string>();
 
         if (!string.IsNullOrWhiteSpace(parameters?.Search))
-        {
             queryParts.Add($"Search={Uri.EscapeDataString(parameters.Search)}");
-        }
 
         if (!string.IsNullOrWhiteSpace(parameters?.Category))
-        {
             queryParts.Add($"Category={Uri.EscapeDataString(parameters.Category)}");
-        }
 
         var url = queryParts.Count > 0
             ? $"{BaseEndpoint}?{string.Join("&", queryParts)}"
             : BaseEndpoint;
 
-        using var response = await _httpClient.GetAsync(url, cancellationToken);
-        await EnsureSuccessOrThrowBackendMessageAsync(response, cancellationToken);
+        var response = await _apiService.GetAsync<JsonElement>(url, cancellationToken);
+        EnsureSuccess(response);
 
-        var rawJson = await response.Content.ReadAsStringAsync(cancellationToken);
-        return NormalizeList(rawJson);
+        return NormalizeList(response.Data);
     }
 
     public async Task CreateChartOfAccountAsync(
         CreateAccountRequest request,
         CancellationToken cancellationToken = default)
     {
-        using var response = await _httpClient.PostAsJsonAsync(BaseEndpoint, request, _jsonOptions, cancellationToken);
-        await EnsureSuccessOrThrowBackendMessageAsync(response, cancellationToken);
+        var response = await _apiService.PostAsync(BaseEndpoint, request, cancellationToken);
+        EnsureSuccess(response);
     }
 
     public async Task UpdateChartOfAccountAsync(
@@ -110,35 +109,27 @@ public class ChartOfAccountsService : IChartOfAccountsService
         UpdateAccountRequest request,
         CancellationToken cancellationToken = default)
     {
-        using var response = await _httpClient.PutAsJsonAsync($"{BaseEndpoint}/{id}", request, _jsonOptions, cancellationToken);
-        await EnsureSuccessOrThrowBackendMessageAsync(response, cancellationToken);
+        var response = await _apiService.PutAsync($"{BaseEndpoint}/{id}", request, cancellationToken);
+        EnsureSuccess(response);
     }
 
     public async Task DeleteChartOfAccountAsync(
         int id,
         CancellationToken cancellationToken = default)
     {
-        using var response = await _httpClient.DeleteAsync($"{BaseEndpoint}/{id}", cancellationToken);
-        await EnsureSuccessOrThrowBackendMessageAsync(response, cancellationToken);
+        var response = await _apiService.DeleteAsync($"{BaseEndpoint}/{id}", cancellationToken);
+        EnsureSuccess(response);
     }
 
     /// <summary>
     /// Menormalkan respons JSON agar mendukung bentuk array langsung maupun objek pembungkus
     /// { success, selectedPeriodName, accounts }.
     /// </summary>
-    private ChartOfAccountsList NormalizeList(string rawJson)
+    private ChartOfAccountsList NormalizeList(JsonElement root)
     {
-        if (string.IsNullOrWhiteSpace(rawJson))
-        {
-            return new ChartOfAccountsList { Success = true };
-        }
-
-        using var doc = JsonDocument.Parse(rawJson);
-        var root = doc.RootElement;
-
         if (root.ValueKind == JsonValueKind.Array)
         {
-            var accounts = JsonSerializer.Deserialize<List<Account>>(rawJson, _jsonOptions) ?? new List<Account>();
+            var accounts = root.Deserialize<List<Account>>(_jsonOptions) ?? new List<Account>();
             return new ChartOfAccountsList
             {
                 Success = true,
@@ -149,48 +140,18 @@ public class ChartOfAccountsService : IChartOfAccountsService
 
         if (root.ValueKind == JsonValueKind.Object)
         {
-            var list = JsonSerializer.Deserialize<ChartOfAccountsList>(rawJson, _jsonOptions);
+            var list = root.Deserialize<ChartOfAccountsList>(_jsonOptions);
             return list ?? new ChartOfAccountsList { Success = true };
         }
 
         return new ChartOfAccountsList { Success = true };
     }
 
-    /// <summary>
-    /// Mengekstrak pesan error dari backend (misalnya ProblemDetails / validation message) saat status HTTP gagal.
-    /// </summary>
-    private static async Task EnsureSuccessOrThrowBackendMessageAsync(
-        HttpResponseMessage response,
-        CancellationToken cancellationToken)
+    private static void EnsureSuccess<T>(ApiResponse<T> response)
     {
-        if (response.IsSuccessStatusCode)
+        if (!response.IsSuccess)
         {
-            return;
+            throw new HttpRequestException(response.ErrorMessage ?? "Permintaan ke server gagal.");
         }
-
-        var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-        if (!string.IsNullOrWhiteSpace(errorContent))
-        {
-            try
-            {
-                using var doc = JsonDocument.Parse(errorContent);
-                if (doc.RootElement.TryGetProperty("message", out var msgProp))
-                {
-                    throw new HttpRequestException(msgProp.GetString());
-                }
-                if (doc.RootElement.TryGetProperty("title", out var titleProp))
-                {
-                    throw new HttpRequestException(titleProp.GetString());
-                }
-            }
-            catch (JsonException)
-            {
-                // Jika bukan JSON, lempar teks mentahnya
-            }
-
-            throw new HttpRequestException(errorContent);
-        }
-
-        response.EnsureSuccessStatusCode();
     }
 }

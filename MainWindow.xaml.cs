@@ -74,14 +74,23 @@ public sealed partial class MainWindow : Window
 
         _hasCheckedUpdate = true;
 
-        // Gerbang autentikasi: tanpa sesi login, tampilkan halaman login dan sembunyikan ribbon
-        if (_auth.IsAuthenticated)
+        SetStatus("Memulihkan sesi...");
+        var (isRestored, errorMessage) = await _auth.RestoreSessionAsync();
+
+        if (isRestored)
         {
+            SetStatus("Siap");
             EnterApp();
         }
         else
         {
+            SetStatus(string.IsNullOrWhiteSpace(errorMessage) ? "Silakan login." : errorMessage);
             ShowLogin();
+
+            if (!string.IsNullOrWhiteSpace(errorMessage) && _loginPage is not null)
+            {
+                _loginPage.ViewModel.ErrorMessage = errorMessage;
+            }
         }
 
         await _updates.CheckAndPromptAsync(Content?.XamlRoot, isManualCheck: false);

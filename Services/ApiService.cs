@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -19,10 +21,13 @@ public sealed class ApiResponse<T>
     public string? ErrorMessage { get; set; }
 }
 
-public class ApiService
+public class ApiService : IApiService
 {
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
+
+    private const int MaxRetries = 2;
+    private static readonly TimeSpan BaseRetryDelay = TimeSpan.FromMilliseconds(600);
 
     public ApiService(HttpClient httpClient)
     {
@@ -39,20 +44,16 @@ public class ApiService
     public void SetAuthToken(string? token)
     {
         if (string.IsNullOrWhiteSpace(token))
-        {
             TokenStore.Instance.Clear();
-        }
         else
-        {
             TokenStore.Instance.Set(token);
-        }
     }
 
     public async Task<bool> CheckServerHealthAsync(string healthEndpoint = "health", CancellationToken ct = default)
     {
         try
         {
-            using var response = await _httpClient.GetAsync(healthEndpoint.TrimStart('/'), ct);
+            using var response = await _httpClient.GetAsync(NormalizeEndpoint(healthEndpoint), ct);
             return response.IsSuccessStatusCode;
         }
         catch
@@ -61,58 +62,88 @@ public class ApiService
         }
     }
 
-    public async Task<ApiResponse<T>> GetAsync<T>(string endpoint, CancellationToken ct = default)
-    {
-        return await SendRequestAsync<T>(() => _httpClient.GetAsync(endpoint.TrimStart('/'), ct), ct);
-    }
+    // =========================================================================
+    // HTTP METHODS (Satu-satunya pintu untuk seluruh feature service)
+    // =========================================================================
 
-    public async Task<ApiResponse<TResponse>> PostAsync<TRequest, TResponse>(string endpoint, TRequest payload, CancellationToken ct = default)
-    {
-        return await SendRequestAsync<TResponse>(() => _httpClient.PostAsJsonAsync(endpoint.TrimStart('/'), payload, _jsonOptions, ct), ct);
-    }
+    public Task<ApiResponse<T>> GetAsync<T>(string endpoint, CancellationToken ct = default)
+        => SendRequestAsync<T>(() => _httpClient.GetAsync(NormalizeEndpoint(endpoint), ct), isIdempotent: true, ct);
 
-    public async Task<ApiResponse<TResponse>> PutAsync<TRequest, TResponse>(string endpoint, TRequest payload, CancellationToken ct = default)
-    {
-        return await SendRequestAsync<TResponse>(() => _httpClient.PutAsJsonAsync(endpoint.TrimStart('/'), payload, _jsonOptions, ct), ct);
-    }
+    public Task<ApiResponse<TResponse>> PostAsync<TRequest, TResponse>(string endpoint, TRequest payload, CancellationToken ct = default)
+        => SendRequestAsync<TResponse>(() => _httpClient.PostAsJsonAsync(NormalizeEndpoint(endpoint), payload, _jsonOptions, ct), isIdempotent: false, ct);
 
-    public async Task<ApiResponse<bool>> DeleteAsync(string endpoint, CancellationToken ct = default)
-    {
-        try
-        {
-            using var response = await _httpClient.DeleteAsync(endpoint.TrimStart('/'), ct);
-            if (response.IsSuccessStatusCode)
-            {
-                return new ApiResponse<bool> { IsSuccess = true, StatusCode = (int)response.StatusCode, Data = true };
-            }
+    public Task<ApiResponse<bool>> PostAsync<TRequest>(string endpoint, TRequest payload, CancellationToken ct = default)
+        => SendRequestAsync<bool>(() => _httpClient.PostAsJsonAsync(NormalizeEndpoint(endpoint), payload, _jsonOptions, ct), isIdempotent: false, ct);
 
-            var err = await response.Content.ReadAsStringAsync(ct);
-            return new ApiResponse<bool>
-            {
-                IsSuccess = false,
-                StatusCode = (int)response.StatusCode,
-                ErrorMessage = string.IsNullOrWhiteSpace(err) ? response.ReasonPhrase : err
-            };
-        }
-        catch (Exception ex)
-        {
-            return HandleException<bool>(ex);
-        }
-    }
+    public Task<ApiResponse<TResponse>> PostEmptyAsync<TResponse>(string endpoint, CancellationToken ct = default)
+        => SendRequestAsync<TResponse>(() => _httpClient.PostAsync(NormalizeEndpoint(endpoint), content: null, ct), isIdempotent: false, ct);
+
+    public Task<ApiResponse<bool>> PostEmptyAsync(string endpoint, CancellationToken ct = default)
+        => SendRequestAsync<bool>(() => _httpClient.PostAsync(NormalizeEndpoint(endpoint), content: null, ct), isIdempotent: false, ct);
+
+    public Task<ApiResponse<TResponse>> PostMultipartAsync<TResponse>(string endpoint, MultipartFormDataContent content, CancellationToken ct = default)
+        => SendRequestAsync<TResponse>(() => _httpClient.PostAsync(NormalizeEndpoint(endpoint), content, ct), isIdempotent: false, ct);
+
+    public Task<ApiResponse<TResponse>> PutAsync<TRequest, TResponse>(string endpoint, TRequest payload, CancellationToken ct = default)
+        => SendRequestAsync<TResponse>(() => _httpClient.PutAsJsonAsync(NormalizeEndpoint(endpoint), payload, _jsonOptions, ct), isIdempotent: true, ct);
+
+    public Task<ApiResponse<bool>> PutAsync<TRequest>(string endpoint, TRequest payload, CancellationToken ct = default)
+        => SendRequestAsync<bool>(() => _httpClient.PutAsJsonAsync(NormalizeEndpoint(endpoint), payload, _jsonOptions, ct), isIdempotent: true, ct);
+
+    public Task<ApiResponse<TResponse>> PatchAsync<TRequest, TResponse>(string endpoint, TRequest payload, CancellationToken ct = default)
+        => SendRequestAsync<TResponse>(() => _httpClient.PatchAsJsonAsync(NormalizeEndpoint(endpoint), payload, _jsonOptions, ct), isIdempotent: false, ct);
+
+    public Task<ApiResponse<bool>> PatchAsync<TRequest>(string endpoint, TRequest payload, CancellationToken ct = default)
+        => SendRequestAsync<bool>(() => _httpClient.PatchAsJsonAsync(NormalizeEndpoint(endpoint), payload, _jsonOptions, ct), isIdempotent: false, ct);
+
+    public Task<ApiResponse<bool>> DeleteAsync(string endpoint, CancellationToken ct = default)
+        => SendRequestAsync<bool>(() => _httpClient.DeleteAsync(NormalizeEndpoint(endpoint), ct), isIdempotent: true, ct);
+
+    public Task<ApiResponse<TResponse>> DeleteAsync<TResponse>(string endpoint, CancellationToken ct = default)
+        => SendRequestAsync<TResponse>(() => _httpClient.DeleteAsync(NormalizeEndpoint(endpoint), ct), isIdempotent: true, ct);
+
+    // =========================================================================
+    // PIPELINE EKSEKUSI, RETRY & PARSING SERAGAM
+    // =========================================================================
 
     private async Task<ApiResponse<T>> SendRequestAsync<T>(
         Func<Task<HttpResponseMessage>> httpCall,
+        bool isIdempotent,
         CancellationToken ct)
     {
-        try
+        int maxAttempts = isIdempotent ? MaxRetries + 1 : 1;
+
+        for (int attempt = 1; attempt <= maxAttempts; attempt++)
         {
-            using var response = await httpCall();
-            return await BuildResponseAsync<T>(response, ct);
+            try
+            {
+                using var response = await httpCall();
+
+                // Retry otomatis hanya jika method idempotent dan error bersifat sementara (502, 503, 504, 408)
+                if (attempt < maxAttempts && IsTransientStatus(response.StatusCode))
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(BaseRetryDelay.TotalMilliseconds * attempt), ct);
+                    continue;
+                }
+
+                return await BuildResponseAsync<T>(response, ct);
+            }
+            catch (Exception ex) when (attempt < maxAttempts && IsTransientException(ex, ct))
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(BaseRetryDelay.TotalMilliseconds * attempt), ct);
+            }
+            catch (Exception ex)
+            {
+                return HandleException<T>(ex, ct);
+            }
         }
-        catch (Exception ex)
+
+        return new ApiResponse<T>
         {
-            return HandleException<T>(ex);
-        }
+            IsSuccess = false,
+            StatusCode = 0,
+            ErrorMessage = "Gagal memproses permintaan setelah beberapa kali percobaan."
+        };
     }
 
     private async Task<ApiResponse<T>> BuildResponseAsync<T>(HttpResponseMessage response, CancellationToken ct)
@@ -121,12 +152,28 @@ public class ApiService
 
         if (response.IsSuccessStatusCode)
         {
-            if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+            if (typeof(T) == typeof(bool))
+            {
+                return new ApiResponse<T>
+                {
+                    IsSuccess = true,
+                    StatusCode = statusCode,
+                    Data = (T)(object)true
+                };
+            }
+
+            if (response.StatusCode == HttpStatusCode.NoContent || response.Content.Headers.ContentLength == 0)
             {
                 return new ApiResponse<T> { IsSuccess = true, StatusCode = statusCode };
             }
 
-            var data = await response.Content.ReadFromJsonAsync<T>(_jsonOptions, ct);
+            var rawSuccess = await response.Content.ReadAsStringAsync(ct);
+            if (string.IsNullOrWhiteSpace(rawSuccess))
+            {
+                return new ApiResponse<T> { IsSuccess = true, StatusCode = statusCode };
+            }
+
+            var data = JsonSerializer.Deserialize<T>(rawSuccess, _jsonOptions);
             return new ApiResponse<T>
             {
                 IsSuccess = true,
@@ -145,28 +192,60 @@ public class ApiService
             {
                 errorData = JsonSerializer.Deserialize<T>(errorBody, _jsonOptions);
             }
-            catch (JsonException)
-            {
-            }
+            catch (JsonException) { }
         }
-
-        bool isHtml = trimmed.StartsWith('<');
 
         return new ApiResponse<T>
         {
             IsSuccess = false,
             StatusCode = statusCode,
             Data = errorData,
-            ErrorMessage = string.IsNullOrWhiteSpace(errorBody) || isHtml
-                ? $"HTTP {statusCode}: {response.ReasonPhrase}"
-                : errorBody
+            ErrorMessage = ExtractFriendlyErrorMessage(statusCode, response.ReasonPhrase, trimmed)
         };
     }
 
-    private static ApiResponse<T> HandleException<T>(Exception ex)
+    private static string ExtractFriendlyErrorMessage(int statusCode, string? reasonPhrase, string trimmedBody)
+    {
+        if (string.IsNullOrWhiteSpace(trimmedBody) || trimmedBody.StartsWith('<'))
+        {
+            return statusCode switch
+            {
+                401 => "Sesi berakhir atau tidak terautentikasi. Silakan login kembali.",
+                403 => "Anda tidak memiliki izin untuk mengakses fitur ini.",
+                404 => "Data atau endpoint tidak ditemukan di server.",
+                502 or 503 or 504 => "Server sedang bangun (cold start) atau sibuk. Silakan coba beberapa saat lagi.",
+                _ => $"HTTP {statusCode}: {reasonPhrase ?? "Terjadi kesalahan pada server"}"
+            };
+        }
+
+        // Ekstrak field pesan umum dari backend JSON (message, error, detail, title)
+        if (trimmedBody.StartsWith('{'))
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(trimmedBody);
+                var root = doc.RootElement;
+
+                foreach (var prop in new[] { "message", "error", "detail", "title" })
+                {
+                    if (root.TryGetProperty(prop, out var val) && val.ValueKind == JsonValueKind.String)
+                    {
+                        var msg = val.GetString();
+                        if (!string.IsNullOrWhiteSpace(msg)) return msg;
+                    }
+                }
+            }
+            catch (JsonException) { }
+        }
+
+        return trimmedBody;
+    }
+
+    private static ApiResponse<T> HandleException<T>(Exception ex, CancellationToken ct)
     {
         string message = ex switch
         {
+            OperationCanceledException when ct.IsCancellationRequested => "Permintaan dibatalkan.",
             TaskCanceledException => "Koneksi timeout. Server Render sedang bangun (cold start), silakan coba lagi.",
             HttpRequestException httpEx => $"Gagal terhubung ke server: {httpEx.Message}",
             JsonException => "Format respons JSON dari server tidak sesuai.",
@@ -180,4 +259,15 @@ public class ApiService
             ErrorMessage = message
         };
     }
+
+    private static string NormalizeEndpoint(string endpoint) => endpoint.TrimStart('/');
+
+    private static bool IsTransientStatus(HttpStatusCode code) =>
+        code is HttpStatusCode.RequestTimeout
+            or HttpStatusCode.BadGateway
+            or HttpStatusCode.ServiceUnavailable
+            or HttpStatusCode.GatewayTimeout;
+
+    private static bool IsTransientException(Exception ex, CancellationToken ct) =>
+        ex is HttpRequestException || (ex is TaskCanceledException && !ct.IsCancellationRequested);
 }

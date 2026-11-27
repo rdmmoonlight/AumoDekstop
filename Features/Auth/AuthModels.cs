@@ -30,14 +30,35 @@ public record RegisterPayload(
 // ==========================================
 // 2. Model dari auth.api.ts
 // ==========================================
-public record LoginRequest(
-    [property: JsonPropertyName("email")] string Email,
-    [property: JsonPropertyName("password")] string Password
-);
+public class LoginRequest
+{
+    [JsonPropertyName("email")]
+    public string Email { get; set; } = string.Empty;
 
-public record GoogleLoginRequest(
-    [property: JsonPropertyName("idToken")] string IdToken
-);
+    [JsonPropertyName("password")]
+    public string Password { get; set; } = string.Empty;
+
+    [JsonPropertyName("rememberMe")]
+    public bool RememberMe { get; set; }
+
+    [JsonPropertyName("isMobileClient")]
+    public bool IsMobileClient { get; set; } = true;
+
+    [JsonPropertyName("operatingSystem")]
+    public string OperatingSystem { get; set; } = "Windows";
+}
+
+public class GoogleLoginRequest
+{
+    [JsonPropertyName("idToken")]
+    public string IdToken { get; set; } = string.Empty;
+
+    [JsonPropertyName("isMobileClient")]
+    public bool IsMobileClient { get; set; } = true;
+
+    [JsonPropertyName("operatingSystem")]
+    public string OperatingSystem { get; set; } = "Windows";
+}
 
 public record AuthResponse(
     [property: JsonPropertyName("success")] bool Success,

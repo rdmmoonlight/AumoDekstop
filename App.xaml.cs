@@ -45,7 +45,7 @@ public partial class App : Application
         _window.Activate();
 
         // Bangunkan server Render sejak aplikasi dibuka (cold start), tanpa menunggu hasilnya
-        _ = Services.GetRequiredService<ApiService>().CheckServerHealthAsync("");
+        _ = Services.GetRequiredService<ApiService>().CheckServerHealthAsync("api/v1/health");
     }
 
     /// <summary>
