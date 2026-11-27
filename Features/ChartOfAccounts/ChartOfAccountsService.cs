@@ -81,10 +81,14 @@ public class ChartOfAccountsService : IChartOfAccountsService
         var queryParts = new List<string>();
 
         if (!string.IsNullOrWhiteSpace(parameters?.Search))
+        {
             queryParts.Add($"Search={Uri.EscapeDataString(parameters.Search)}");
+        }
 
         if (!string.IsNullOrWhiteSpace(parameters?.Category))
+        {
             queryParts.Add($"Category={Uri.EscapeDataString(parameters.Category)}");
+        }
 
         var url = queryParts.Count > 0
             ? $"{BaseEndpoint}?{string.Join("&", queryParts)}"

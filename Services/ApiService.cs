@@ -44,9 +44,13 @@ public class ApiService : IApiService
     public void SetAuthToken(string? token)
     {
         if (string.IsNullOrWhiteSpace(token))
+        {
             TokenStore.Instance.Clear();
+        }
         else
+        {
             TokenStore.Instance.Set(token);
+        }
     }
 
     public async Task<bool> CheckServerHealthAsync(string healthEndpoint = "health", CancellationToken ct = default)
@@ -231,7 +235,10 @@ public class ApiService : IApiService
                     if (root.TryGetProperty(prop, out var val) && val.ValueKind == JsonValueKind.String)
                     {
                         var msg = val.GetString();
-                        if (!string.IsNullOrWhiteSpace(msg)) return msg;
+                        if (!string.IsNullOrWhiteSpace(msg))
+                        {
+                            return msg;
+                        }
                     }
                 }
             }
