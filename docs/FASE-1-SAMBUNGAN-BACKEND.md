@@ -144,9 +144,9 @@ public class LoginRequest
 
 ### 1.9 Sesi berakhir terpusat (T6)
 
-- [ ] Di `MainWindow`, berlangganan `ITokenStore.SessionExpired`. Event datang dari utas non-UI, jadi pindahkan ke `DispatcherQueue.TryEnqueue`.
-- [ ] Handler: bersihkan sesi tersimpan, `ShowLogin()`, tampilkan pesan "Sesi berakhir, silakan masuk kembali."
-- [ ] Lepas langganan saat jendela ditutup.
+- [x] Di `MainWindow`, berlangganan `ITokenStore.SessionExpired`. Event datang dari utas non-UI, jadi pindahkan ke `DispatcherQueue.TryEnqueue`.
+- [x] Handler: bersihkan sesi tersimpan, `ShowLogin()`, tampilkan pesan "Sesi berakhir, silakan masuk kembali."
+- [x] Lepas langganan saat jendela ditutup.
 
 ### 1.10 Perbaiki path (Tabel T3)
 
