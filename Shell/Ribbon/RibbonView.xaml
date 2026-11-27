@@ -61,7 +61,7 @@
                 <local:RibbonPeriodsPanel x:Name="RibbonPeriods" Visibility="Collapsed" CommandInvoked="OnPanelCommand" />
                 <local:RibbonCoaPanel x:Name="RibbonCoa" Visibility="Collapsed" CommandInvoked="OnPanelCommand" />
                 <local:RibbonDataPanel x:Name="RibbonData" Visibility="Collapsed" CommandInvoked="OnPanelCommand" />
-                <local:RibbonReportPanel x:Name="RibbonReport" Visibility="Collapsed" CommandInvoked="OnPanelCommand" />
+                <local:RibbonReportsPanel x:Name="RibbonReport" Visibility="Collapsed" CommandInvoked="OnPanelCommand" />
                 <local:RibbonSettingsPanel x:Name="RibbonSettings" Visibility="Collapsed" CommandInvoked="OnPanelCommand" />
             </Grid>
         </Border>
