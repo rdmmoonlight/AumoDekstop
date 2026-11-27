@@ -1,5 +1,5 @@
 <UserControl
-    x:Class="AumoDekstop.Shell.Ribbon.RibbonReportPanel"
+    x:Class="AumoDekstop.Shell.Ribbon.RibbonReportsPanel"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:AumoDekstop.Shell.Ribbon">
@@ -12,9 +12,9 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0" Orientation="Horizontal">
-                <local:RibbonButton Glyph="&#xEA37;" Label="TB Awal" CommandId="reports.trial-balance.unadjusted" Click="OnButtonClick" />
-                <local:RibbonButton Glyph="&#xE762;" Label="TB Penyesuaian" CommandId="reports.trial-balance.adjusted" Click="OnButtonClick" />
-                <local:RibbonButton Glyph="&#xEA18;" Label="TB Penutup" CommandId="reports.trial-balance.post-closing" Click="OnButtonClick" />
+                <local:RibbonButton Glyph="&#xEA37;" Label="TB Awal" CommandId="UnadjustedTrialBalance" Click="OnButtonClick" />
+                <local:RibbonButton Glyph="&#xE762;" Label="TB Penyesuaian" CommandId="AdjustedTrialBalance" Click="OnButtonClick" />
+                <local:RibbonButton Glyph="&#xEA18;" Label="TB Penutup" CommandId="PostClosingTrialBalance" Click="OnButtonClick" />
             </StackPanel>
             <TextBlock Grid.Row="1" Text="Neraca Saldo" FontSize="11" HorizontalAlignment="Center"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
@@ -23,17 +23,33 @@
         <Rectangle Width="1" Height="64" Margin="4,0" VerticalAlignment="Center"
                    Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
-        <!-- Grup 2: Laporan Keuangan (Financial Statements) -->
+        <!-- Grup 2: Kertas Kerja (Worksheet) -->
         <Grid Padding="4,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0" Orientation="Horizontal">
-                <local:RibbonButton Glyph="&#xE9D2;" Label="Laba Rugi" CommandId="reports.financial-statements.income-statement" Click="OnButtonClick" />
-                <local:RibbonButton Glyph="&#xE8C7;" Label="Laba Ditahan" CommandId="reports.financial-statements.retained-earnings" Click="OnButtonClick" />
-                <local:RibbonButton Glyph="&#xE8AB;" Label="Arus Kas" CommandId="reports.financial-statements.cash-flow" Click="OnButtonClick" />
-                <local:RibbonButton Glyph="&#xE8A5;" Label="Neraca" CommandId="reports.financial-statements.financial-position" Click="OnButtonClick" />
+                <local:RibbonButton Glyph="&#xE80A;" Label="Worksheet" CommandId="Worksheet" Click="OnButtonClick" />
+            </StackPanel>
+            <TextBlock Grid.Row="1" Text="Kertas Kerja" FontSize="11" HorizontalAlignment="Center"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        </Grid>
+
+        <Rectangle Width="1" Height="64" Margin="4,0" VerticalAlignment="Center"
+                   Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+        <!-- Grup 3: Laporan Keuangan (Financial Statements) -->
+        <Grid Padding="4,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <local:RibbonButton Glyph="&#xE9D2;" Label="Laba Rugi" CommandId="IncomeStatement" Click="OnButtonClick" />
+                <local:RibbonButton Glyph="&#xE8C7;" Label="Laba Ditahan" CommandId="RetainedEarnings" Click="OnButtonClick" />
+                <local:RibbonButton Glyph="&#xE8AB;" Label="Arus Kas" CommandId="CashFlow" Click="OnButtonClick" />
+                <local:RibbonButton Glyph="&#xE8A5;" Label="Neraca" CommandId="FinancialPosition" Click="OnButtonClick" />
             </StackPanel>
             <TextBlock Grid.Row="1" Text="Laporan Keuangan" FontSize="11" HorizontalAlignment="Center"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
@@ -42,7 +58,7 @@
         <Rectangle Width="1" Height="64" Margin="4,0" VerticalAlignment="Center"
                    Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
-        <!-- Grup 3: Keluaran -->
+        <!-- Grup 4: Keluaran -->
         <Grid Padding="4,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
