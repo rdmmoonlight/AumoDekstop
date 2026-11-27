@@ -1,4 +1,3 @@
-
 using System;
 using AumoDekstop.Features.Auth.Services;
 using AumoDekstop.Features.Auth.Views;
@@ -17,6 +16,7 @@ namespace AumoDekstop;
 public sealed partial class MainWindow : Window
 {
     private bool _hasCheckedUpdate;
+    private bool _isHandlingSessionExpired;
     private readonly UpdateCoordinator _updates;
     private readonly ApiService _api = App.Current.Services.GetRequiredService<ApiService>();
     private readonly ITokenStore _tokenStore = App.Current.Services.GetRequiredService<ITokenStore>();
@@ -59,9 +59,24 @@ public sealed partial class MainWindow : Window
         // Pemanggilan HTTP sering berjalan di background thread; pastikan manipulasi UI masuk ke UI thread
         DispatcherQueue.TryEnqueue(() =>
         {
-            _auth.ClearSession();
-            SetStatus("Sesi telah berakhir. Silakan login kembali.");
-            ShowLogin();
+            if (_isHandlingSessionExpired)
+            {
+                return;
+            }
+
+            _isHandlingSessionExpired = true;
+            try
+            {
+                const string message = "Sesi berakhir, silakan masuk kembali.";
+                _auth.ClearSession();
+                SessionStorageService.ClearSession();
+                ShowLogin(message);
+                SetStatus($"● {message}");
+            }
+            finally
+            {
+                _isHandlingSessionExpired = false;
+            }
         });
     }
 
@@ -74,23 +89,16 @@ public sealed partial class MainWindow : Window
 
         _hasCheckedUpdate = true;
 
-        SetStatus("Memulihkan sesi...");
+        SetStatus("● Memulihkan sesi...");
         var (isRestored, errorMessage) = await _auth.RestoreSessionAsync();
 
         if (isRestored)
         {
-            SetStatus("Siap");
             EnterApp();
         }
         else
         {
-            SetStatus(string.IsNullOrWhiteSpace(errorMessage) ? "Silakan login." : errorMessage);
-            ShowLogin();
-
-            if (!string.IsNullOrWhiteSpace(errorMessage) && _loginPage is not null)
-            {
-                _loginPage.ViewModel.ErrorMessage = errorMessage;
-            }
+            ShowLogin(errorMessage);
         }
 
         await _updates.CheckAndPromptAsync(Content?.XamlRoot, isManualCheck: false);
