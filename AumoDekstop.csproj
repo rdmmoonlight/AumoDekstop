@@ -13,12 +13,16 @@
     <PublishProfile Condition="'$(RuntimeIdentifier)' != '' and Exists('Properties\PublishProfiles\win-$(Platform).pubxml')">win-$(Platform).pubxml</PublishProfile>
     <UseWinUI>true</UseWinUI>
 
-    <!-- Konfigurasi Unpackaged & Self-Contained (dipasang lewat installer Inno Setup) -->
+    <!-- Unpackaged & Self-Contained (untuk Inno Setup) -->
     <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-    <EnableMsixTooling>true</EnableMsixTooling>
-    <EnableWinAppRunSupport>false</EnableWinAppRunSupport>
+    <EnableMsixTooling>false</EnableMsixTooling>
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
+
+    <!-- Pengaturan Native AOT & CsWinRT -->
+    <PublishAot>true</PublishAot>
+    <CsWinRTAotOptimizerEnabled>true</CsWinRTAotOptimizerEnabled>
+    <CsWinRTAotWarningLevel>2</CsWinRTAotWarningLevel>
 
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -34,30 +38,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- MVVM & DI (Versi Stabil untuk .NET 10) -->
+    <!-- MVVM & DI (Versi .NET 10) -->
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="11.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
 
-    <!-- Windows App SDK & BuildTools (Rilis Stabil, bukan Preview) -->
+    <!-- Windows App SDK & BuildTools -->
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.6.5" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2957" />
   </ItemGroup>
 
-  <!-- Publish Properties -->
-  <PropertyGroup>
-    <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
-    <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
-    <PublishAot>true</PublishAot>
-    <PublishTrimmed>true</PublishTrimmed>
-  </PropertyGroup>
-
+  <!-- Publish Properties khusus Release -->
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <SelfContained>true</SelfContained>
-    <!-- Mode installer: publish sebagai folder biasa (tanpa single-file) lalu dibungkus Inno Setup -->
-    <PublishSingleFile>false</PublishSingleFile>
+    <!-- PublishSingleFile dan PublishReadyToRun tidak dipakai saat PublishAot=true -->
   </PropertyGroup>
 </Project>
