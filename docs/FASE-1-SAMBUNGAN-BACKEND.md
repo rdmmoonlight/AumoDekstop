@@ -150,9 +150,9 @@ public class LoginRequest
 
 ### 1.10 Perbaiki path (Tabel T3)
 
-- [ ] `PeriodsApiService`: `api/v1/periods/select/{id}` dan `api/v1/periods/close/{id}`.
-- [ ] Cocokkan isi `CreatePeriodAsync` dengan `CreatePeriodRequest` backend: `Month`, `Year`, `SetupMode` (`LoadExisting` atau `CreateNew`), `CashAccountId`, `BankAccountId`, dan akun laba ditahan. Buka `backend/AumoBackend/DTOs/PeriodsDto.cs` untuk daftar lengkap, lalu cek bentuk respons `open-info` di Scalar.
-- [ ] Jurnal: biarkan path ubah/hapus apa adanya sampai B-1. Lihat Fase 3 butir 3.6.
+- [x] `PeriodsApiService`: `api/v1/periods/select/{id}` dan `api/v1/periods/close/{id}`.
+- [x] Cocokkan isi `CreatePeriodAsync` dengan `CreatePeriodRequest` backend: `Month`, `Year`, `SetupMode` (`LoadExisting` atau `CreateNew`), `CashAccountId`, `BankAccountId`, dan akun laba ditahan. Buka `backend/AumoBackend/DTOs/PeriodsDto.cs` untuk daftar lengkap, lalu cek bentuk respons `open-info` di Scalar.
+- [x] Jurnal: biarkan path ubah/hapus apa adanya sampai B-1. Lihat Fase 3 butir 3.6.
 
 ### 1.11 Seragamkan service ke `ApiService` (T7, K3)
 
