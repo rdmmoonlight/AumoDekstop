@@ -157,14 +157,43 @@ jobs:
             Copy-Item "./appsettings.json" (Join-Path $publishDir "appsettings.json") -Force
           }
 
-          # Salin resources.pri jika dihasilkan di bin/obj tapi belum masuk ke folder publish
+          # Salin *.pri (AumoDekstop.pri / resources.pri) sebagai resources.pri ke folder publish
           if (-not (Test-Path (Join-Path $publishDir "resources.pri"))) {
-            $priFile = Get-ChildItem -Path "bin", "obj" -Filter "resources.pri" -Recurse -ErrorAction SilentlyContinue |
+            $priFile = Get-ChildItem -Path "bin", "obj" -Filter "*.pri" -Recurse -ErrorAction SilentlyContinue |
+                       Where-Object { $_.Name -eq "resources.pri" -or $_.Name -eq "AumoDekstop.pri" } |
+                       Sort-Object Length -Descending |
                        Select-Object -First 1
             if ($priFile) {
-              Write-Host "Menyalin resources.pri dari $($priFile.FullName) ke $publishDir"
+              Write-Host "Menyalin $($priFile.FullName) -> $publishDir\resources.pri"
               Copy-Item $priFile.FullName (Join-Path $publishDir "resources.pri") -Force
             }
+          }
+
+          # Salin semua compiled XAML (*.xbf) dari folder output build ke publish jika belum ada
+          $xbfRoot = Get-ChildItem -Path "bin" -Filter "App.xbf" -Recurse -ErrorAction SilentlyContinue |
+                     Select-Object -First 1 -ExpandProperty DirectoryName
+          if (-not $xbfRoot) {
+            $xbfRoot = Get-ChildItem -Path "obj" -Filter "App.xbf" -Recurse -ErrorAction SilentlyContinue |
+                       Select-Object -First 1 -ExpandProperty DirectoryName
+          }
+          if ($xbfRoot) {
+            Write-Host "Menyalin compiled XAML (.xbf) dari $xbfRoot ke $publishDir"
+            Get-ChildItem -Path $xbfRoot -Filter "*.xbf" -Recurse | ForEach-Object {
+              $relPath = $_.FullName.Substring($xbfRoot.Length).TrimStart('\', '/')
+              $destFile = Join-Path $publishDir $relPath
+              $destParent = Split-Path $destFile -Parent
+              if (-not (Test-Path $destParent)) {
+                New-Item -ItemType Directory -Path $destParent -Force | Out-Null
+              }
+              Copy-Item $_.FullName $destFile -Force
+            }
+          }
+
+          # Gagalkan CI jika resources.pri tetap belum ada agar tidak merilis installer yang crash
+          if (-not (Test-Path (Join-Path $publishDir "resources.pri"))) {
+            Write-Host "Daftar *.pri yang ditemukan di bin/obj:"
+            Get-ChildItem -Path "bin", "obj" -Filter "*.pri" -Recurse -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.FullName }
+            throw "FATAL: File .pri tidak ditemukan di bin maupun obj!"
           }
 
           Write-Host "=== Isi folder publish ==="
