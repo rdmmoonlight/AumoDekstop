@@ -140,10 +140,24 @@ jobs:
             Remove-Item $publishDir -Recurse -Force
           }
 
+          # 1. Jalankan Build penuh terlebih dahulu agar XAML (.xbf) & resources.pri di-generate oleh Windows App SDK
+          dotnet build $env:Project_Path `
+            -c $env:Configuration `
+            -r win-x64 `
+            -p:Platform=x64 `
+            -p:Version=${{ steps.version.outputs.semver_version }} `
+            -p:InformationalVersion=${{ steps.version.outputs.app_version }} `
+            -p:AssemblyVersion=${{ steps.version.outputs.assembly_version }} `
+            -p:FileVersion=${{ steps.version.outputs.assembly_version }}
+
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+          # 2. Publish Native AOT ke folder publish
           dotnet publish $env:Project_Path `
             -c $env:Configuration `
             -r win-x64 `
             -p:Platform=x64 `
+            --no-build `
             -o "$publishDir" `
             -p:Version=${{ steps.version.outputs.semver_version }} `
             -p:InformationalVersion=${{ steps.version.outputs.app_version }} `
@@ -152,6 +166,30 @@ jobs:
 
           if ($LASTEXITCODE -ne 0) { exit 1 }
 
+          # 3. Cadangan penyalinan eksplisit resources.pri & .xbf dari bin/obj jika target MSBuild melewatkannya
+          $buildOutDir = Get-ChildItem -Path "bin" -Directory -Recurse |
+                         Where-Object { $_.FullName -like "*\win-x64" -and (Test-Path (Join-Path $_.FullName "resources.pri")) } |
+                         Select-Object -First 1 -ExpandProperty FullName
+
+          if (-not $buildOutDir) {
+            $priFallback = Get-ChildItem -Path "bin", "obj" -Filter "resources.pri" -Recurse -ErrorAction SilentlyContinue |
+                           Select-Object -First 1
+            if ($priFallback) {
+              Copy-Item $priFallback.FullName (Join-Path $publishDir "resources.pri") -Force
+            }
+          } else {
+            Copy-Item (Join-Path $buildOutDir "*.pri") $publishDir -Force -ErrorAction SilentlyContinue
+            Get-ChildItem -Path $buildOutDir -Filter "*.xbf" -Recurse | ForEach-Object {
+              $relPath = $_.FullName.Substring($buildOutDir.Length).TrimStart('\', '/')
+              $destFile = Join-Path $publishDir $relPath
+              $destParent = Split-Path $destFile -Parent
+              if (-not (Test-Path $destParent)) {
+                New-Item -ItemType Directory -Path $destParent -Force | Out-Null
+              }
+              Copy-Item $_.FullName $destFile -Force
+            }
+          }
+
           # Pastikan appsettings.json ikut tersalin ke folder publish
           if (Test-Path "./appsettings.json") {
             Copy-Item "./appsettings.json" (Join-Path $publishDir "appsettings.json") -Force
@@ -159,7 +197,9 @@ jobs:
 
           # Verifikasi aset wajib WinUI 3 (resources.pri & .xbf) agar tidak crash saat dijalankan
           if (-not (Test-Path (Join-Path $publishDir "resources.pri"))) {
-            throw "FATAL: resources.pri tidak ditemukan di $publishDir! Pastikan EnableMsixTooling=true di .csproj."
+            Write-Host "Daftar file di bin & obj:"
+            Get-ChildItem -Path "bin", "obj" -Filter "*.pri" -Recurse -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.FullName }
+            throw "FATAL: resources.pri tidak ditemukan di $publishDir!"
           }
 
           $xbfCount = (Get-ChildItem -Path $publishDir -Filter "*.xbf" -Recurse).Count
