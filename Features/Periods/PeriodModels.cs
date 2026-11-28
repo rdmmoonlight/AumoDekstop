@@ -6,7 +6,7 @@ using AumoDekstop.Features.Periods.Helpers;
 
 namespace AumoDekstop.Features.Periods.Models;
 
-public class PeriodItem : INotifyPropertyChanged
+public partial class PeriodItem : INotifyPropertyChanged
 {
     private int _id;
     private string _periodName = string.Empty;
