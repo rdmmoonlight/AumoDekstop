@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using AumoDekstop.Features.Auth.Services;
 using AumoDekstop.Features.Auth.ViewModels;
+using AumoDekstop.Features.ChartOfAccounts;
 using AumoDekstop.Features.ChartOfAccounts.Services;
 using AumoDekstop.Features.ChartOfAccounts.Views;
 using AumoDekstop.Features.JournalEntry.Services;
@@ -63,6 +64,7 @@ public static class DependencyInjection
 
         // 5. Chart Of Accounts
         services.AddSingleton<IChartOfAccountsService, ChartOfAccountsService>();
+        services.AddTransient<ChartOfAccountsViewModel>();
         services.AddTransient<ChartOfAccountsPage>();
 
         // 6. Journal Entry
