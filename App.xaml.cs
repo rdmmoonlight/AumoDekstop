@@ -7,7 +7,6 @@ using AumoDekstop.Services;
 using AumoDekstop.Services.Api;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Markup;
 
 namespace AumoDekstop;
 
@@ -79,7 +78,7 @@ public partial class App : Application
     {
         var sb = new StringBuilder();
         sb.AppendLine(string.IsNullOrWhiteSpace(fallbackMessage) ? "Unhandled Exception" : fallbackMessage);
-        sb.AppendLine($"  BaseDirectory : {AppContext.BaseDirectory}");
+        sb.AppendLine($"  BaseDirectory  : {AppContext.BaseDirectory}");
         sb.AppendLine($"  HasResourcesPri: {File.Exists(Path.Combine(AppContext.BaseDirectory, "resources.pri"))}");
 
         if (rootException is null)
@@ -95,11 +94,6 @@ public partial class App : Application
             string prefix = depth == 0 ? "RootException" : $"InnerException[{depth}]";
             sb.AppendLine($"  {prefix}: {current.GetType().FullName} (HResult: 0x{current.HResult:X8})");
             sb.AppendLine($"    Message: {current.Message}");
-
-            if (current is XamlParseException xamlEx)
-            {
-                sb.AppendLine($"    XAML Location: Line {xamlEx.LineNumber}, Column {xamlEx.LinePosition}");
-            }
 
             if (!string.IsNullOrWhiteSpace(current.StackTrace))
             {
