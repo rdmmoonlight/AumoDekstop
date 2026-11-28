@@ -11,6 +11,7 @@ using AumoDekstop.Features.Periods.ViewModels;
 using AumoDekstop.Features.Reports.FinancialStatements.Services;
 using AumoDekstop.Features.Reports.FinancialStatements.ViewModels;
 using AumoDekstop.Features.Reports.FinancialStatements.Views;
+using AumoDekstop.Features.Reports.GeneralLedgers;
 using AumoDekstop.Features.Reports.TrialBalances.Services;
 using AumoDekstop.Features.Reports.TrialBalances.ViewModels;
 using AumoDekstop.Features.Reports.TrialBalances.Views;
@@ -48,11 +49,10 @@ public static class DependencyInjection
         })
         .AddHttpMessageHandler<AuthHeaderHandler>();
 
-        // 2. Satu-satunya pintu akses HTTP (IApiService & ApiService)
-        services.AddHttpClient<IApiService, ApiService>("AumoApi");
-
-        // Opsional: forward sementara jika masih ada kelas lama yang meminta concrete ApiService
-        services.AddTransient<ApiService>(sp => (ApiService)sp.GetRequiredService<IApiService>());
+        // 2. Satu-satunya pintu akses HTTP (tepat satu CreateClient("AumoApi"))
+        services.AddSingleton<ApiService>(sp =>
+            new ApiService(sp.GetRequiredService<IHttpClientFactory>().CreateClient("AumoApi")));
+        services.AddSingleton<IApiService>(sp => sp.GetRequiredService<ApiService>());
 
         // 3. Autentikasi & Google OAuth
         services.AddSingleton<IAuthService, AuthService>();
@@ -75,8 +75,9 @@ public static class DependencyInjection
         services.AddTransient<RegisterViewModel>();
         services.AddTransient<PeriodsPageViewModel>();
 
-        // 8. Trial Balances & Worksheet
-        services.AddTransient<ITrialBalancesApiService, TrialBalancesApiService>();
+        // 8. General Ledgers, Trial Balances & Worksheet
+        services.AddSingleton<IGeneralLedgersService, GeneralLedgersService>();
+        services.AddSingleton<ITrialBalancesApiService, TrialBalancesApiService>();
         services.AddSingleton<IWorksheetService, WorksheetService>();
         services.AddTransient<WorksheetPageViewModel>();
         services.AddTransient<WorksheetPage>();
@@ -88,7 +89,7 @@ public static class DependencyInjection
         services.AddTransient<PostClosingTrialBalancePage>();
 
         // 9. Financial Statements
-        services.AddTransient<IFinancialStatementsApiService, FinancialStatementsApiService>();
+        services.AddSingleton<IFinancialStatementsApiService, FinancialStatementsApiService>();
         services.AddTransient<IncomeStatementViewModel>();
         services.AddTransient<RetainedEarningsViewModel>();
         services.AddTransient<StatementOfCashFlowViewModel>();

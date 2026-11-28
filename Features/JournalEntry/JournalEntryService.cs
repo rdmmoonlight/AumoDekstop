@@ -22,10 +22,10 @@ public interface IJournalEntryService
 
 public class JournalEntryService : IJournalEntryService
 {
-    private readonly IApiService _apiService;
+    private readonly ApiService _apiService;
     private readonly IMessenger _messenger;
 
-    public JournalEntryService(IApiService apiService, IMessenger? messenger = null)
+    public JournalEntryService(ApiService apiService, IMessenger? messenger = null)
     {
         ArgumentNullException.ThrowIfNull(apiService);
         _apiService = apiService;

@@ -1,11 +1,8 @@
-
 using System;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using AumoDekstop.Features.Reports.FinancialStatements.Models;
+using AumoDekstop.Services.Api;
 
 namespace AumoDekstop.Features.Reports.FinancialStatements.Services;
 
@@ -24,16 +21,11 @@ public interface IFinancialStatementsApiService
 
 public sealed class FinancialStatementsApiService : IFinancialStatementsApiService
 {
-    private readonly HttpClient _httpClient;
+    private readonly ApiService _apiService;
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    public FinancialStatementsApiService(ApiService apiService)
     {
-        PropertyNameCaseInsensitive = true
-    };
-
-    public FinancialStatementsApiService(HttpClient httpClient)
-    {
-        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
     }
 
     public Task<IncomeStatementData?> GetIncomeStatementAsync(CancellationToken cancellationToken = default)
@@ -62,9 +54,13 @@ public sealed class FinancialStatementsApiService : IFinancialStatementsApiServi
 
     private async Task<T?> FetchAsync<T>(string requestUri, CancellationToken cancellationToken)
     {
-        using var response = await _httpClient.GetAsync(requestUri, cancellationToken);
-        response.EnsureSuccessStatusCode();
+        var response = await _apiService.GetAsync<T>(requestUri, cancellationToken);
 
-        return await response.Content.ReadFromJsonAsync<T>(JsonOptions, cancellationToken);
+        if (!response.IsSuccess)
+        {
+            throw new InvalidOperationException(response.ErrorMessage ?? $"Request failed with status {response.StatusCode}.");
+        }
+
+        return response.Data;
     }
 }

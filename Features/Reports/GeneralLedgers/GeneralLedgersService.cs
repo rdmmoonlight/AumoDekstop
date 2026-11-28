@@ -1,79 +1,12 @@
-
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using AumoDekstop.Services.Api;
 
 namespace AumoDekstop.Features.Reports.GeneralLedgers;
-#region DTO / Response Models
-
-public class GetGeneralLedgerPermanentResponse
-{
-    [JsonPropertyName("success")]
-    public bool Success { get; set; }
-
-    [JsonPropertyName("hasPeriodSelected")]
-    public bool HasPeriodSelected { get; set; }
-
-    [JsonPropertyName("selectedPeriodName")]
-    public string? SelectedPeriodName { get; set; }
-
-    [JsonPropertyName("isTemporary")]
-    public bool IsTemporary { get; set; }
-
-    [JsonPropertyName("message")]
-    public string? Message { get; set; }
-
-    [JsonPropertyName("accounts")]
-    public List<JsonElement>? Accounts { get; set; }
-}
-
-public class GetGeneralLedgerTemporaryResponse
-{
-    [JsonPropertyName("success")]
-    public bool Success { get; set; }
-
-    [JsonPropertyName("hasPeriodSelected")]
-    public bool HasPeriodSelected { get; set; }
-
-    [JsonPropertyName("selectedPeriodName")]
-    public string? SelectedPeriodName { get; set; }
-
-    [JsonPropertyName("isTemporary")]
-    public bool IsTemporary { get; set; }
-
-    [JsonPropertyName("netIncomeBeforeClosing")]
-    public decimal? NetIncomeBeforeClosing { get; set; }
-
-    [JsonPropertyName("message")]
-    public string? Message { get; set; }
-
-    [JsonPropertyName("accounts")]
-    public List<JsonElement>? Accounts { get; set; }
-}
-
-public class RefreshGeneralLedgerResponse
-{
-    [JsonPropertyName("success")]
-    public bool Success { get; set; }
-
-    [JsonPropertyName("message")]
-    public string? Message { get; set; }
-
-    /// <summary>
-    /// Menampung properti tambahan dinamis ([key: string]: unknown)
-    /// </summary>
-    [JsonExtensionData]
-    public Dictionary<string, JsonElement>? AdditionalData { get; set; }
-}
-
-#endregion
-
-#region API Service
 
 public interface IGeneralLedgersService
 {
@@ -84,66 +17,55 @@ public interface IGeneralLedgersService
 
 public class GeneralLedgersService : IGeneralLedgersService
 {
-    private readonly HttpClient _httpClient;
+    private readonly ApiService _apiService;
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    public GeneralLedgersService(ApiService apiService)
     {
-        PropertyNameCaseInsensitive = true
-    };
-
-    public GeneralLedgersService(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
+        _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
     }
 
     public async Task<GetGeneralLedgerPermanentResponse> GetGeneralLedgerPermanentAsync(
         CancellationToken cancellationToken = default)
     {
-        using var response = await _httpClient.GetAsync(
-            "/api/v1/reports/general-ledgers/permanent",
+        var response = await _apiService.GetAsync<GetGeneralLedgerPermanentResponse>(
+            "api/v1/reports/general-ledgers/permanent",
             cancellationToken);
 
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccess)
+        {
+            throw new InvalidOperationException(response.ErrorMessage ?? $"Request failed with status {response.StatusCode}.");
+        }
 
-        var data = await response.Content.ReadFromJsonAsync<GetGeneralLedgerPermanentResponse>(
-            JsonOptions,
-            cancellationToken);
-
-        return data ?? throw new InvalidOperationException("Respons permanent general ledger kosong.");
+        return response.Data ?? throw new InvalidOperationException("Respons permanent general ledger kosong.");
     }
 
     public async Task<GetGeneralLedgerTemporaryResponse> GetGeneralLedgerTemporaryAsync(
         CancellationToken cancellationToken = default)
     {
-        using var response = await _httpClient.GetAsync(
-            "/api/v1/reports/general-ledgers/temporary",
+        var response = await _apiService.GetAsync<GetGeneralLedgerTemporaryResponse>(
+            "api/v1/reports/general-ledgers/temporary",
             cancellationToken);
 
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccess)
+        {
+            throw new InvalidOperationException(response.ErrorMessage ?? $"Request failed with status {response.StatusCode}.");
+        }
 
-        var data = await response.Content.ReadFromJsonAsync<GetGeneralLedgerTemporaryResponse>(
-            JsonOptions,
-            cancellationToken);
-
-        return data ?? throw new InvalidOperationException("Respons temporary general ledger kosong.");
+        return response.Data ?? throw new InvalidOperationException("Respons temporary general ledger kosong.");
     }
 
     public async Task<RefreshGeneralLedgerResponse> RefreshGeneralLedgerAsync(
         CancellationToken cancellationToken = default)
     {
-        using var response = await _httpClient.PostAsync(
-            "/api/v1/reports/general-ledgers/refresh",
-            content: null,
+        var response = await _apiService.PostEmptyAsync<RefreshGeneralLedgerResponse>(
+            "api/v1/reports/general-ledgers/refresh",
             cancellationToken);
 
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccess)
+        {
+            throw new InvalidOperationException(response.ErrorMessage ?? $"Request failed with status {response.StatusCode}.");
+        }
 
-        var data = await response.Content.ReadFromJsonAsync<RefreshGeneralLedgerResponse>(
-            JsonOptions,
-            cancellationToken);
-
-        return data ?? throw new InvalidOperationException("Respons refresh general ledger kosong.");
+        return response.Data ?? throw new InvalidOperationException("Respons refresh general ledger kosong.");
     }
 }
-
-#endregion

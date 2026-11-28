@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -61,13 +60,13 @@ public interface IChartOfAccountsService
 
 public class ChartOfAccountsService : IChartOfAccountsService
 {
-    private readonly IApiService _apiService;
+    private readonly ApiService _apiService;
     private readonly JsonSerializerOptions _jsonOptions;
     private const string BaseEndpoint = "api/v1/chart-of-accounts";
 
-    public ChartOfAccountsService(IApiService apiService)
+    public ChartOfAccountsService(ApiService apiService)
     {
-        _apiService = apiService;
+        _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
@@ -155,7 +154,7 @@ public class ChartOfAccountsService : IChartOfAccountsService
     {
         if (!response.IsSuccess)
         {
-            throw new HttpRequestException(response.ErrorMessage ?? "Permintaan ke server gagal.");
+            throw new InvalidOperationException(response.ErrorMessage ?? "Permintaan ke server gagal.");
         }
     }
 }

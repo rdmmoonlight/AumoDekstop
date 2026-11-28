@@ -1,13 +1,11 @@
-
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using AumoDekstop.Features.Reports.TrialBalances.Helpers;
 using AumoDekstop.Features.Reports.TrialBalances.Models;
+using AumoDekstop.Services.Api;
 
 namespace AumoDekstop.Features.Reports.TrialBalances.Services;
 
@@ -31,16 +29,16 @@ public interface ITrialBalancesApiService
 
 public sealed class TrialBalancesApiService : ITrialBalancesApiService
 {
-    private readonly HttpClient _httpClient;
+    private readonly ApiService _apiService;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
-    public TrialBalancesApiService(HttpClient httpClient)
+    public TrialBalancesApiService(ApiService apiService)
     {
-        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
     }
 
     public async Task<TrialBalanceFetchResult> GetTrialBalanceAsync(
@@ -50,135 +48,64 @@ public sealed class TrialBalancesApiService : ITrialBalancesApiService
         var typeValue = (parameters?.Type ?? TrialBalanceType.Unadjusted).ToApiQueryValue();
         var requestUri = $"api/v1/reports/trial-balances?type={Uri.EscapeDataString(typeValue)}";
 
-        using var response = await _httpClient.GetAsync(requestUri, cancellationToken);
+        var response = await _apiService.GetAsync<JsonElement>(requestUri, cancellationToken);
 
         // Status 404 dianggap belum ada periode yang dipilih (noPeriod)
-        if (response.StatusCode == HttpStatusCode.NotFound)
+        if (response.StatusCode == 404)
         {
             return new TrialBalanceFetchResult { HasPeriodSelected = false };
         }
 
-        var content = await response.Content.ReadAsStringAsync(cancellationToken);
-
-        if (!response.IsSuccessStatusCode)
+        if (!response.IsSuccess)
         {
-            var serverMessage = ExtractErrorMessage(content);
-            throw new HttpRequestException(serverMessage ?? $"Request failed with status {(int)response.StatusCode}.");
+            throw new InvalidOperationException(response.ErrorMessage ?? $"Request failed with status {response.StatusCode}.");
         }
 
-        if (string.IsNullOrWhiteSpace(content))
+        var root = response.Data;
+        if (root.ValueKind != JsonValueKind.Object)
         {
             return new TrialBalanceFetchResult();
         }
 
-        using var doc = JsonDocument.Parse(content);
-        var root = doc.RootElement;
+        var hasPeriodSelected = !(root.TryGetProperty("hasPeriodSelected", out var hasPeriodProp) &&
+                                  hasPeriodProp.ValueKind == JsonValueKind.False);
 
-        if (root.ValueKind == JsonValueKind.Object)
+        var isPeriodClosed = !(root.TryGetProperty("isPeriodClosed", out var isClosedProp) &&
+                               isClosedProp.ValueKind == JsonValueKind.False);
+
+        string? selectedPeriodName = null;
+        if (root.TryGetProperty("selectedPeriodName", out var periodNameProp) &&
+            periodNameProp.ValueKind == JsonValueKind.String)
         {
-            var hasPeriodSelected = !(root.TryGetProperty("hasPeriodSelected", out var hasPeriodProp) &&
-                                      hasPeriodProp.ValueKind == JsonValueKind.False);
+            selectedPeriodName = periodNameProp.GetString();
+        }
 
-            var isPeriodClosed = !(root.TryGetProperty("isPeriodClosed", out var isClosedProp) &&
-                                   isClosedProp.ValueKind == JsonValueKind.False);
-
-            string? selectedPeriodName = null;
-            if (root.TryGetProperty("selectedPeriodName", out var periodNameProp) &&
-                periodNameProp.ValueKind == JsonValueKind.String)
-            {
-                selectedPeriodName = periodNameProp.GetString();
-            }
-
-            if (!hasPeriodSelected || !isPeriodClosed)
-            {
-                return new TrialBalanceFetchResult
-                {
-                    HasPeriodSelected = hasPeriodSelected,
-                    IsPeriodClosed = isPeriodClosed,
-                    SelectedPeriodName = selectedPeriodName
-                };
-            }
-
-            List<RawTrialRow>? rawRows = null;
-            if (root.TryGetProperty("data", out var dataProp) && dataProp.ValueKind == JsonValueKind.Array)
-            {
-                rawRows = JsonSerializer.Deserialize<List<RawTrialRow>>(dataProp.GetRawText(), JsonOptions);
-            }
-            else if (root.TryGetProperty("rows", out var rowsProp) && rowsProp.ValueKind == JsonValueKind.Array)
-            {
-                rawRows = JsonSerializer.Deserialize<List<RawTrialRow>>(rowsProp.GetRawText(), JsonOptions);
-            }
-
+        if (!hasPeriodSelected || !isPeriodClosed)
+        {
             return new TrialBalanceFetchResult
             {
-                HasPeriodSelected = true,
-                IsPeriodClosed = true,
-                SelectedPeriodName = selectedPeriodName,
-                Rows = TrialBalanceNormalizer.NormalizeTrialRows(rawRows)
+                HasPeriodSelected = hasPeriodSelected,
+                IsPeriodClosed = isPeriodClosed,
+                SelectedPeriodName = selectedPeriodName
             };
         }
 
-        if (root.ValueKind == JsonValueKind.Object)
+        List<RawTrialRow>? rawRows = null;
+        if (root.TryGetProperty("data", out var dataProp) && dataProp.ValueKind == JsonValueKind.Array)
         {
-            if (root.TryGetProperty("hasPeriodSelected", out var hasPeriodProp) &&
-                hasPeriodProp.ValueKind == JsonValueKind.False)
-            {
-                return new TrialBalanceFetchResult { HasPeriodSelected = false };
-            }
-
-            List<RawTrialRow>? rawRows = null;
-            if (root.TryGetProperty("data", out var dataProp) && dataProp.ValueKind == JsonValueKind.Array)
-            {
-                rawRows = JsonSerializer.Deserialize<List<RawTrialRow>>(dataProp.GetRawText(), JsonOptions);
-            }
-            else if (root.TryGetProperty("rows", out var rowsProp) && rowsProp.ValueKind == JsonValueKind.Array)
-            {
-                rawRows = JsonSerializer.Deserialize<List<RawTrialRow>>(rowsProp.GetRawText(), JsonOptions);
-            }
-
-            return new TrialBalanceFetchResult
-            {
-                HasPeriodSelected = true,
-                Rows = TrialBalanceNormalizer.NormalizeTrialRows(rawRows)
-            };
+            rawRows = JsonSerializer.Deserialize<List<RawTrialRow>>(dataProp.GetRawText(), JsonOptions);
+        }
+        else if (root.TryGetProperty("rows", out var rowsProp) && rowsProp.ValueKind == JsonValueKind.Array)
+        {
+            rawRows = JsonSerializer.Deserialize<List<RawTrialRow>>(rowsProp.GetRawText(), JsonOptions);
         }
 
-        return new TrialBalanceFetchResult();
-    }
-
-    private static string? ExtractErrorMessage(string json)
-    {
-        if (string.IsNullOrWhiteSpace(json))
+        return new TrialBalanceFetchResult
         {
-            return null;
-        }
-
-        try
-        {
-            using var doc = JsonDocument.Parse(json);
-            var root = doc.RootElement;
-
-            if (root.ValueKind == JsonValueKind.Object)
-            {
-                if (root.TryGetProperty("message", out var msg) && msg.ValueKind == JsonValueKind.String)
-                {
-                    return msg.GetString();
-                }
-
-                if (root.TryGetProperty("data", out var data) &&
-                    data.ValueKind == JsonValueKind.Object &&
-                    data.TryGetProperty("message", out var nestedMsg) &&
-                    nestedMsg.ValueKind == JsonValueKind.String)
-                {
-                    return nestedMsg.GetString();
-                }
-            }
-        }
-        catch
-        {
-            // Abaikan jika bukan JSON valid
-        }
-
-        return null;
+            HasPeriodSelected = true,
+            IsPeriodClosed = true,
+            SelectedPeriodName = selectedPeriodName,
+            Rows = TrialBalanceNormalizer.NormalizeTrialRows(rawRows)
+        };
     }
 }

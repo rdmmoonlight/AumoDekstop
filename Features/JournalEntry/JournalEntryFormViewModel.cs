@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,13 +5,12 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using AumoDekstop.Features.JournalEntry.Controls;
 using AumoDekstop.Features.JournalEntry.Models;
 using AumoDekstop.Features.JournalEntry.Services;
+using AumoDekstop.Services.Api;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -20,16 +18,16 @@ namespace AumoDekstop.Features.JournalEntry.ViewModels;
 
 public partial class JournalEntryFormViewModel : ObservableObject
 {
-    private readonly HttpClient _httpClient;
+    private readonly ApiService _apiService;
     private readonly IJournalEntryService _journalEntryService;
 
     public JournalEntryFormViewModel(
-        HttpClient httpClient,
+        ApiService apiService,
         IJournalEntryService journalEntryService,
         IEnumerable<JournalLineRowItem>? initialLines = null)
     {
-        _httpClient = httpClient;
-        _journalEntryService = journalEntryService;
+        _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
+        _journalEntryService = journalEntryService ?? throw new ArgumentNullException(nameof(journalEntryService));
 
         Lines.CollectionChanged += Lines_CollectionChanged;
         InitializeLines(initialLines);
@@ -52,14 +50,22 @@ public partial class JournalEntryFormViewModel : ObservableObject
         AccountsError = null;
         try
         {
-            var data = await _httpClient.GetFromJsonAsync<List<AccountOption>>(
+            var response = await _apiService.GetAsync<List<AccountOption>>(
                 "api/chart-of-accounts",
                 cancellationToken);
 
-            Accounts.Clear();
-            if (data is not null)
+            if (!response.IsSuccess)
             {
-                foreach (var acc in data)
+                AccountsError = !string.IsNullOrWhiteSpace(response.ErrorMessage)
+                    ? response.ErrorMessage
+                    : "Gagal memuat akun";
+                return;
+            }
+
+            Accounts.Clear();
+            if (response.Data is not null)
+            {
+                foreach (var acc in response.Data)
                 {
                     Accounts.Add(new AccountOption(acc.Id, acc.Code, acc.Name));
                 }
@@ -154,6 +160,7 @@ public partial class JournalEntryFormViewModel : ObservableObject
 
     [ObservableProperty]
     public partial string Description { get; set; } = string.Empty;
+
     public ObservableCollection<JournalLineRowItem> Lines { get; } = [];
 
     [ObservableProperty]

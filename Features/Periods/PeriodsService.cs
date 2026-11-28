@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using AumoDekstop.Features.Periods.Models;
-using AumoDekstop.Services;
 using AumoDekstop.Services.Api;
 
 namespace AumoDekstop.Features.Periods.Services;
@@ -25,7 +22,7 @@ public interface IPeriodsService
 
 public sealed class PeriodsService : IPeriodsService
 {
-    private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+    private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
@@ -34,7 +31,7 @@ public sealed class PeriodsService : IPeriodsService
 
     public event EventHandler? PeriodContextChanged;
 
-    public PeriodsService(ApiService? apiService = null)
+    public PeriodsService(ApiService apiService)
     {
         _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
     }
@@ -48,10 +45,7 @@ public sealed class PeriodsService : IPeriodsService
 
         if (!response.IsSuccess)
         {
-            throw new HttpRequestException(
-                response.ErrorMessage ?? "Gagal memuat daftar periode.",
-                null,
-                (HttpStatusCode)response.StatusCode);
+            throw new InvalidOperationException(response.ErrorMessage ?? "Gagal memuat daftar periode.");
         }
 
         var root = response.Data;
@@ -79,10 +73,7 @@ public sealed class PeriodsService : IPeriodsService
 
         if (!response.IsSuccess)
         {
-            throw new HttpRequestException(
-                response.ErrorMessage ?? "Gagal memuat informasi pembukaan periode.",
-                null,
-                (HttpStatusCode)response.StatusCode);
+            throw new InvalidOperationException(response.ErrorMessage ?? "Gagal memuat informasi pembukaan periode.");
         }
 
         return response.Data ?? new PeriodsOpenInfo();
@@ -99,10 +90,8 @@ public sealed class PeriodsService : IPeriodsService
 
         if (!response.IsSuccess)
         {
-            throw new HttpRequestException(
-                response.ErrorMessage ?? response.Data?.Message ?? "Gagal membuat periode baru.",
-                null,
-                (HttpStatusCode)response.StatusCode);
+            throw new InvalidOperationException(
+                response.ErrorMessage ?? response.Data?.Message ?? "Gagal membuat periode baru.");
         }
 
         NotifyPeriodChanged();
@@ -111,17 +100,13 @@ public sealed class PeriodsService : IPeriodsService
 
     public async Task SelectPeriodAsync(int id, CancellationToken cancellationToken = default)
     {
-        var response = await _apiService.PostAsync<object?, JsonElement>(
+        var response = await _apiService.PostEmptyAsync<JsonElement>(
             $"api/v1/periods/select/{id}",
-            null,
             cancellationToken);
 
         if (!response.IsSuccess)
         {
-            throw new HttpRequestException(
-                response.ErrorMessage ?? "Gagal memilih periode.",
-                null,
-                (HttpStatusCode)response.StatusCode);
+            throw new InvalidOperationException(response.ErrorMessage ?? "Gagal memilih periode.");
         }
 
         NotifyPeriodChanged();
@@ -129,17 +114,13 @@ public sealed class PeriodsService : IPeriodsService
 
     public async Task ClearPeriodSelectionAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _apiService.PostAsync<object?, JsonElement>(
+        var response = await _apiService.PostEmptyAsync<JsonElement>(
             "api/v1/periods/clear-selection",
-            null,
             cancellationToken);
 
         if (!response.IsSuccess)
         {
-            throw new HttpRequestException(
-                response.ErrorMessage ?? "Gagal menghapus pilihan periode.",
-                null,
-                (HttpStatusCode)response.StatusCode);
+            throw new InvalidOperationException(response.ErrorMessage ?? "Gagal menghapus pilihan periode.");
         }
 
         NotifyPeriodChanged();
@@ -147,17 +128,13 @@ public sealed class PeriodsService : IPeriodsService
 
     public async Task ClosePeriodAsync(int id, CancellationToken cancellationToken = default)
     {
-        var response = await _apiService.PostAsync<object?, JsonElement>(
+        var response = await _apiService.PostEmptyAsync<JsonElement>(
             $"api/v1/periods/close/{id}",
-            null,
             cancellationToken);
 
         if (!response.IsSuccess)
         {
-            throw new HttpRequestException(
-                response.ErrorMessage ?? "Gagal menutup periode.",
-                null,
-                (HttpStatusCode)response.StatusCode);
+            throw new InvalidOperationException(response.ErrorMessage ?? "Gagal menutup periode.");
         }
 
         NotifyPeriodChanged();

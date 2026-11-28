@@ -158,13 +158,13 @@ public class LoginRequest
 
 Satu service per commit. Urutan dari yang paling sederhana:
 
-- [ ] `TrialBalancesApiService`
-- [ ] `FinancialStatementsApiService`
-- [ ] `WorksheetApiService`
-- [ ] `ChartOfAccountsService`
-- [ ] `JournalEntryService`
-- [ ] `GeneralLedgersService`
-- [ ] `JournalsReportService`
+- [x] `TrialBalancesService`
+- [x] `FinancialStatementsService`
+- [x] `WorksheetService`
+- [x] `ChartOfAccountsService`
+- [x] `JournalEntryService`
+- [x] `GeneralLedgersService`
+- [x] `JournalsReportService`
 
 Untuk setiap service:
 
@@ -177,7 +177,7 @@ Untuk setiap service:
 
 Setelah semua selesai:
 
-- [ ] `grep -rn "CreateClient\|new HttpClient\|ApiService.Instance" --include=*.cs .` hanya boleh menemukan satu `CreateClient("AumoApi")` di `App.xaml.cs`.
+- [x] `grep -rn "CreateClient\|new HttpClient\|ApiService.Instance" --include=*.cs .` hanya boleh menemukan satu `CreateClient("AumoApi")` di `App.xaml.cs`.
 
 ### 1.12 Pesan galat seragam
 
