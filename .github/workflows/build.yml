@@ -135,11 +135,16 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
 
+          $publishDir = Join-Path (Get-Location) "publish"
+          if (Test-Path $publishDir) {
+            Remove-Item $publishDir -Recurse -Force
+          }
+
           dotnet publish $env:Project_Path `
             -c $env:Configuration `
             -r win-x64 `
             -p:Platform=x64 `
-            -p:PublishDir=./publish/ `
+            -o "$publishDir" `
             -p:Version=${{ steps.version.outputs.semver_version }} `
             -p:InformationalVersion=${{ steps.version.outputs.app_version }} `
             -p:AssemblyVersion=${{ steps.version.outputs.assembly_version }} `
@@ -149,17 +154,33 @@ jobs:
 
           # Pastikan appsettings.json ikut tersalin ke folder publish
           if (Test-Path "./appsettings.json") {
-            Copy-Item "./appsettings.json" "./publish/appsettings.json" -Force
+            Copy-Item "./appsettings.json" (Join-Path $publishDir "appsettings.json") -Force
           }
+
+          # Verifikasi aset wajib WinUI 3 (resources.pri & .xbf) agar tidak crash saat dijalankan
+          if (-not (Test-Path (Join-Path $publishDir "resources.pri"))) {
+            throw "FATAL: resources.pri tidak ditemukan di $publishDir! Pastikan EnableMsixTooling=true di .csproj."
+          }
+
+          $xbfCount = (Get-ChildItem -Path $publishDir -Filter "*.xbf" -Recurse).Count
+          if ($xbfCount -eq 0) {
+            throw "FATAL: Tidak ada file .xbf (compiled XAML) di $publishDir!"
+          }
+
+          Write-Host "Verifikasi sukses: resources.pri ditemukan beserta $xbfCount file .xbf."
 
       - name: Sign Application Executable
         env:
           CERT_BASE64: ${{ secrets.CERT_BASE64 }}
           CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }}
-        if: env.CERT_BASE64 != ''
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
+          if ([string]::IsNullOrWhiteSpace($env:CERT_BASE64)) {
+            Write-Host "CERT_BASE64 kosong, melewati penandatanganan AumoDekstop.exe."
+            exit 0
+          }
+
           $pfxPath = "$env:TEMP\codesign.pfx"
 
           try {
@@ -206,10 +227,14 @@ jobs:
         env:
           CERT_BASE64: ${{ secrets.CERT_BASE64 }}
           CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }}
-        if: env.CERT_BASE64 != ''
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
+          if ([string]::IsNullOrWhiteSpace($env:CERT_BASE64)) {
+            Write-Host "CERT_BASE64 kosong, melewati penandatanganan Installer."
+            exit 0
+          }
+
           $pfxPath = "$env:TEMP\codesign.pfx"
 
           try {
