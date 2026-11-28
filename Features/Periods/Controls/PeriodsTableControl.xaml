@@ -192,7 +192,6 @@
                                 <!-- DropdownMenu Aksi -->
                                 <Button
                                     Grid.Column="4"
-                                    DataContext="{x:Bind}"
                                     Visibility="{x:Bind HasAnyAction, Mode=OneWay}"
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Center"
@@ -207,7 +206,8 @@
                                         <MenuFlyout Placement="BottomEdgeAlignedRight">
                                             <MenuFlyoutItem
                                                 Text="Tutup Periode"
-                                                Visibility="{Binding IsOpen}"
+                                                Tag="{x:Bind Id}"
+                                                Visibility="{x:Bind IsOpen, Mode=OneWay}"
                                                 Click="ClosePeriodMenuItem_Click">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xE72E;"/>
@@ -216,7 +216,8 @@
                                 
                                             <MenuFlyoutItem
                                                 Text="Pilih Periode"
-                                                Visibility="{Binding CanSelect}"
+                                                Tag="{x:Bind Id}"
+                                                Visibility="{x:Bind CanSelect, Mode=OneWay}"
                                                 Click="SelectPeriodMenuItem_Click">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xE73E;"/>
