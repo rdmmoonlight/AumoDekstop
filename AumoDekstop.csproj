@@ -16,8 +16,9 @@
     <!-- Unpackaged & Self-Contained (untuk Inno Setup) -->
     <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-    <EnableMsixTooling>false</EnableMsixTooling>
+    <EnableMsixTooling>true</EnableMsixTooling>
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
+    <GenerateAppxPackageOnBuild>false</GenerateAppxPackageOnBuild>
 
     <!-- Pengaturan Native AOT & CsWinRT -->
     <PublishAot>true</PublishAot>
@@ -53,6 +54,5 @@
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <!-- PublishSingleFile dan PublishReadyToRun tidak dipakai saat PublishAot=true -->
   </PropertyGroup>
 </Project>
