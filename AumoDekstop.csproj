@@ -55,4 +55,20 @@
     <DebugSymbols>false</DebugSymbols>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
+
+  <!-- Pastikan resources.pri & compiled XAML (.xbf) selalu ikut tersalin saat Native AOT Publish -->
+  <Target Name="CopyWinUIResourcesToPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <WinUIPriFiles Include="$(OutDir)**\*.pri" />
+      <WinUIXbfFiles Include="$(OutDir)**\*.xbf" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(WinUIPriFiles)"
+          DestinationFiles="@(WinUIPriFiles->'$(PublishDir)%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+
+    <Copy SourceFiles="@(WinUIXbfFiles)"
+          DestinationFiles="@(WinUIXbfFiles->'$(PublishDir)%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+  </Target>
 </Project>
