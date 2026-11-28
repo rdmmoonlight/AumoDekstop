@@ -13,7 +13,7 @@ public sealed partial class PeriodsTableControl : UserControl
     public static readonly DependencyProperty PeriodsProperty =
         DependencyProperty.Register(
             nameof(Periods),
-            typeof(IEnumerable<PeriodItem>),
+            typeof(object),
             typeof(PeriodsTableControl),
             new PropertyMetadata(null, OnPeriodsChanged));
 
@@ -24,11 +24,15 @@ public sealed partial class PeriodsTableControl : UserControl
             typeof(PeriodsTableControl),
             new PropertyMetadata(false, OnStatePropertyChanged));
 
-    public IEnumerable<PeriodItem>? Periods
+    // Bertipe object (seperti ItemsControl.ItemsSource): DP bertipe IEnumerable<T> dengan T kelas sendiri
+    // gagal di-marshal oleh WinUI pada build Native AOT ("No such interface supported").
+    public object? Periods
     {
-        get => (IEnumerable<PeriodItem>?)GetValue(PeriodsProperty);
+        get => GetValue(PeriodsProperty);
         set => SetValue(PeriodsProperty, value);
     }
+
+    private IEnumerable<PeriodItem>? PeriodItems => Periods as IEnumerable<PeriodItem>;
 
     public bool IsLoading
     {
@@ -40,8 +44,8 @@ public sealed partial class PeriodsTableControl : UserControl
     public event EventHandler<int>? SelectPeriodRequested;
 
     public bool ShowLoadingState => IsLoading;
-    public bool ShowEmptyState => !IsLoading && (Periods is null || !Periods.Any());
-    public bool ShowListState => !IsLoading && Periods is not null && Periods.Any();
+    public bool ShowEmptyState => !IsLoading && (PeriodItems is null || !PeriodItems.Any());
+    public bool ShowListState => !IsLoading && PeriodItems is not null && PeriodItems.Any();
 
     public PeriodsTableControl()
     {
